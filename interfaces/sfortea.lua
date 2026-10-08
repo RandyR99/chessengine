@@ -1,0 +1,280 @@
+interface = {}
+
+interface.level = "a1"
+interface.cur_level = nil
+interface.sel = 0
+interface.cur_sel = 0
+
+function interface.get_module()
+	if machine.system.name == "sfortea" then
+		return "Novag Super Forte A"
+	elseif machine.system.name == "sfortea1" then
+		return "Novag Super Forte A v2"
+	elseif machine.system.name == "sfortea2" then
+		return "Novag Super Forte A v3"
+	else
+		return machine.system.description
+	end
+end
+
+function interface.get_author()
+	return "David Kittinger"
+end
+
+function interface.getdigit(n)
+	local ddram = emu.item(machine.devices[':hd44780'].items['0/m_ddram'])
+	local d = ddram:read(n)
+	while (d == 0x20) do
+		emu.wait(0.5)
+		d = ddram:read(n)
+	end
+	return string.char(d)
+end
+
+function interface.setsel()
+	local ddram = emu.item(machine.devices[':hd44780'].items['0/m_ddram'])
+	local sel_code = { 0x66, 0x6e }
+	send_input(":IN.1", 0x01, 0.6) -- Set Level
+	repeat
+		sb_press_square(":board", 0.6, 8, 8) -- "h8"
+	until (ddram:read(0x41) == sel_code[interface.sel+1])
+	send_input(":IN.0", 0x01, 0.6) -- Go
+end
+
+function interface.setlevel()
+	if (interface.cur_level == nil or (interface.cur_level == interface.level and interface.cur_sel == interface.sel)) then
+		return
+	end
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	local level = interface.level
+	local cols_idx = { a=1, b=2, c=3, d=4, e=5, f=6, g=7, h=8 }
+	local x = cols_idx[level:sub(1,1)]
+	local y = level:sub(2,2)
+	send_input(":IN.5", 0x02, 0.6) -- Sound (off)
+	if (interface.cur_sel ~= interface.sel) then
+		interface.cur_sel = interface.sel
+		interface.setsel()
+	end
+	if (interface.cur_level ~= interface.level) then
+		interface.cur_level = interface.level
+		send_input(":IN.1", 0x01, 0.6) -- Set Level
+		sb_press_square(":board", 0.6, x, y)
+		level = level:sub(4)
+		for i = 1, level:len() do
+			if (i == 1) then
+				send_input(":IN.1", 0x04, 0.6) -- <-
+			end
+			local j = i % 9
+			if (j == 0) then
+				send_input(":IN.5", 0x01, 0.6) -- Change Color
+				send_input(":IN.1", 0x04, 0.6) -- <-
+			elseif (j ~= 3 and j ~= 6) then
+				local k = 0
+				if (j == 1 or j == 4) then
+					k = 0x05
+				elseif (j == 2 or j == 5) then
+					k = 0x06
+				elseif (j == 7) then
+					k = 0x40
+				elseif (j == 8) then
+					k = 0x41
+				end
+				local d = tonumber(level:sub(i,i)) - tonumber(interface.getdigit(k))
+				if (j == 7) then
+					if (d > 3) then
+						d = d - 6
+					elseif (d < -3) then
+						d = d + 6
+					end
+				else
+					if (d > 5) then
+						d = d - 10
+					elseif (d < -5) then
+						d = d + 10
+					end
+				end
+				for n = 1, math.abs(d) do
+					if (d > 0) then
+						send_input(":IN.0", 0x04, 0.3) -- ->
+					else
+						send_input(":IN.1", 0x04, 0.3) -- <-
+					end
+				end
+				send_input(":IN.2", 0x04, 0.6) -- Yes
+			end
+		end
+		send_input(":IN.0", 0x01, 0.6) -- Go
+	end
+	send_input(":IN.5", 0x02, 0.6) -- Sound (on)
+	send_input(":IN.1", 0x01, 0.6) -- Set Level
+	send_input(":IN.0", 0x01, 0.6) -- Go
+	machine.video.throttled = throttled_state
+end
+
+function interface.setup_machine()
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	sb_reset_board(":board")
+	emu.wait(4)
+	send_input(":IN.7", 0x01, 0.6) -- New Game
+	emu.wait(1)
+	machine.video.throttled = throttled_state
+	interface.cur_level = "a1"
+	interface.cur_sel = 0
+	interface.setlevel()
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	send_input(":IN.1", 0x01, 1) -- Set Level
+	send_input(":IN.5", 0x02, 1) -- Sound/Info
+	ddram = emu.item(machine.devices[':hd44780'].items['0/m_ddram']):read_block(0x00, 0x80)
+	if string.upper(ddram:sub(65,65)) == "F" then
+		send_input(":IN.5", 0x02, 0.3) -- Sound/Info
+	end
+	send_input(":IN.0", 0x01, 1) -- Go
+	machine.video.throttled = throttled_state
+end
+
+function setpiece(n)
+	if     (n == 1) then send_input(":IN.7", 0x02, 0.6) -- K
+	elseif (n == 2) then send_input(":IN.6", 0x02, 0.6) -- Q
+	elseif (n == 3) then send_input(":IN.3", 0x02, 0.6) -- R
+	elseif (n == 4) then send_input(":IN.5", 0x02, 0.6) -- B
+	elseif (n == 5) then send_input(":IN.4", 0x02, 0.6) -- N
+	elseif (n == 6) then send_input(":IN.2", 0x02, 0.6) -- P
+	end
+end
+
+function interface.set_pos(mode)
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	if mode == 0 then
+		send_input(":IN.5", 0x02, 0.6) -- Sound
+		if machine.system.name == "scorpio68" then
+			send_input(":IN.5", 0x02, 0.6) -- Sound
+			send_input(":IN.5", 0x02, 0.6) -- Sound
+		end
+		send_input(":IN.6", 0x01, 0.6) -- Verify/Setup
+		send_input(":IN.6", 0x01, 0.6) -- Verify/Setup
+		send_input(":IN.4", 0x01, 0.6) -- Clear Board
+		machine.video.throttled = throttled_state
+		return (":board")
+	else
+		local piece = 7
+		for y = 1, 8 do
+			for x = 1, 8 do
+				local p = get_piece_id(x, 9 - y)
+				if p ~= 0 then
+					if p * piece < 0 then
+						send_input(":IN.5", 0x01, 0.6) -- Change Color
+					end
+					if math.abs(p) ~= math.abs(piece) then
+						setpiece(math.abs(p))
+					end
+					sb_press_square(":board", 0.6, x, 9 - y)
+					piece = p
+				end
+			end
+		end
+		send_input(":IN.0", 0x01, 0.6) -- GO
+		send_input(":IN.5", 0x02, 0.6) -- Sound
+		if machine.system.name == "scorpio68" then
+			send_input(":IN.5", 0x02, 0.6) -- Sound
+		end
+		if mode == -1 then
+			send_input(":IN.5", 0x01, 0.6) -- Change Color
+			send_input(":IN.2", 0x04, 0.6) -- Yes
+		else
+			send_input(":IN.6", 0x01, 0.6) -- Verify/Setup
+			send_input(":IN.0", 0x01, 0.6) -- Go
+		end
+	end
+	machine.video.throttled = throttled_state
+end
+
+function interface.edit_game()
+	send_input(":IN.7", 0x02, 1) -- Player/Player
+	emu.wait(1)
+end
+
+function interface.start_play(init)
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	emu.wait(2)
+	send_input(":IN.0", 0x01, 1) -- Go
+	machine.video.throttled = throttled_state
+end
+
+function interface.is_selected(x, y)
+	local xval = output:get_value(tostring(8 - x) .. ".1") ~= 0
+	local yval = output:get_value(tostring(y - 1) .. ".0") ~= 0
+	return xval and yval
+end
+
+function interface.select_piece(x, y, event)
+	if (event == "get_castling") then
+		emu.wait(1)
+	end
+	sb_select_piece(":board", 1, x, y, event)
+end
+
+function interface.get_options()
+	return {
+		{ "string", "Level", "a1" },
+	}
+end
+
+function interface.set_option(name, value)
+	if (name == "level") then
+		local level = value:lower():match("^%s*(.-)%s*$"):gsub("%s%s+"," ") -- trim
+		local num = tonumber(level:sub(1,2))
+		if (num ~= nil and num >= 1 and num <= 63) then
+			local mod = (num - 1) % 8 + 1
+			local div = (num - mod) / 8 + 1
+			level = string.char(div + 96) .. tostring(mod) .. level:sub(3)
+		end
+		local n = level:find("%ss[0-7]")
+		if (n ~= nil) then
+			interface.sel = math.min(1,tonumber(level:sub(n+2)))
+			level = level:sub(1,n-1)
+		end
+		if ((level:match("^[a-h][1-8]$") and level ~= "h8") or level:match("^b8%s%d%d/%d%d:[0-5]%d$") or level:match("^b8%s%d%d/%d%d:[0-5]%d%s%d%d/%d%d:[0-5]%d$")) then
+			interface.level = level
+			interface.setlevel()
+		end
+	end
+end
+
+function interface.get_promotion(x, y)
+	local ddram = emu.item(machine.devices[':hd44780'].items['0/m_ddram']):read_block(0x00, 0x80)
+	local ch9 = ddram:sub(0x42,0x42)
+	if	   (ch9 == '\x02' or ch9 == '\x0a') then return 'q'
+	elseif (ch9 == '\x03' or ch9 == '\x0b') then return 'r'
+	elseif (ch9 == '\x04' or ch9 == '\x0c') then return 'b'
+	elseif (ch9 == '\x05' or ch9 == '\x0d') then return 'n'
+	end
+	return nil
+end
+
+function interface.promote(x, y, piece)
+	sb_promote(":board", x, y, piece)
+	emu.wait(1)
+	if	   (piece == "q") then send_input(":IN.6", 0x02, 1)
+	elseif (piece == "r") then send_input(":IN.3", 0x02, 1)
+	elseif (piece == "b") then send_input(":IN.5", 0x02, 1)
+	elseif (piece == "n") then send_input(":IN.4", 0x02, 1)
+	end
+end
+
+function interface.show_info(on)
+	if on then
+		local ddram = emu.item(machine.devices[':hd44780'].items['0/m_ddram']):read_block(0x00, 0x80)
+		if ddram:sub(66,66) == "." then
+			return "info score cp " .. tostring(ddram.sub(ddram,7,8) .. ddram.sub(ddram,65,70)):gsub(" ", ""):gsub("%.","") .. " pv " .. tostring(ddram.sub(ddram,2,5))
+		elseif ddram:sub(2,2) == "d" and ddram:sub(8,8) == "-" then
+			return "info depth " .. tostring(ddram.sub(ddram,3,4)):gsub(" ", "")
+		end
+	end
+end
+
+return interface
