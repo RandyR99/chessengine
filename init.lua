@@ -160,9 +160,17 @@ local function promotion_error(piece)
 end
 
 local function send_input(tag, mask, seconds)
-  manager.machine.ioport.ports[tag]:field(mask):set_value(1)
+  local port = manager.machine.ioport.ports[tag]
+  if port == nil then
+    error("send_input: no input port '" .. tag .. "'", 2)
+  end
+  local field = port:field(mask)
+  if field == nil then
+    error(string.format("send_input: port '%s' has no field for mask 0x%x", tag, mask), 2)
+  end
+  field:set_value(1)
   emu.wait(seconds * 2 / 3)
-  manager.machine.ioport.ports[tag]:field(mask):set_value(0)
+  field:set_value(0)
   emu.wait(seconds * 1 / 3)
 end
 
