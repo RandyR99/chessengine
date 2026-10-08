@@ -1,9 +1,9 @@
 local exports = {}
 exports.name = "chessengine"
-exports.version = "2023.1.1"
+exports.version = "2026.09.01"
 exports.description = "Chess UCI/XBoard Interface plugin"
 exports.license = "The BSD 3-Clause License"
-exports.author = { name = "Sandro Ronco & Franz Huber" }
+exports.author = { name = "Sandro Ronco, Franz Huber & Randy Reade" }
 
 local frskip = 10
 local ticker = 0
