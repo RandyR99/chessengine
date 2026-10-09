@@ -101,11 +101,16 @@ end
 function interface.is_selected(x, y)
 	local xval = { 0x0f7, 0x3cf, 0x039, 0x30f, 0x0f9, 0x0f1, 0x0bd, 0x0f6 }
 	local yval = { 0x300, 0x0db, 0x0cf, 0x0e6, 0x0ed, 0x0fd, 0x007, 0x0ff }
-	local d0 = output:get_value("digit7")
-	local d1 = output:get_value("digit6")
-	local d2 = output:get_value("digit5")
-	local d3 = output:get_value("digit4")
-	local d4 = output:get_value("digit3")
+	local root = machine.devices[":"]
+	local function digit(n)
+		local node = root:output("digit" .. n)
+		return node and node:get() or 0
+	end
+	local d0 = digit(7)
+	local d1 = digit(6)
+	local d2 = digit(5)
+	local d3 = digit(4)
+	local d4 = digit(3)
 	return (d2 == 0x008 or interface.color == "W") and (d2 == 0x001 or interface.color == "B") and ((xval[x] == d0 and yval[y] == d1) or (xval[x] == d3 and yval[y] == d4))
 end
 
