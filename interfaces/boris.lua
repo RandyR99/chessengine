@@ -2,7 +2,7 @@ interface = {}
 
 interface.turn = true
 interface.color = "B"
-interface.level = "00"
+interface.level = "000000"
 interface.cur_level = nil
 
 function interface.get_module()
@@ -60,7 +60,7 @@ function interface.setup_machine()
 	machine.video.throttled = false
 	emu.wait(12)
 	machine.video.throttled = throttled_state
-	interface.cur_level = "00"
+	interface.cur_level = "000000"
 	interface.setlevel()
 end
 
@@ -91,7 +91,7 @@ function interface.set_pos(mode)
 				end
 			end
 		end
-		if mode * piece < 0 then
+		if mode * piece > 0 then
 			send_input(":IN.3", 0x04, 0.5) -- B/W
 		end
 		if mode == 1 then
@@ -126,11 +126,16 @@ end
 function interface.is_selected_int(x, y)
 	local xval = { 0x3cf, 0x0e3f, 0x00f3, 0x0c3f, 0x01f3, 0x01c3, 0x02fb, 0x03cc }
 	local yval = { 0xc31, 0x0377, 0x023f, 0x038c, 0x03bb, 0x03fb, 0x4803, 0x03ff }
-	local d0 = output:get_value("digit7")
-	local d1 = output:get_value("digit6")
-	local d2 = output:get_value("digit5")
-	local d3 = output:get_value("digit4")
-	local d4 = output:get_value("digit3")
+	local root = machine.devices[":"]
+	local function digit(n)
+		local node = root:output("digit" .. n)
+		return node and node:get() or 0
+	end
+	local d0 = digit(7)
+	local d1 = digit(6)
+	local d2 = digit(5)
+	local d3 = digit(4)
+	local d4 = digit(3)
 	return (d2 == 0x0003 or interface.color == "W") and (d2 == 0x0030 or interface.color == "B") and ((xval[x] == d0 and yval[y] == d1) or (xval[x] == d3 and yval[y] == d4))
 end
 
@@ -173,13 +178,15 @@ end
 
 function interface.get_options()
 	return {
-		{ "string", "Level", "00" },
+		{ "string", "Level", "000000" },  -- timer interval hhmmss
 	}
 end
 
 function interface.set_option(name, value)
-	if (name == "level" and value ~= "") then
-		interface.level = value
+	-- Level is Boris's timer interval as hhmmss; shorter values are padded with leading zeros
+	local level = value:match("^%s*(%d+)%s*$")
+	if (name == "level" and level and level:len() <= 6) then
+		interface.level = string.rep("0", 6 - level:len()) .. level
 		interface.setlevel()
 	end
 end
