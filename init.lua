@@ -491,7 +491,7 @@ local function search_selected_piece()
 
       if (new_type == nil) then
         if interface.test_promotion then
-          new_type = interface.test_promotion(piece_to.x, piece_to.y) -- test promotion piece after the move
+          new_type = string.lower(interface.test_promotion(piece_to.x, piece_to.y)) -- test promotion piece after the move (interfaces return uppercase)
         else
           manager.machine:logerror(manager.machine.system.name .. " Unable to determine the promotion")
           new_type = "q"  -- default to Queen
