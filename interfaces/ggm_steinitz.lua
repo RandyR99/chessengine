@@ -8,6 +8,12 @@ local computing
 interface.edit = false
 interface.Ticker = 0
 
+-- Display digit as a 14seg value (0 when the output does not exist)
+local function digit(n)
+	local node = machine.devices[":"]:output("digit" .. n)
+	return node and node:get() or 0
+end
+
 function interface.get_module()
 	return "GGM Steinitz Edition"
 end
@@ -95,8 +101,8 @@ function interface.set_pos(mode)
 			interface.color = "W"
 		end
 		send_input(":IN.3", 0x10, 0.5) -- ENTER
+		machine.video.throttled = throttled_state
 	end
-	machine.video.throttled = throttled_state
 end
 
 function interface.edit_game(on)
@@ -127,8 +133,9 @@ function interface.is_selected(x, y)
 		machine.video.throttled = false
 		computing = false
 		for i = 1, 4 do
-			if (output:get_value("digit7") == 0) then
+			if (digit(7) == 0) then
 				computing = true
+				machine.video.throttled = throttled_state
 				return false
 			elseif (i < 4) then
 				emu.wait(0.25)
@@ -140,11 +147,11 @@ function interface.is_selected(x, y)
 	end
 	local xval = { 0x0f7, 0x3cf, 0x039, 0x30f, 0x0f9, 0x0f1, 0x0bd, 0x0f6 }
 	local yval = { 0x300, 0x0db, 0x0cf, 0x0e6, 0x0ed, 0x0fd, 0x007, 0x0ff }
-	local d0 = output:get_value("digit7")
-	local d1 = output:get_value("digit6")
-	local d2 = output:get_value("digit5")
-	local d3 = output:get_value("digit4")
-	local d4 = output:get_value("digit3")
+	local d0 = digit(7)
+	local d1 = digit(6)
+	local d2 = digit(5)
+	local d3 = digit(4)
+	local d4 = digit(3)
 	return ((xval[x] == d0 and yval[y] == d1) or (xval[x] == d3 and yval[y] == d4))
 end
 
@@ -210,15 +217,63 @@ function interface.promote(x, y, piece)
 	-- TODO
 end
 
+local function digit_ascii(value)
+	if     value == nil then return " "
+	elseif value == 0   then return " "
+	elseif value == 192 then return "-"
+	elseif value == 63  then return "0"
+	elseif value == 191 then return "0"
+	elseif value == 6   then return "1"
+	elseif value == 134 then return "1"
+	elseif value == 768 then return "1"
+	elseif value == 91  then return "2"
+	elseif value == 219 then return "2"
+	elseif value == 79  then return "3"
+	elseif value == 207 then return "3"
+	elseif value == 102 then return "4"
+	elseif value == 230 then return "4"
+	elseif value == 109 then return "5"
+	elseif value == 237 then return "5"
+	elseif value == 125 then return "6"
+	elseif value == 253 then return "6"
+	elseif value == 7   then return "7"
+	elseif value == 135 then return "7"
+	elseif value == 127 then return "8"
+	elseif value == 255 then return "8"
+	elseif value == 111 then return "9"
+	elseif value == 239 then return "9"
+	elseif value == 55  then return "n"
+	elseif value == 247 then return "a"
+	elseif value == 975 then return "b"
+	elseif value == 57  then return "c"
+	elseif value == 783 then return "d"
+	elseif value == 121 then return "e"
+	elseif value == 249 then return "e"
+	elseif value == 241 then return "f"
+	elseif value == 189 then return "g"
+	elseif value == 246 then return "h"
+	elseif value == 8   then return "_"
+	elseif value == 56  then return "l"
+	elseif value == 83  then return "?"
+	elseif value == 115 then return "p"
+	elseif value == 80  then return "r"
+	elseif value == 48  then return "i"
+	elseif value == 62  then return "u"
+	elseif value == 49  then return "t"
+	elseif value == 110 then return "y"
+	else                     return ""
+	end
+end
+
 function interface.show_info(on)
     if on and interface.Ticker == 0 then
 		local depth = 0
 		local score = 0
 		send_input(":IN.3", 0x01, 0.25) -- LEVEL
 		emu.wait(0.5)
-		local d1 = output:get_value("digit6")
-		local d6 = output:get_value("digit1")
-		local d7 = output:get_value("digit0")
+		local d1 = digit(6)
+		local d6 = digit(1)
+		local d7 = digit(0)
 		if digit_ascii(d1) ~= "e" then
 			interface.Ticker = 1
 			send_input(":IN.3", 0x10, 0.25) -- ENTER
@@ -227,11 +282,12 @@ function interface.show_info(on)
 		depth = digit_ascii(d6) .. digit_ascii(d7)
 		send_input(":IN.3", 0x04, 0.25) -- score
 		emu.wait(0.5)
-		d0 = output:get_value("digit7")
-		d4 = output:get_value("digit3")
-		d5 = output:get_value("digit2")
-		d6 = output:get_value("digit1")
-		d7 = output:get_value("digit0")
+		local d0 = digit(7)
+		local d4, d5
+		d4 = digit(3)
+		d5 = digit(2)
+		d6 = digit(1)
+		d7 = digit(0)
 		if digit_ascii(d0) ~= "5" then
 			interface.Ticker = 1
 			send_input(":IN.3", 0x10, 0.25) -- ENTER
@@ -240,64 +296,16 @@ function interface.show_info(on)
 		score = digit_ascii(d4) .. digit_ascii(d5) .. digit_ascii(d6) .. digit_ascii(d7)
 		send_input(":IN.3", 0x10, 0.5) -- ENTER
 		emu.wait(0.6)
-		d0 = output:get_value("digit7")
-		d1 = output:get_value("digit6")
-		d3 = output:get_value("digit4")
-		d4 = output:get_value("digit3")
+		d0 = digit(7)
+		d1 = digit(6)
+		local d3 = digit(4)
+		d4 = digit(3)
 		interface.Ticker = 1
 		return "info score cp " .. score .. " depth " .. depth .. " pv " .. digit_ascii(d0) .. digit_ascii(d1) .. digit_ascii(d3) .. digit_ascii(d4)
 	end
 	interface.Ticker = interface.Ticker + 1
 	if interface.Ticker == 4 then
 		interface.Ticker = 0
-	end
-end
-
-function digit_ascii(digit)
-	if     digit == nil then return " "
-	elseif digit == 0   then return " "
-	elseif digit == 192 then return "-"
-	elseif digit == 63  then return "0"
-	elseif digit == 191 then return "0"
-	elseif digit == 6   then return "1"
-	elseif digit == 134 then return "1"
-	elseif digit == 768 then return "1"
-	elseif digit == 91  then return "2"
-	elseif digit == 219 then return "2"
-	elseif digit == 79  then return "3"
-	elseif digit == 207 then return "3"
-	elseif digit == 102 then return "4"
-	elseif digit == 230 then return "4"
-	elseif digit == 109 then return "5"
-	elseif digit == 237 then return "5"
-	elseif digit == 125 then return "6"
-	elseif digit == 253 then return "6"
-	elseif digit == 7   then return "7"
-	elseif digit == 135 then return "7"
-	elseif digit == 127 then return "8"
-	elseif digit == 255 then return "8"
-	elseif digit == 111 then return "9"
-	elseif digit == 239 then return "9"
-	elseif digit == 55  then return "n"
-	elseif digit == 247 then return "a"
-	elseif digit == 975 then return "b"
-	elseif digit == 57  then return "c"
-	elseif digit == 783 then return "d"
-	elseif digit == 121 then return "e"
-	elseif digit == 249 then return "e"
-	elseif digit == 241 then return "f"
-	elseif digit == 189 then return "g"
-	elseif digit == 246 then return "h"
-	elseif digit == 8   then return "_"
-	elseif digit == 56  then return "l"
-	elseif digit == 83  then return "?"
-	elseif digit == 115 then return "p"
-	elseif digit == 80  then return "r"
-	elseif digit == 48  then return "i"
-	elseif digit == 62  then return "u"
-	elseif digit == 49  then return "t"
-	elseif digit == 110 then return "y"
-	else                     return ""
 	end
 end
 
