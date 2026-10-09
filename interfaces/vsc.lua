@@ -12,9 +12,12 @@ function interface.setlevel()
 	local level = interface.level
 	local lev = "123456789H"
 	lev = lev:find(level:sub(1,1))
+	local p0 = machine.devices[":"]:output("digit0")
+	local presses = 0
 	repeat
 		send_input(":IN.1", 0x08, 0.6) -- LV
-	until output:get_value("digit0") == lcd_lev[lev]
+		presses = presses + 1
+	until (p0 and p0:get() or 0) == lcd_lev[lev] or presses > 25
 	send_input(":IN.1", 0x01, 0.6) -- TM
 end
 
@@ -97,7 +100,8 @@ function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
-	return output:get_value(tostring(x - 1) .. "." .. tostring(y - 1 + 8)) ~= 0
+	local led = machine.devices[":"]:output(tostring(x - 1) .. "." .. tostring(y - 1 + 8))
+	return led ~= nil and led:get() ~= 0
 end
 
 function interface.select_piece(x, y, event)
