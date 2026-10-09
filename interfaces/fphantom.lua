@@ -5,7 +5,6 @@ interface.cur_level = nil
 interface.turn = true
 interface.capt = 0
 interface.edit = false
-local getprom = false
 
 -- INITIAL BOOT STATE TRACKER FLAG:
 interface.initial_boot = true
@@ -43,12 +42,44 @@ function interface.setlevel()
 	send_input(":IN.0", 0x080, 0.5) -- CLEAR
 end
 
+-- True when the arm is idle and every square holds its start-position piece
+-- (sensorboard ids: 1-6 = white P N B R Q K, 7-12 = black P N B R Q K)
+local function board_at_start()
+	local root = machine.devices[":"]
+	local hand = root:output("cpu_hand")
+	if hand and hand:get() ~= 0 then
+		return false
+	end
+	local files = "abcdefgh"
+	local back_rank = { 4, 2, 3, 5, 6, 3, 2, 4 }
+	for y = 1, 8 do
+		for x = 1, 8 do
+			local expected = 0
+			if     (y == 1) then expected = back_rank[x]
+			elseif (y == 2) then expected = 1
+			elseif (y == 7) then expected = 7
+			elseif (y == 8) then expected = back_rank[x] + 6
+			end
+			local node = root:output("piece_" .. files:sub(x, x) .. tostring(y))
+			local val = node and node:get() or 0
+			if (val ~= expected) then
+				return false
+			end
+		end
+	end
+	return true
+end
+
 function interface.setup_machine()
-	sb_reset_board(":board:board")
+	-- Only snap the sensorboard to the start position on first boot. Afterwards the
+	-- Phantom rearranges the pieces itself on NEW; resetting the sensorboard first
+	-- makes the arm drop pieces onto occupied squares ("Collision at ..!").
+	if interface.initial_boot then
+		sb_reset_board(":board:board")
+	end
 	interface.turn = true
 	interface.capt = 0
 	interface.edit = false
-	getprom = false
 	f0 = "00"
 	f1 = "--"
 	f2 = "--"
@@ -57,8 +88,9 @@ function interface.setup_machine()
 	send_input(":IN.0", 0x004, 0.5) -- NEW / LEVEL
 	emu.wait(0.5)
 
+	-- The level keys (ending in CLEAR) also confirm NEW; the arm starts moving after this
 	interface.setlevel()
-	
+
 	if interface.initial_boot then
 		local throttled_state = machine.video.throttled
 		machine.video.throttled = false
@@ -66,7 +98,16 @@ function interface.setup_machine()
 		machine.video.throttled = throttled_state
 		interface.initial_boot = false
 	else
+		-- Run unthrottled until the arm has restored the start position
+		local throttled_state = machine.video.throttled
+		machine.video.throttled = false
+		local waited = 0
+		repeat
+			emu.wait(0.5)
+			waited = waited + 0.5
+		until board_at_start() or waited >= 300
 		emu.wait(1.5)
+		machine.video.throttled = throttled_state
 	end
 end
 
@@ -111,8 +152,10 @@ function interface.set_pos(mode)
 		emu.wait(0.5)
 		
 		local files = {"a", "b", "c", "d", "e", "f", "g", "h"}
+		local waited = 0
 		repeat
 			emu.wait(0.1)
+			waited = waited + 0.1
 			local active_pieces_left = 0
 			
 			for y = 1, 8 do
@@ -126,8 +169,8 @@ function interface.set_pos(mode)
 					end
 				end
 			end
-		until (active_pieces_left == 0)
-		
+		until (active_pieces_left == 0) or waited >= 300
+
 		emu.wait(0.5)
 		return ("")
 	else
@@ -206,10 +249,16 @@ function interface.is_selected(x, y)
 	local root = machine.devices[":"]
 	if not root then return false end
 
-	local d2_node = root:output("digit2")
-	local d2_val = d2_node and d2_node:get() or 0
+	-- 'n x' (mate in x moves) needs CLEAR before the move is shown. Only clear it when a
+	-- number is on the display, so the checkmate display ('-n', no number) stays up.
+	local function digit(n)
+		local node = root:output("digit" .. n)
+		return (node and node:get() or 0) & 0x7f  -- 0x80 = dot segment
+	end
+	local numerals = { [0x3f] = true, [0x06] = true, [0x5b] = true, [0x4f] = true, [0x66] = true,
+		[0x6d] = true, [0x7d] = true, [0x07] = true, [0x7f] = true, [0x6f] = true, [0x67] = true }
 
-	if (d2_val == 0x54) then
+	if (digit(2) == 0x54 and (numerals[digit(3)] or numerals[digit(4)])) then
 		send_input(":IN.0", 0x080, 0.5) -- CLEAR
 	end
 	
@@ -228,16 +277,54 @@ function interface.is_selected(x, y)
 	return false
 end
 
-function removepiece(p)
-	local z = 11  -- White outer strip column index (Col X1 / x=-20)
-	if (p > 0) then
-		send_input(":board:SPAWN", 0x01<<(6-p), 1)
-	elseif (p < 0) then
-		send_input(":board:SPAWN", 0x01<<(12+p), 1)
-		z = 10    -- Black outer strip column index (Col X4 / x=90)
+-- Sensorboard piece id on any square, including the border spaces (columns 9-12)
+local function piece_at(x, y)
+	local node = machine.devices[":"]:output("piece_" .. ("abcdefghijkl"):sub(x, x) .. tostring(y))
+	return node and node:get() or 0
+end
+
+-- Border spaces for a sensorboard piece id (1-6 = white P N B R Q K, 7-12 = black).
+-- Columns: white 11 outer / 12 inner, black 10 outer / 9 inner.
+-- Rows: 8 = Q (outer) and K (inner), 7 = R, 6 = B, 5 = N, 4-1 = pawns.
+local function border_slots(id)
+	local white = id <= 6
+	local t = white and id or id - 6
+	local outer = white and 11 or 10
+	local inner = white and 12 or 9
+	if t == 6 then return { { inner, 8 } } end
+	if t == 5 then return { { outer, 8 } } end
+	if t >= 2 then return { { outer, t + 3 }, { inner, t + 3 } } end
+	local slots = {}
+	for row = 4, 1, -1 do
+		slots[#slots + 1] = { outer, row }
+		slots[#slots + 1] = { inner, row }
 	end
-	sb_move_piece(":board:board", z, 1)
-	sb_press_square(":board:board", 1, z, 1)
+	return slots
+end
+
+-- First border space for this piece id that is empty (occupied = false)
+-- or that holds this piece (occupied = true)
+local function find_slot(id, occupied)
+	for _, s in ipairs(border_slots(id)) do
+		local v = piece_at(s[1], s[2])
+		if (occupied and v == id) or (not occupied and v == 0) then
+			return s
+		end
+	end
+	return nil
+end
+
+-- Put a piece that left the board (init.lua id: 1-6 = K Q R B N P, negative = black)
+-- on its own border space, pressing the space as the manual asks
+function removepiece(p)
+	local id = 7 - math.abs(p)
+	if (p < 0) then
+		id = id + 6
+	end
+	local slot = find_slot(id, false) or border_slots(id)[1]
+	send_input(":board:board:SPAWN", 0x01 << (id - 1), 1)
+	sb_move_piece(":board:board", slot[1], slot[2])
+	sb_press_square(":board:board", 1, slot[1], slot[2])
 end
 
 function interface.select_piece(x, y, event)
@@ -270,10 +357,12 @@ function interface.select_piece(x, y, event)
 	end
 	if (interface.turn or interface.edit or event == "get_castling" or event == "put_castling" or event == "en_passant") then
 		if (event == "get") then
+			local waited = 0
 			repeat
 				emu.wait(0.5)
+				waited = waited + 0.5
 				local dot_val = dot_node and dot_node:get() or 0
-			until dot_val ~= 0x00
+			until dot_val ~= 0x00 or waited >= 30
 			f0 = tostring(x) .. tostring(y)
 			if ram then
 				ram:write_u8(0x000f, ram:read_u8(0x000f) | 0x01) -- Ponder OFF
@@ -307,43 +396,54 @@ function interface.set_option(name, value)
 end
 
 function interface.test_promotion(x, y)
-	local p
-	emu.wait(10)
+	-- Wait for the arm to drop the pawn on the promotion square before verifying
+	local root = machine.devices[":"]
+	local hand = root:output("cpu_hand")
+	local square = root:output("piece_" .. ("abcdefgh"):sub(x, x) .. tostring(y))
+	local waited = 0
+	repeat
+		emu.wait(0.5)
+		waited = waited + 0.5
+	until (hand:get() == 0 and square:get() ~= 0) or waited >= 15
+	emu.wait(1)
+
+	-- VERIFY + square lights the LED of the piece the machine promoted to
 	send_input(":IN.0", 0x001, 1) -- VERIFY
 	sb_press_square(":board:board", 1, x, y)
-
-	local root = machine.devices[":"]
-	if root then
-		local q_node = root:output("0.3")
-		local n_node = root:output("0.6")
-		local b_node = root:output("0.5")
-		local r_node = root:output("0.4")
-
-		if     (q_node and q_node:get() ~= 0) then p = "Q"
-		elseif (n_node and n_node:get() ~= 0) then p = "N"
-		elseif (b_node and b_node:get() ~= 0) then p = "B"
-		elseif (r_node and r_node:get() ~= 0) then p = "R"
-		else p = "Q"
-		end
-	else
-		p = "Q"
-	end
+	local p = promotion_led() or "q"
 
 	send_input(":IN.0", 0x080, 1) -- CLEAR
-	return p
+	return p:upper()
+end
+
+-- Piece shown by the promotion LEDs (0.3 Q, 0.4 R, 0.5 B, 0.6 N), or nil if none is lit
+function promotion_led()
+	local root = machine.devices[":"]
+	local leds = { { "0.3", "q" }, { "0.4", "r" }, { "0.5", "b" }, { "0.6", "n" } }
+	for _, led in ipairs(leds) do
+		local node = root:output(led[1])
+		if node and node:get() ~= 0 then
+			return led[2]
+		end
+	end
+	return nil
 end
 
 function interface.get_promotion(x, y)
-	return "r"
+	-- The promotion LEDs only light in VERIFY mode, so let init.lua call
+	-- test_promotion() once the move is complete
+	return nil
 end
 
 function interface.promote(x, y, piece)
-	if getprom then
-		sb_promote(":board:board", x, y, piece)
-		getprom = false
+	-- Uppercase = the machine's own promotion: the arm has already swapped the pawn
+	-- for the new piece from storage, so there is nothing left to do here
+	if piece == piece:upper() then
 		return
 	end
-	
+
+	-- Lowercase = promotion in the opponent's move: make the swap on the sensorboard
+
 	local root = machine.devices[":"]
 	if not root then return end
 
@@ -352,41 +452,32 @@ function interface.promote(x, y, piece)
 	local original_throttle = machine.video.throttled
 	machine.video.throttled = true
 
-	local p_char = piece:lower()
-	local z = 12  -- White major pieces column registry index (Col X2)
-	local p = 7   
-	
-	if     (p_char == "n") then p = 5
-	elseif (p_char == "b") then p = 6
-	elseif (p_char == "r") then p = 7
-	end
-	
+	-- Steps D-F of the manual's pawn promotion (A-C were done by select_piece)
+	local ids = { n = 2, b = 3, r = 4, q = 5 }
+	local id = ids[piece] or 5
 	if (y == 1) then
-		z = 9     -- Black major pieces column registry index (Col X3)
+		id = id + 6  -- black promotes on rank 1
 	end
-	
-	local q_node = root:output("0.3")
-	repeat
+	local src = find_slot(id, true)
+
+	if src then
+		-- D: pick up the replacement piece from its border space
+		sb_select_piece(":board:board", 1, src[1], src[2], "get")
 		emu.wait(0.5)
-		local q_active = q_node and q_node:get() or 0
-	until q_active ~= 0
-	
-	-- STEP 1: Lift the replacement Rook from the side panel storage slot
-	sb_select_piece(":board:board", 1, z, p, "get")
-	emu.wait(0.5)
-	
-	-- STEP 2: Place that piece onto the active promotion destination square (B8)
-	sb_select_piece(":board:board", 1, x, y, "put")
-	emu.wait(0.5)
-	
-	-- STEP 3: Spawn the original pawn and place it cleanly inside the outer strip row 1
-	if (y == 1) then
-		removepiece(-6) -- Black Pawn (Targets Col X1 / Row 1)
+		-- E: put it on the promotion square (replacing the pawn on the sensorboard)
+		sb_select_piece(":board:board", 1, x, y, "put")
+		emu.wait(0.5)
+		-- F: the pawn goes to its own border space
+		removepiece((y == 1) and -6 or 6)
 	else
-		removepiece(6)  -- White Pawn (Targets Col X4 / Row 1)
+		-- No replacement available: press its empty border space and leave the pawn on the
+		-- square. The Phantom remembers it as promoted (a "crowned" pawn in the manual) and
+		-- returns it to a pawn space on NEW, so the sensorboard must keep showing a pawn.
+		local slot = border_slots(id)[1]
+		sb_press_square(":board:board", 1, slot[1], slot[2])
 	end
 	emu.wait(0.5)
-	
+
 	machine.video.throttled = original_throttle
 	interface.promotion_active = false
 end
