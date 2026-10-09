@@ -2,7 +2,7 @@ interface = {}
 
 interface.turn = true
 interface.color = "B"
-interface.level = "00"
+interface.level = "000000"
 interface.cur_level = nil
 interface.set = false
 
@@ -48,7 +48,7 @@ function interface.setup_machine()
 	interface.set = false
 	send_input(":RESET", 0x01, 0.5) -- RESET
 	emu.wait(1)
-	interface.cur_level = "00"
+	interface.cur_level = "000000"
 	interface.setlevel()
 end
 
@@ -92,7 +92,9 @@ function interface.set_pos(mode)
 end
 
 function interface.start_play(init)
-	if (init) then
+	-- New game, or the machine moves first after a position setup: move the hyphen
+	-- (the player's side) away from the side to move, so ENTER makes the machine move
+	if (init or interface.set) then
 		send_input(":IN.0", 0x04, 0.5) -- B/W
 		interface.set = false
 	end
@@ -109,20 +111,31 @@ end
 function interface.stop_play()
 end
 
+-- Driver save item m_ram_address; looked up once, as device.items walks every save item
+local ram_address = nil
+
 function interface.is_selected_int(x, y)
-	if (emu.item(machine.devices[':maincpu'].owner.items['0/m_ram_address']):read() ~= 0x0f) then
+	if ram_address == nil then
+		ram_address = emu.item(machine.devices[':maincpu'].owner.items['0/m_ram_address'])
+	end
+	if (ram_address:read() ~= 0x0f) then
 		emu.wait(0.5)
-		if (emu.item(machine.devices[':maincpu'].owner.items['0/m_ram_address']):read() ~= 0x0f) then
+		if (ram_address:read() ~= 0x0f) then
 			return false
 		end
 	end
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	local d0 = output:get_value("digit0")
-	local d1 = output:get_value("digit1")
-	local d2 = output:get_value("digit2")
-	local d3 = output:get_value("digit3")
-	local d4 = output:get_value("digit4")
+	local root = machine.devices[":"]
+	local function digit(n)
+		local node = root:output("digit" .. n)
+		return node and node:get() or 0
+	end
+	local d0 = digit(0)
+	local d1 = digit(1)
+	local d2 = digit(2)
+	local d3 = digit(3)
+	local d4 = digit(4)
 	return (d2 == 0x01 or interface.color == "W") and (d2 == 0x08 or interface.color == "B") and ((xval[x] == d0 and yval[y] == d1) or (xval[x] == d3 and yval[y] == d4))
 end
 
@@ -165,13 +178,15 @@ end
 
 function interface.get_options()
 	return {
-		{ "string", "Level", "00" },
+		{ "string", "Level", "000000" },  -- timer interval hhmmss
 	}
 end
 
 function interface.set_option(name, value)
-	if (name == "level" and value ~= "") then
-		interface.level = value
+	-- Level is the timer interval as hhmmss; shorter values are padded with leading zeros
+	local level = value:match("^%s*(%d+)%s*$")
+	if (name == "level" and level and level:len() <= 6) then
+		interface.level = string.rep("0", 6 - level:len()) .. level
 		interface.setlevel()
 	end
 end
