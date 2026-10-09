@@ -91,7 +91,7 @@ function interface.set_pos(mode)
 				end
 			end
 		end
-		if mode * piece > 0 then
+		if mode * piece < 0 then
 			send_input(":IN.3", 0x04, 0.5) -- B/W
 		end
 		if mode == 1 then
@@ -106,7 +106,9 @@ function interface.set_pos(mode)
 end
 
 function interface.start_play(init)
-	if (init) then
+	-- New game, or the machine moves first after a position setup: move the hyphen
+	-- (the player's side) away from the side to move, so ENTER makes the machine move
+	if (init or interface.set) then
 		send_input(":IN.3", 0x04, 0.5) -- B/W
 		interface.set = false
 	end
