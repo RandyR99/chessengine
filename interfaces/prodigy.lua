@@ -16,7 +16,8 @@ function interface.setlevel()
 		return
 	end
 	interface.cur_level = interface.level
-	if (output:get_value("digit0") ~= 0x38) then
+	local d0 = machine.devices[":"]:output("digit0")
+	if ((d0 and d0:get() or 0) ~= 0x38) then
 		send_input(":IN.0", 0x040, 1) -- LEVEL
 	end
 	interface.send_pos(interface.level)
@@ -82,9 +83,9 @@ function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_value("4." .. tostring(x - 1)) ~= 0
-	local yval = output:get_value("5." .. tostring(y - 1)) ~= 0
-	return xval and yval
+	local xled = machine.devices[":"]:output("4." .. tostring(x - 1))
+	local yled = machine.devices[":"]:output("5." .. tostring(y - 1))
+	return xled ~= nil and yled ~= nil and xled:get() ~= 0 and yled:get() ~= 0
 end
 
 function interface.send_pos(p)
