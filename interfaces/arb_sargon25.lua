@@ -1,5 +1,10 @@
 interface = {}
 
+local function led_on(name)
+	local led = machine.devices[":"]:output(name)
+	return led ~= nil and led:get() ~= 0
+end
+
 interface.level = 1
 interface.cur_level = nil
 
@@ -31,13 +36,15 @@ end
 
 function interface.set_pos(mode)
 	if mode == 0 then
-		ioport.ports[":IN.1"]:field(0x01):set_value(1)
-		ioport.ports[":IN.1"]:field(0x02):set_value(1)
+		-- MAME's 6522 reset doesn't release an IRQ that is asserted at that moment, and the
+		-- program then hangs in its IRQ handler. Disable the VIA interrupts (IER) first.
+		machine.devices[":maincpu"].spaces["program"]:write_u8(0x800e, 0x7f)
+		ioport.ports[":IN.1"]:field(0x01):set_value(1) -- RESET
+		ioport.ports[":IN.1"]:field(0x02):set_value(1) -- HALT
 		emu.wait(0.1)
 		ioport.ports[":IN.1"]:field(0x02):set_value(0)
 		ioport.ports[":IN.1"]:field(0x01):set_value(0)
 		sb_clear_board(":board")
-		machine.video.throttled = throttled_state
 		return (":board")
 	else
 		send_input(":IN.0", 0x10, 1) -- Change Board
@@ -65,14 +72,14 @@ end
 function interface.edit_game(on)
 	if on then
 		send_input(":IN.0", 0x04, 1) -- Monitor
-	elseif output:get_value("9.10") ~= 0 then
+	elseif led_on("9.10") then
 		interface.start_play()
 	end
 end
 
 function interface.start_play(init)
 	send_input(":IN.0", 0x20, 1) -- Change Color
-	if output:get_value("8.1") ~= 0 then
+	if led_on("8.1") then
 		send_input(":IN.0", 0x01, 1) -- Black
 	else
 		send_input(":IN.0", 0x02, 1) -- White
@@ -84,7 +91,7 @@ function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
-	return output:get_value((x - 1) .. "." .. (y - 1)) ~= 0
+	return led_on((x - 1) .. "." .. (y - 1))
 end
 
 function interface.select_piece(x, y, event)
@@ -112,10 +119,10 @@ end
 function interface.test_promotion(x, y)
 	local piece = "Q"
 	sb_select_piece(":board", 0.5, x, y, "")
-	if     output:get_value("8.3") ~= 0 then piece = "Q"
-	elseif output:get_value("8.4") ~= 0 then piece = "R"
-	elseif output:get_value("8.5") ~= 0 then piece = "B"
-	elseif output:get_value("8.6") ~= 0 then piece = "N"
+	if     led_on("8.3") then piece = "Q"
+	elseif led_on("8.4") then piece = "R"
+	elseif led_on("8.5") then piece = "B"
+	elseif led_on("8.6") then piece = "N"
 	end
 	sb_select_piece(":board", 0.5, x, y, "")
 	return piece

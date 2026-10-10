@@ -1,5 +1,10 @@
 interface = {}
 
+local function led_on(name)
+	local led = machine.devices[":"]:output(name)
+	return led ~= nil and led:get() ~= 0
+end
+
 interface.opt_clear_announcements = true
 interface.level = 0
 interface.cur_level = nil
@@ -25,7 +30,7 @@ function interface.setlevel()
 	local dif_level
 	send_input(":IN.0", 0x40, 0.5) -- Change Level
 	for y = 0, 7 do
-		if output:get_indexed_value("8.", 7 - y) ~= 0 then
+		if led_on("8." .. (7 - y)) then
 			cur_leds = cur_leds + (1 << y)
 		end
 	end
@@ -121,14 +126,14 @@ function interface.stop_play()
 end
 
 function interface.clear_announcements()
-	if (output:get_value("0.0") ~= 0 and output:get_value("1.1") ~= 0 and
-		output:get_value("2.2") ~= 0 and output:get_value("3.3") ~= 0 and
-		output:get_value("4.4") ~= 0 and output:get_value("5.5") ~= 0 and
-		output:get_value("6.6") ~= 0 and output:get_value("7.7") ~= 0 and
-		output:get_value("0.7") ~= 0 and output:get_value("1.6") ~= 0 and
-		output:get_value("2.5") ~= 0 and output:get_value("3.4") ~= 0 and
-		output:get_value("4.3") ~= 0 and output:get_value("5.2") ~= 0 and
-		output:get_value("6.1") ~= 0 and output:get_value("7.0") ~= 0) then
+	if (led_on("0.0") and led_on("1.1") and
+		led_on("2.2") and led_on("3.3") and
+		led_on("4.4") and led_on("5.5") and
+		led_on("6.6") and led_on("7.7") and
+		led_on("0.7") and led_on("1.6") and
+		led_on("2.5") and led_on("3.4") and
+		led_on("4.3") and led_on("5.2") and
+		led_on("6.1") and led_on("7.0")) then
 		send_input(":IN.0", 0x02, 0.5) -- Clear
 	end
 end
@@ -138,7 +143,7 @@ function interface.is_selected(x, y)
 		interface.clear_announcements()
 		emu.wait(0.5)
 	end
-	return output:get_value((x - 1) .. "." .. (y - 1)) ~= 0
+	return led_on((x - 1) .. "." .. (y - 1))
 end
 
 function interface.select_piece(x, y, event)
@@ -169,7 +174,7 @@ end
 function interface.test_promotion(x, y)
 	local function board_led(x, y)
 		for i = 1, 5 do
-			if (output:get_value((x - 1) .. "." .. (y - 1)) ~= 0) then
+			if (led_on((x - 1) .. "." .. (y - 1))) then
 				send_input(":IN.0", 0x02, 0.5) -- Clear
 				return true
 			end
