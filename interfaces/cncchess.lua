@@ -1,10 +1,16 @@
 interface = {}
 
+local function digit(n)
+	local d = machine.devices[":"]:output("digit" .. n)
+	return d and d:get() or 0
+end
+
 interface.turn = true
 interface.invert = false
 interface.last_get = nil
 interface.level = 1
 interface.cur_level = nil
+interface.set_color = 0
 
 function interface.get_module()
 	return "Conic Master"
@@ -38,6 +44,7 @@ function interface.setup_machine()
 	interface.turn = true
 	interface.invert = false
 	interface.last_get = nil
+	interface.set_color = 0
 	send_input(":RESET", 0x01, 1)		-- Reset
 	send_input(":IN.0", 0x08, 0.5)		-- 1
 	send_input(":IN.3", 0x04, 0.5)		-- F
@@ -51,14 +58,14 @@ function interface.set_pos(mode)
     if mode == 0 then
         return ("")
     else
-        local ram = emu.item(machine.devices[':maincpu'].items['0/00000000-0000ffff'])
+        local ram = machine.devices[":maincpu"].spaces["program"]
         local fig = {0xfe,0xfb,0xfa,0xf5,0xec,0xf8,0x00,0x08,0x14,0x0b,0x06,0x05,0x02}
         local adr = 0x1815
         for x=1,8 do
             for y=1,8 do
                 local p=get_piece_id(x,y)
                 local z=fig[p+7]
-                ram:write(adr+10*(y-1)+x-1,z)
+                ram:write_u8(adr+10*(y-1)+x-1,z)
             end
         end
         interface.set_color = mode
@@ -67,13 +74,13 @@ end
 
 function invert_pos()
     interface.invert = true
-    local ram = emu.item(machine.devices[':maincpu'].items['0/00000000-0000ffff'])
+    local ram = machine.devices[":maincpu"].spaces["program"]
     local adr = 0x1815
     for x=1,8 do
         for y=1,4 do
-            local z=ram:read(adr+10*(y-1)+x-1)
-            ram:write(adr+10*(y-1)+x-1,256-ram:read(adr+10*(9-y-1)+x-1))
-            ram:write(adr+10*(9-y-1)+x-1,256-z)
+            local z=ram:read_u8(adr+10*(y-1)+x-1)
+            ram:write_u8(adr+10*(y-1)+x-1,256-ram:read_u8(adr+10*(9-y-1)+x-1))
+            ram:write_u8(adr+10*(9-y-1)+x-1,256-z)
         end
     end
 end
@@ -88,7 +95,19 @@ function interface.start_play(init)
 		send_input(":IN.3", 0x01, 1) -- GO
 		emu.wait(0.5)
 		machine.video.throttled = throttled_state
+	elseif interface.set_color ~= 0 then
+		interface.turn = false
+		if interface.set_color == 1 then
+			invert_pos()
+		end
+		interface.set_color = 0
+		send_input(":IN.1", 0x02, 1) -- SP
+		send_input(":IN.3", 0x01, 1) -- GO
+		emu.wait(0.5)
 	end
+end
+
+function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
@@ -97,10 +116,10 @@ function interface.is_selected(x, y)
 	end
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	local d0 = output:get_value("digit0")
-	local d1 = output:get_value("digit1")
-	local d2 = output:get_value("digit2")
-	local d3 = output:get_value("digit3")
+	local d0 = digit(0)
+	local d1 = digit(1)
+	local d2 = digit(2)
+	local d3 = digit(3)
 	if (d0 == 0x39 and d1 == 0x40 and d2 == 0x40 and d3 == 0x77) then -- "C--A", computer castles queenside
 		if ((x == 5 or x == 3) and (y == 8)) then
 			return true
@@ -151,6 +170,10 @@ function interface.send_pos(x, y)
 end
 
 function interface.select_piece(x, y, event)
+	if interface.set_color == -1 then
+		invert_pos()
+		interface.set_color = 0
+	end
 	if (event == "get" and interface.turn) then
 		interface.last_get = {x=x, y=y}
 	elseif (event == "put" and interface.turn) then
@@ -184,17 +207,6 @@ function interface.select_piece(x, y, event)
 			interface.send_pos(interface.last_get.x, interface.last_get.y)
 			interface.send_pos(x, y)
 			send_input(":IN.3", 0x02, 0.5) -- MD
-			send_input(":IN.1", 0x01, 0.5) -- IP
-			if (y == 8) then
-				send_input(":IN.3", 0x08, 0.5)
-			else
-				send_input(":IN.1", 0x08, 0.5)
-			end
-			interface.send_pos(x, y)
-			send_input(":IN.3", 0x01, 0.5) -- GO
-			if (interface.invert) then
-				y = 9 - y
-			end
 		else
 			interface.send_pos(interface.last_get.x, interface.last_get.y)
 			interface.send_pos(x, y)
@@ -234,7 +246,11 @@ function interface.promote(x, y, piece)
 		local throttled_state = machine.video.throttled
 		machine.video.throttled = false
 		send_input(":IN.1", 0x01, 0.5) -- IP
-		if get_piece_id(x,y) > 0 then
+		local p = get_piece_id(x,y)
+		if (interface.invert) then
+			p = -p
+		end
+		if p > 0 then
 			if	   (piece == "q") then send_input(":IN.3", 0x08, 0.5)
 			elseif (piece == "r") then send_input(":IN.2", 0x04, 0.5)
 			elseif (piece == "b") then send_input(":IN.2", 0x01, 0.5)
@@ -246,9 +262,6 @@ function interface.promote(x, y, piece)
 			elseif (piece == "b") then send_input(":IN.0", 0x01, 0.5)
 			elseif (piece == "n") then send_input(":IN.0", 0x02, 0.5)
 			end
-		end
-		if (interface.invert) then
-			y = 9 - y
 		end
 		interface.send_pos(x, y)
 		send_input(":IN.3", 0x01, 0.5) -- GO
