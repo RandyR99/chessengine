@@ -1,5 +1,10 @@
 interface = load_interface("conc")
 
+local function led_on(name)
+	local led = machine.devices[":"]:output(name)
+	return led ~= nil and led:get() ~= 0
+end
+
 local lastx = 0
 local lasty = 0
 
@@ -26,7 +31,7 @@ function interface.setup_machine()
 end
 
 function interface.select_piece(x, y, event)
-	local timeout = output:get_value("0.1") ~= 0 and output:get_value("0.7") ~= 0
+	local timeout = led_on("0.1") and led_on("0.7")
 	if (timeout) then
 		send_input(":IN.0", 0x80, 0.15) -- Continue
 		emu.wait(1.5)

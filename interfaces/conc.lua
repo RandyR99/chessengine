@@ -1,5 +1,10 @@
 interface = {}
 
+local function led_on(name)
+	local led = machine.devices[":"]:output(name)
+	return led ~= nil and led:get() ~= 0
+end
+
 local mate_piece = nil
 interface.level = "P2"
 interface.cur_level = nil
@@ -102,9 +107,9 @@ function interface.edit_game(on)
 end
 
 function interface.start_play(init)
-	if (output:get_value("9.7") ~= 0) then
+	if (led_on("9.7")) then
 		send_input(":IN.1", 0x80, 0.5) -- Black
-	elseif (output:get_value("9.6") ~= 0) then
+	elseif (led_on("9.6")) then
 		send_input(":IN.1", 0x40, 0.5) -- White
 	end
 end
@@ -113,8 +118,26 @@ function interface.stop_play()
 	send_input(":IN.0", 0x02, 1) -- Stop
 end
 
+local function square_lit(x, y)
+	return led_on(tostring(9 - x) .. "." .. (y - 1))
+end
+
+-- When capturing en passant the machine blinks the captured pawn next to the
+-- capturing one before it shows the destination; don't report it as a target.
+local function ep_victim(x, y)
+	local p = get_piece_id(x, y)
+	if (p == 6 and y == 4) or (p == -6 and y == 5) then
+		for dx = -1, 1, 2 do
+			if x + dx >= 1 and x + dx <= 8 and get_piece_id(x + dx, y) == -p and square_lit(x + dx, y) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function interface.is_selected(x, y)
-	return (output:get_indexed_value(tostring(9 - x) .. ".", y - 1) ~= 0)
+	return square_lit(x, y) and not ep_victim(x, y)
 end
 
 function interface.select_piece(x, y, event)
@@ -150,12 +173,12 @@ end
 
 function interface.get_promotion(x, y)
 	local piece = nil
-	if (output:get_value("0.6") == 0) then -- mate announcement!
+	if (not led_on("0.6")) then -- mate announcement!
 		for i = 0, 5 do
-			if     (output:get_value("9.4") ~= 0) then piece = 'q'
-			elseif (output:get_value("9.3") ~= 0) then piece = 'r'
-			elseif (output:get_value("9.2") ~= 0) then piece = 'b'
-			elseif (output:get_value("9.1") ~= 0) then piece = 'n'
+			if     (led_on("9.4")) then piece = 'q'
+			elseif (led_on("9.3")) then piece = 'r'
+			elseif (led_on("9.2")) then piece = 'b'
+			elseif (led_on("9.1")) then piece = 'n'
 			end
 			if piece ~= nil then
 				break
@@ -168,10 +191,10 @@ function interface.get_promotion(x, y)
 	piece = mate_piece
 	mate_piece = nil
 	for i = 0, 5 do
-		if     (output:get_value("9.4") ~= 0) and (piece ~= 'q') then return 'q'
-		elseif (output:get_value("9.3") ~= 0) and (piece ~= 'r') then return 'r'
-		elseif (output:get_value("9.2") ~= 0) and (piece ~= 'b') then return 'b'
-		elseif (output:get_value("9.1") ~= 0) and (piece ~= 'n') then return 'n'
+		if     (led_on("9.4")) and (piece ~= 'q') then return 'q'
+		elseif (led_on("9.3")) and (piece ~= 'r') then return 'r'
+		elseif (led_on("9.2")) and (piece ~= 'b') then return 'b'
+		elseif (led_on("9.1")) and (piece ~= 'n') then return 'n'
 		end
 		emu.wait(0.2)
 	end
