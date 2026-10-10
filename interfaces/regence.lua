@@ -1,5 +1,10 @@
 interface = {}
 
+local function led_on(name)
+	local led = machine.devices[":"]:output(name)
+	return led ~= nil and led:get() ~= 0
+end
+
 interface.level = 2
 interface.cur_level = nil
 interface.edit = false
@@ -22,15 +27,17 @@ function interface.setlevel()
 	interface.cur_level = interface.level
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
+	local presses = 0
 	repeat
 		send_input(":IN.1", 0x02, 0.5) -- Level
+		presses = presses + 1
 		local cur_level = 0
 		for y = 0, 7 do
-			if output:get_indexed_value("0.", 7 - y) ~= 0 then
+			if led_on("0." .. (7 - y)) then
 				cur_level = cur_level + 1
 			end
 		end
-	until cur_level == interface.level
+	until cur_level == interface.level or presses > 10
 	machine.video.throttled = throttled_state
 end
 
@@ -130,7 +137,7 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	return output:get_indexed_value(tostring(x - 1) .. ".", 8 - y) ~= 0
+	return led_on(tostring(x - 1) .. "." .. (8 - y))
 end
 
 function interface.select_piece(x, y, event)
@@ -184,8 +191,32 @@ function interface.set_option(name, value)
 	end
 end
 
+function interface.test_promotion(x, y)
+	local function piece_led(port, code)
+		send_input(port, code, 0.5)
+		for i = 1, 5 do
+			if led_on(tostring(x - 1) .. "." .. (8 - y)) then
+				return true
+			end
+			emu.wait(0.1)
+		end
+		return false
+	end
+
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	local p = "Q"
+	if     piece_led(":IN.0", 0x10) then p = "Q"
+	elseif piece_led(":IN.1", 0x40) then p = "N"
+	elseif piece_led(":IN.0", 0x40) then p = "B"
+	elseif piece_led(":IN.0", 0x20) then p = "R"
+	end
+	machine.video.throttled = throttled_state
+	return p
+end
+
 function interface.get_promotion(x, y)
-	return 'q'	-- TODO
+	return nil	-- test_promotion() reads the piece after the move
 end
 
 function interface.promote(x, y, piece)

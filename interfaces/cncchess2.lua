@@ -1,5 +1,10 @@
 interface = {}
 
+local function led_on(name)
+	local led = machine.devices[":"]:output(name)
+	return led ~= nil and led:get() ~= 0
+end
+
 interface.turn = true
 interface.invert = false
 interface.color = "B"
@@ -150,14 +155,14 @@ function interface.is_selected(x, y)
 	end
 	-- castling moves
 	if (y == 8 or y == 1) then
-		local d1 = (output:get_value((y - 1) .. "." .. 0) ~= 0)
-		local d2 = (output:get_value((y - 1) .. "." .. 1) ~= 0)
-		local d3 = (output:get_value((y - 1) .. "." .. 2) ~= 0)
-		local d4 = (output:get_value((y - 1) .. "." .. 3) ~= 0)
-		local d5 = (output:get_value((y - 1) .. "." .. 4) ~= 0)
-		local d6 = (output:get_value((y - 1) .. "." .. 5) ~= 0)
-		local d7 = (output:get_value((y - 1) .. "." .. 6) ~= 0)
-		local d8 = (output:get_value((y - 1) .. "." .. 7) ~= 0)
+		local d1 = (led_on((y - 1) .. "." .. 0))
+		local d2 = (led_on((y - 1) .. "." .. 1))
+		local d3 = (led_on((y - 1) .. "." .. 2))
+		local d4 = (led_on((y - 1) .. "." .. 3))
+		local d5 = (led_on((y - 1) .. "." .. 4))
+		local d6 = (led_on((y - 1) .. "." .. 5))
+		local d7 = (led_on((y - 1) .. "." .. 6))
+		local d8 = (led_on((y - 1) .. "." .. 7))
 		if (not interface.invert) then
 			if (d1 and d3 and d4 and d5) then
 				if (x == 5 or x == 3) then
@@ -191,23 +196,23 @@ function interface.is_selected(x, y)
 		end
 	-- enpassant moves
 	elseif (y == 4) then
-		local d1 = (output:get_value(3 .. "." .. (x-2)) ~= 0)
-		local d2 = (output:get_value(3 .. "." .. (x-1)) ~= 0)
-		local d3 = (output:get_value(3 .. "." .. (x-0)) ~= 0)
-		local d4 = (output:get_value(2 .. "." .. (x-1)) ~= 0)
+		local d1 = (led_on(3 .. "." .. (x-2)))
+		local d2 = (led_on(3 .. "." .. (x-1)))
+		local d3 = (led_on(3 .. "." .. (x-0)))
+		local d4 = (led_on(2 .. "." .. (x-1)))
 		if (d2 and d4 and (d1 or d3)) then
 			return false
 		end
 	elseif (y == 5) then
-		local d1 = (output:get_value(4 .. "." .. (x-2)) ~= 0)
-		local d2 = (output:get_value(4 .. "." .. (x-1)) ~= 0)
-		local d3 = (output:get_value(4 .. "." .. (x-0)) ~= 0)
-		local d4 = (output:get_value(5 .. "." .. (x-1)) ~= 0)
+		local d1 = (led_on(4 .. "." .. (x-2)))
+		local d2 = (led_on(4 .. "." .. (x-1)))
+		local d3 = (led_on(4 .. "." .. (x-0)))
+		local d4 = (led_on(5 .. "." .. (x-1)))
 		if (d2 and d4 and (d1 or d3)) then
 			return false
 		end
 	end
-	return output:get_value((y - 1) .. "." .. (x - 1)) ~= 0
+	return led_on((y - 1) .. "." .. (x - 1))
 end
 
 function interface.select_piece(x, y, event)
