@@ -1,5 +1,10 @@
 interface = {}
 
+local function led_on(name)
+	local led = machine.devices[":"]:output(name)
+	return led ~= nil and led:get() ~= 0
+end
+
 interface.level = 2
 interface.cur_level = nil
 interface.edit = false
@@ -26,7 +31,7 @@ function interface.setlevel()
 		send_input(":IN.1", 0x40, 1) -- Level
 		local cur_level = 0
 		for y = 0, 7 do
-			if output:get_indexed_value(7-y .. ".", 0) ~= 0 then
+			if led_on(7 - y .. ".0") then
 				cur_level = cur_level + 1
 			end
 		end
@@ -121,8 +126,8 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_value(tostring(x - 1) .. ".1") ~= 0
-	local yval = output:get_value(tostring(8 - y) .. ".0") ~= 0
+	local xval = led_on(tostring(x - 1) .. ".1")
+	local yval = led_on(tostring(8 - y) .. ".0")
 	return xval and yval
 end
 
