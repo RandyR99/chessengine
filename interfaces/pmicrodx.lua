@@ -1,5 +1,10 @@
 interface = {}
 
+local function led_on(name)
+	local led = machine.devices[":"]:output(name)
+	return led ~= nil and led:get() ~= 0
+end
+
 interface.turn = true
 interface.level = 1
 interface.cur_level = nil
@@ -69,7 +74,7 @@ function getdigit(n)
 		     {"0.25","0.26","0.31","0.32","0.33","0.24","0.34"}}
 	local dig = 0x00
 	for i=1,7 do
-		if (output:get_value(map[n][i]) ~= 0) then
+		if led_on(map[n][i]) then
 			dig = dig | (1 << (i-1))
 		end
 	end
