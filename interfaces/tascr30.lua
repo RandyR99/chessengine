@@ -1,5 +1,10 @@
 interface = {}
 
+local function led_on(name)
+	local led = machine.devices[":"]:output(name)
+	return led ~= nil and led:get() ~= 0
+end
+
 interface.level = "010 sec/move"
 interface.cur_level = nil
 interface.levelnum = 1
@@ -143,8 +148,8 @@ function interface.setup_machine()
 	emu.wait(0.25)
 	send_input(":IN.2", 0x20, 0.3) -- Menu
 	emu.wait(0.25)
-	--interface.cur_level = ""
-	--interface.setlevel()
+	interface.cur_level = ""
+	interface.setlevel()
 	local drei = 0
 	repeat
 		if drei == 3 or drei == 9 then
@@ -207,7 +212,7 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	return output:get_value("sb30_led_" .. tostring(8 - y) .. "." .. tostring(8 - x)) == 1
+	return led_on("sb30_led_" .. tostring(8 - y) .. "." .. tostring(8 - x))
 end
 
 function interface.select_piece(x, y, event)
