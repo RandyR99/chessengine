@@ -1,5 +1,10 @@
 interface = {}
 
+local function led_on(name)
+	local led = machine.devices[":"]:output(name)
+	return led ~= nil and led:get() ~= 0
+end
+
 interface.level = 1
 interface.cur_level = nil
 
@@ -37,7 +42,6 @@ function interface.setup_machine()
 	interface.setlevel()
 end
 
---[[
 function interface.set_pos(mode)
 	if mode == 0 then
 		send_input(":IN.1", 0x02, 1) -- Reset
@@ -45,7 +49,7 @@ function interface.set_pos(mode)
 	else
 		local throttled_state = machine.video.throttled
 		machine.video.throttled = false
-		local ram = emu.item(machine.devices[':maincpu'].spaces['program'])
+		local ram = machine.devices[":maincpu"].spaces["program"]
 		local fig = {0x81,0x82,0x83,0x84,0x85,0x86,0x00,0x06,0x05,0x04,0x03,0x02,0x01}
 		local adr = 0x3715
 		local brd = {{  3, 5, 4, 2, 1, 4, 5, 3 },
@@ -78,7 +82,6 @@ function interface.set_pos(mode)
 		machine.video.throttled = throttled_state
 	end
 end
---]]
 
 function interface.edit_game(on)
 	if on then
@@ -96,8 +99,26 @@ function interface.stop_play()
 	send_input(":IN.1", 0x01, 1) 		-- Halt
 end
 
+local led_snap = {}
+
 function interface.is_selected(x, y)
-	return output:get_indexed_value(tostring(x - 1) .. ".", y - 1) ~= 0
+	-- the computer's move is shown with a blinking destination led. If a poll sees only
+	-- the source, the piece gets lifted first, and an en passant destination is then
+	-- never shown again. So sample the leds for 0.4 seconds at the start of each poll.
+	if x == 1 and y == 1 then
+		led_snap = {}
+		for i = 1, 8 do
+			for sy = 1, 8 do
+				for sx = 1, 8 do
+					if led_on(tostring(sx - 1) .. "." .. tostring(sy - 1)) then
+						led_snap[sy * 8 + sx] = true
+					end
+				end
+			end
+			emu.wait(0.05)
+		end
+	end
+	return led_snap[y * 8 + x] == true
 end
 
 function interface.select_piece(x, y, event)
@@ -106,14 +127,14 @@ end
 
 function interface.get_options()
 	return {
-		{ "spin", "Level", "1", "1", "8" },
+		{ "spin", "Level", "1", "0", "7" },
 	}
 end
 
 function interface.set_option(name, value)
 	if (name == "level") then
 		local level = tonumber(value)
-		if (level < 1 or level > 8) then
+		if (level < 0 or level > 7) then
 			return
 		end
 		interface.level = level
