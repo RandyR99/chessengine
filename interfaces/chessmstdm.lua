@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = 0
 interface.cur_level = nil
 interface.count = 0
@@ -61,7 +66,7 @@ function interface.setlevel()
 		emu.wait(1)
 		send_input(":IN.0", 0x80, 0.5) -- Enter
 		emu.wait(1)
-		while output:get_value("digit0") ~= lcd_num[interface.level + 1] do
+		while output_value("digit0") ~= lcd_num[interface.level + 1] do
 			send_input(":IN.0", 0x01, 0.5) -- Move Fore
 			emu.wait(1)
 		end
@@ -92,18 +97,18 @@ function interface.setup_machine()
 	machine.video.throttled = throttled_state
 end
 
---[[
 function interface.set_pos(mode)
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	if mode == 0 then
+		send_input(":IN.1", 0x01, 1) -- Monitor (leave the score display)
 		send_input(":IN.0", 0x04, 1) -- Board
 		sb_clear_board(":board")
 		send_input(":IN.0", 0x80, 1) -- Enter
 		machine.video.throttled = throttled_state
 		return (":board")
 	else
-		local ram = emu.item(machine.devices[':maincpu'].spaces['program'])
+		local ram = machine.devices[":maincpu"].spaces["program"]
 		local fig = {0x81,0x82,0x83,0x84,0x85,0x86,0x00,0x06,0x05,0x04,0x03,0x02,0x01}
 		local adr = 0x8315
 		local brd = {{  3, 5, 4, 2, 1, 4, 5, 3 },
@@ -135,13 +140,13 @@ function interface.set_pos(mode)
 	end
 	machine.video.throttled = throttled_state
 end
---]]
 
 function interface.edit_game()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
+	send_input(":IN.1", 0x01, 0.5) -- Monitor (leave the score display, the manual starts from "Y")
 	send_input(":IN.0", 0x20, 0.5) -- Selection
-	send_input(":IN.0", 0x80, 0.5) -- Enter
+	send_input(":IN.0", 0x80, 0.5) -- Enter: referee mode on/off
 	send_input(":IN.1", 0x01, 0.5) -- Monitor
 	emu.wait(0.5)
 	machine.video.throttled = throttled_state
@@ -156,7 +161,7 @@ function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
-	return output:get_indexed_value(tostring(x - 1) .. ".", y - 1) ~= 0
+	return output_value(tostring(x - 1) .. "." .. tostring(y - 1)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -189,7 +194,7 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local d0 = output:get_value("digit0") & 0xffff
+	local d0 = output_value("digit0") & 0xffff
 	if     (d0 == 0xf730) then return "q"
 	elseif (d0 == 0x93b4) then return "r"
 	elseif (d0 == 0xd432) then return "b"
@@ -223,10 +228,10 @@ end
 
 function interface.show_info(on)
 	if on then
-		local d1 = output:get_value("digit3") + 1
-		local d2 = output:get_value("digit2") + 1
-		local d3 = output:get_value("digit1") + 1
-		local d4 = output:get_value("digit0") + 1
+		local d1 = output_value("digit3") + 1
+		local d2 = output_value("digit2") + 1
+		local d3 = output_value("digit1") + 1
+		local d4 = output_value("digit0") + 1
 		if interface.count == 0 then
 			if d1 ~= 1 then
 				interface.score = (digit(d1) .. digit(d2) .. digit(d3) .. digit(d4)):gsub(" ", ""):gsub("%.", "") .. "0"
