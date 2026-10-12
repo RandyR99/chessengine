@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.turn = true
 interface.level = 1
 interface.cur_level = nil
@@ -29,10 +34,10 @@ end
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	local d0 = output:get_value("digit6")
-	local d1 = output:get_value("digit5")
-	local d2 = output:get_value("digit4")
-	local d3 = output:get_value("digit3")
+	local d0 = output_value("digit6")
+	local d1 = output_value("digit5")
+	local d2 = output_value("digit4")
+	local d3 = output_value("digit3")
 	return (xval[x] == d0 and yval[y] == d1) or (xval[x] == d2 and yval[y] == d3)
 end
 
@@ -81,10 +86,11 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	return 'q'	-- TODO
+	return 'q'	-- engine always promotes to Queen
 end
 
 function interface.promote(x, y, piece)
+	promotion_error(piece)
 	-- TODO
 end
 
