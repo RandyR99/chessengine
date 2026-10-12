@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = 6
 interface.cur_level = nil
 local promcode = 0
@@ -13,7 +18,7 @@ function getdigit(n)
 		     {"s1.12","s1.0","s0.0","s0.1","s1.1","s0.13","s1.13"}}
 	local dig = 0x00
 	for i=1,7 do
-		if (output:get_value(map[n][i]) ~= 0) then
+		if (output_value(map[n][i]) ~= 0) then
 			dig = dig | (1 << (i-1))
 		end
 	end
@@ -157,8 +162,35 @@ function interface.is_selected(x, y)
 	return (xval[x] == d1 and yval[y] == d2) or (xval[x] == d4 and yval[y] == d5)
 end
 
+local function shows_from(x, y)
+	-- display shows "xy---": the player's from square, no to square yet
+	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
+	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
+	return getdigit(1) == xval[x] and getdigit(2) == yval[y] and getdigit(4) == 0x40 and getdigit(5) == 0x40
+end
+
 function interface.select_piece(x, y, event)
-	sb_select_piece(":board", 0.5, x, y, event)
+	-- Ivan doesn't scan the board while he talks, so a press can get lost.
+	-- For the player's moves, check the display and press again if needed.
+	if event == "get" and not interface.is_selected(x, y) then
+		for i = 1, 4 do
+			sb_select_piece(":board", 0.5, x, y, event)
+			emu.wait(1)
+			if shows_from(x, y) then break end
+		end
+	elseif event == "put" then
+		local fx, fy
+		for i = 1, 8 do for j = 1, 8 do
+			if shows_from(i, j) then fx, fy = i, j end
+		end end
+		for i = 1, 4 do
+			sb_select_piece(":board", 0.5, x, y, event)
+			emu.wait(1)
+			if fx == nil or not shows_from(fx, fy) then break end
+		end
+	else
+		sb_select_piece(":board", 0.5, x, y, event)
+	end
 end
 
 function interface.get_options()
@@ -179,10 +211,10 @@ end
 function interface.get_promotion(x, y)
 	emu.wait(0.5)
 	promcode = 1
-	if     output:get_value("s0.14") ~= 0 then return "q"
-	elseif output:get_value("s0.16") ~= 0 then return "r"
-	elseif output:get_value("s0.17") ~= 0 then return "b"
-	elseif output:get_value("s0.19") ~= 0 then return "n"
+	if     output_value("s0.14") ~= 0 then return "q"
+	elseif output_value("s0.16") ~= 0 then return "r"
+	elseif output_value("s0.17") ~= 0 then return "b"
+	elseif output_value("s0.19") ~= 0 then return "n"
 	end
 end
 
