@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = 2
 interface.cur_level = nil
 interface.player = false
@@ -24,14 +29,14 @@ function interface.setlevel()
 		emu.wait(1)
 		local cur_level = 0
 		for y = 0, 7 do
-			if output:get_indexed_value("7.", 7 - y) ~= 0 then
+			if output_value("7." .. (7 - y)) ~= 0 then
 				cur_level = cur_level + 1
 			end
 		end
 		if (cur_level == 0) then
 			cur_level = 8
 			for y = 0, 3 do
-				if output:get_indexed_value("6.", 7 - y) ~= 0 then
+				if output_value("6." .. (7 - y)) ~= 0 then
 					cur_level = cur_level + 1
 				end
 			end
@@ -116,7 +121,7 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	return output:get_indexed_value(tostring(x - 1) .. ".", 8 - y) ~= 0
+	return output_value((x - 1) .. "." .. (8 - y)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
