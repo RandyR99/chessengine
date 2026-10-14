@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.invert = false
 interface.level = "a4"
 interface.cur_level = nil
@@ -19,7 +24,7 @@ end
 function interface.setup_machine()
 	sb_reset_board(":board")
 	interface.invert = false
-    send_input(":IN.1", 0x01, 0.5) -- RESET
+	send_input(":IN.1", 0x01, 0.5) -- RESET
 	emu.wait(6.5)
 
 	interface.cur_level = "a4"
@@ -73,8 +78,8 @@ function interface.is_selected(x, y)
 		x = 9 - x
 		y = 9 - y
 	end
-	local xval = output:get_value("1." .. tostring(x - 1)) ~= 0
-	local yval = output:get_value("0." .. tostring(y - 1)) ~= 0
+	local xval = output_value("1." .. tostring(x - 1)) ~= 0
+	local yval = output_value("0." .. tostring(y - 1)) ~= 0
 	return xval and yval
 end
 
@@ -106,10 +111,10 @@ function interface.get_promotion(x, y)
 		y = 9 - y
 	end
 	sb_press_square(":board", 0.5, x, y)
-	if     (output:get_value("s0.28") ~= 0) then return 'q'
-	elseif (output:get_value("s0.26") ~= 0) then return 'r'
-	elseif (output:get_value("s0.24") ~= 0) then return 'b'
-	elseif (output:get_value("s0.15") ~= 0) then return 'n'
+	if     (output_value("s0.28") ~= 0) then return 'q'
+	elseif (output_value("s0.26") ~= 0) then return 'r'
+	elseif (output_value("s0.24") ~= 0) then return 'b'
+	elseif (output_value("s0.15") ~= 0) then return 'n'
 	end
 	return p
 end
