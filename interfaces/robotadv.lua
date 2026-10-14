@@ -1,13 +1,19 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.turn = false
 interface.level = 2
 interface.cur_level = 2
 interface.edit = false
 local throttled = true
 
-local ram = emu.item(machine.devices[':maincpu'].items['0/:nvram'])
-local adr = 0x6e
+-- the level is kept at 0xceb0, the move list at 0xd46e (battery RAM)
+local mem = machine.devices[":maincpu"].spaces["program"]
+local adr = 0xd46e
 local led = 2
 
 function interface.setlevel()
@@ -15,8 +21,8 @@ function interface.setlevel()
 		return
 	end
 	interface.cur_level = interface.level
-	ram:write(0xceb0,interface.level)
-	ram:write(0xceb1,interface.level)
+	mem:write_u8(0xceb0, interface.level)
+	mem:write_u8(0xceb1, interface.level)
 --	send_input(":IN.0", 0x40, 1) -- Level
 --  send_input(":IN.0", 0x80, 1) -- GO
 --	machine:popmessage("Level " .. tostring(interface.level))
@@ -30,10 +36,10 @@ function interface.setup_machine()
     send_input(":IN.2", 0x40, 2) -- Emotions
 	sb_reset_board(":board")
 	emu.wait(1.0)
-	adr = 0x6e
+	adr = 0xd46e
 	led = 2
 
-	interface.cur_level = ram:read(0xceb0)
+	interface.cur_level = mem:read_u8(0xceb0)
 	interface.setlevel()
 end
 
@@ -50,11 +56,11 @@ end
 function prompieces()
 	local z = { 4,2,2,1,1,3,3}
 	for y=1,7 do
-		if output:get_value("piece_i" .. tostring(8-y)) == 0 then
+		if output_value("piece_i" .. tostring(8-y)) == 0 then
 			send_input(":board:SPAWN", 0x01<<z[y], 0.09)
 			sb_move_piece(":board", 9, 8-y)
 		end
-		if output:get_value("piece_l" .. tostring(8-y)) == 0 then
+		if output_value("piece_l" .. tostring(8-y)) == 0 then
 			send_input(":board:SPAWN", 0x01<<(z[y]+6), 0.09)
 			sb_move_piece(":board", 12, 8-y)
 		end
@@ -62,10 +68,13 @@ function prompieces()
 end
 
 function interface.set_pos(mode)
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
 	if mode == 0 then
 		send_input(":IN.1", 0x40, 1) -- Set Up
 		sb_clear_board(":board")
 		prompieces()
+		machine.video.throttled = throttled_state
 		return ("")
 	else
 		local piece=7
@@ -95,7 +104,10 @@ function interface.set_pos(mode)
 			send_input(":IN.0", 0x04, 1) -- Change Color
 		end
 		send_input(":IN.1", 0x40, 1) -- Set Up
+		-- LED 1.2 (White) or 1.3 (Black) shows the side to move
+		led = (mode > 0) and 2 or 3
 	end
+	machine.video.throttled = throttled_state
 end
 
 function interface.edit_game(on)
@@ -123,7 +135,7 @@ function interface.stop_play()
 end
 
 function get_piece_sb(x, y)
-	local piece = output:get_value("piece_" .. ("abcdefgh"):sub(x,x) .. tostring(y))
+	local piece = output_value("piece_" .. ("abcdefgh"):sub(x,x) .. tostring(y))
 	if piece < 7 then return 7 - piece
 	elseif piece < 13 then return piece - 13
 	else return 0
@@ -131,10 +143,10 @@ function get_piece_sb(x, y)
 end
 
 function interface.is_selected(x, y)
---	if output:get_value("1." .. led) ~= 0 then -- slower but safer
+--	if output_value("1." .. led) ~= 0 then -- slower but safer
 	if get_piece_sb(x, y) ~= get_piece_id(x, y) then
-		local z1 = (ram:read(adr))&0x77
-		local z2 = (ram:read(adr+1))&0x77
+		local z1 = mem:read_u8(adr) & 0x77
+		local z2 = mem:read_u8(adr + 1) & 0x77
 		local x1 = 8-(z1>>4)
 		local y1 = 8-(z1&0x07)
 		local x2 = 8-(z2>>4)
@@ -151,7 +163,7 @@ function interface.select_piece(x, y, event)
 		else
 			interface.turn = not interface.turn
 			if interface.turn then
-				while output:get_value("1." .. led) == 0 do
+				while output_value("1." .. led) == 0 do
 					emu.wait(0.5)
 				end
 			end
@@ -184,22 +196,22 @@ end
 
 function interface.test_promotion(x, y)
 	local p
-	throttled = machine:video().throttled
-	machine:video().throttled = false
+	throttled = machine.video.throttled
+	machine.video.throttled = false
 	emu.wait(15)
 	prompieces()
 	send_input(":IN.0", 0x02, 1) -- Verify
 	sb_press_square(":board", 1, x, y)
 
-	if     (output:get_value("2.5") ~= 0) then p = "Q"
-	elseif (output:get_value("2.3") ~= 0) then p = "N"
-	elseif (output:get_value("2.4") ~= 0) then p = "B"
-	elseif (output:get_value("2.2") ~= 0) then p = "R"
+	if     (output_value("2.5") ~= 0) then p = "Q"
+	elseif (output_value("2.3") ~= 0) then p = "N"
+	elseif (output_value("2.4") ~= 0) then p = "B"
+	elseif (output_value("2.2") ~= 0) then p = "R"
 	else p = "Q"
 	end
 
 	send_input(":IN.0", 0x02, 1) -- Verify
-	machine:video().throttled = throttled
+	machine.video.throttled = throttled
 	return p
 end
 
