@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = "a1"
 interface.cur_level = nil
 local promcode = 0
@@ -15,7 +20,7 @@ function setdigit(n,z)
 	local dig = 0x00
 	repeat
 		for i=1,7 do
-			if (output:get_value(map[n][i]) ~= 0) then
+			if (output_value(map[n][i]) ~= 0) then
 				dig = dig | (1 << (i-1))
 			end
 		end
@@ -159,13 +164,15 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_indexed_value("1.", 8 - x) ~= 0
-	local yval = output:get_indexed_value("0.", y - 1) ~= 0
+	local xval = output_value("1." .. tostring(8 - x)) ~= 0
+	local yval = output_value("0." .. tostring(y - 1)) ~= 0
 	return xval and yval
 end
 
+-- The board needs a square held for more than 250 ms (MAME driver
+-- set_delay) and the machine misses short presses while it is busy.
 function interface.select_piece(x, y, event)
-	sb_select_piece(":board", 0.5, x, y, event)
+	sb_select_piece(":board", 1, x, y, event)
 end
 
 function interface.get_options()
@@ -203,10 +210,10 @@ function interface.get_promotion(x, y)
 	promcode = 1
 	local p = nil
 	repeat
-		if     output:get_value("s0.7") ~= 0 then p = "q"
-		elseif output:get_value("s0.9") ~= 0 then p = "r"
-		elseif output:get_value("s0.12") ~= 0 then p = "b"
-		elseif output:get_value("s0.14") ~= 0 then p = "n"
+		if     output_value("s0.7") ~= 0 then p = "q"
+		elseif output_value("s0.9") ~= 0 then p = "r"
+		elseif output_value("s0.12") ~= 0 then p = "b"
+		elseif output_value("s0.14") ~= 0 then p = "n"
 		end
 		if p == nil then
 			emu.wait(0.25)
