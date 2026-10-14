@@ -159,15 +159,37 @@ local function lifted(x, y)
 	return false
 end
 
+local function put_down(x, y)
+	for i = 1, 10 do
+		if not interface.is_selected(x, y) then
+			return true
+		end
+		emu.wait(0.1)
+	end
+	return false
+end
+
+local from_sq = nil
+
 function interface.select_piece(x, y, event)
 	sb_select_piece(":board", 1, x, y, event)
 	if event == "get" then
+		from_sq = { x = x, y = y }
 		for i = 1, 3 do
 			if lifted(x, y) then
 				break
 			end
 			sb_select_piece(":board", 1, x, y, event)
 		end
+	elseif event == "put" and from_sq ~= nil then
+		-- the FROM square stays lit if the TO square was ignored
+		for i = 1, 3 do
+			if put_down(from_sq.x, from_sq.y) then
+				break
+			end
+			sb_select_piece(":board", 1, x, y, event)
+		end
+		from_sq = nil
 	end
 end
 
