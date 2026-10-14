@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.turn = true
 interface.level = "c1"
 interface.cur_level = nil
@@ -24,7 +29,7 @@ function interface.setup_machine()
 	sb_reset_board(":board")
 	interface.turn = true
 	interface.edit = false
-    send_input(":IN.0", 0x04000, 0.5) -- New Game
+	send_input(":IN.0", 0x04000, 0.5) -- New Game
 	emu.wait(1)
 
 	interface.cur_level = "g1"
@@ -81,13 +86,13 @@ function interface.set_pos(mode)
 			send_input(":IN.0", 0x00020, 0.5) -- Black
 		end
 		local fig = {0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x00,0x06,0x05,0x04,0x03,0x02,0x01}
-		local ram = emu.item(machine.devices[':maincpu'].items['0/:maincpu:ram0'])
-		local adr = 0x20
+		local ram = machine.devices[":maincpu"].spaces["data"]
+		local adr = 0x40 -- board, rank by rank from a1
 		for x=1,8 do
 			for y=1,8 do
 				local p=get_piece_id(x,y)
 				local z=fig[p+7]
-				ram:write(adr+8*(y-1)+x-1,z)
+				ram:write_u8(adr+8*(y-1)+x-1,z)
 			end
 		end
 		send_input(":IN.0", 0x00200, 0.5) -- Setup Position
@@ -117,7 +122,7 @@ function getdigit(n)
 		     {"0.3","0.15","0.23","0.7","0.19","0.11","0.27"}}
 	local dig = 0x00
 	for i=1,7 do
-		if (output:get_value(map[n][i]) ~= 0) then
+		if (output_value(map[n][i]) ~= 0) then
 			dig = dig | (1 << (i-1))
 		end
 	end
