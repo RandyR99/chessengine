@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = 6
 interface.cur_level = nil
 interface.prom = false
@@ -9,6 +14,20 @@ local pv3 = ""
 local l_pv = ""
 local score = ""
 local zaehler = 0
+
+-- the machine switches itself off after a few idle minutes; the LCD is then blank
+local function On()
+	for t = 1, 6 do
+		for i = 0, 23 do
+			if output_value("s0." .. i) ~= 0 or output_value("s1." .. i) ~= 0 then
+				return
+			end
+		end
+		emu.wait(0.05)
+	end
+	send_input(":IN.1", 0x01, 0.5) -- ON/OFF
+	emu.wait(1)
+end
 
 function interface.get_author()
     return "G.Horvath"
@@ -24,7 +43,7 @@ function leseZeichen(n, ascii)
     }
     local Zeichen = 0x00
     for i = 1, 7 do
-        if (output:get_value(Segmente[n][i]) ~= 0) then
+        if (output_value(Segmente[n][i]) ~= 0) then
             Zeichen = Zeichen | (1 << (i - 1))
         end
     end
@@ -34,14 +53,14 @@ function leseZeichen(n, ascii)
 end
 
 function interface.show_info(on)
-    local doppelpunkt = output:get_value("s0.6")
+    local doppelpunkt = output_value("s0.6")
     if on == true then
         local d1 = leseZeichen(1, 1)
         local d2 = leseZeichen(2, 1)
         local d3 = leseZeichen(3, 1)
         local d4 = leseZeichen(4, 1)
         local d5 = leseZeichen(5, 1)
-        local punkt = output:get_value("s0.7")
+        local punkt = output_value("s0.7")
         if d2:sub(1, 1) == "?" or d2:sub(1, 1) == "?" or d2:sub(1, 1) == "?" or
             d2:sub(1, 1) == "?" then
             emu.wait(0.1)
@@ -88,14 +107,8 @@ function interface.show_info(on)
     end
 end
 
-function interface.back_move(on)
-    if on == true then
-        send_input(":IN.1", 0x10, 0.5) -- TB
-        emu.wait(0.25)
-    end
-end
-
 function interface.setlevel()
+    On()
     if (interface.cur_level == nil or interface.cur_level == interface.level) then
         return
     end
@@ -178,81 +191,29 @@ function setpiece(n)
     end
 end
 
-function interface.fen2pos(fen)
-
-    send_input(":IN.0", 0x04, 0.5) -- Set Up
-    send_input(":IN.1", 0x80, 0.5) -- Clear Board
-    send_input(":IN.1", 0x80, 0.5) -- Clear Board
-    sb_clear_board(":board")
-    emu.wait(1)
-    -- Brett ist geleert
-    local x = 1
-    local y = 1
-    local piece = 0
-    local i = 1
-    local lastpiece = 7
-    repeat
-        piece = 0
-        piece = setpiece2integer(fen:sub(i, i))
-        if piece == 0 and fen:sub(i, i) ~= "/" then
-            x = x + tonumber(fen:sub(i, i))
-            i = i + 1
-        elseif fen:sub(i, i) == "/" then
-            i = i + 1
-        else
-            if piece * lastpiece < 0 then
-                if piece < 0 then
-                    send_input(":IN.1", 0x10, 0.5) -- Left (Black)
-                else
-                    send_input(":IN.0", 0x10, 0.5) -- Right (White)
-                end
-            end
-            if math.abs(piece) ~= math.abs(lastpiece) then
-                setpiece(math.abs(piece))
-            end
-            sb_piece_to_square(piece, x, 9 - y)
-            lastpiece = piece
-            i = i + 1
-            x = x + 1
-        end
-        if x == 9 then
-            x = 1
-            y = y + 1
-        end
-    until y == 9
-    local Farbe = 1
-    if fen:sub(i + 1, i + 1) == "b" then Farbe = -1 end
-    if Farbe < 0 then
-        send_input(":IN.1", 0x10, 0.5) -- Left (Black)
-    else
-        send_input(":IN.0", 0x10, 0.5) -- Right (White)
-    end
-    send_input(":IN.0", 0x04, 0.5) -- Set Up
-    return string.upper(fen:sub(i + 1, i + 1)) -- Farbe zurückmelden (ply)
-end
-
-function interface.playermode()
+function interface.edit_game()
+    On()
     send_input(":IN.0", 0x20, 0.5) -- Multi Move
 end
 
 function interface.start_play(init)
+    On()
     send_input(":IN.1", 0x04, 0.5) -- Move
 end
 
 function interface.stop_play()
+    On()
     send_input(":IN.1", 0x04, 0.5) -- Move
 end
 
 function interface.is_selected(x, y)
-    local xval = output:get_indexed_value("1.", 8 - x) ~= 0
-    local yval = output:get_indexed_value("0.", y - 1) ~= 0
+    local xval = output_value("1." .. 8 - x) ~= 0
+    local yval = output_value("0." .. y - 1) ~= 0
     return xval and yval
 end
 
 function interface.select_piece(x, y, event)
-    if output:get_value("OFF") == 1 then
-        send_input(":IN.1", 0x01, 0.5) -- ON/OFF
-    end
+    On()
     emu.wait(0.5)
     if (event == "en_passant") then
         sb_remove_piece(":board", x, y)
@@ -312,20 +273,25 @@ function interface.set_option(name, value)
     end
 end
 
-function interface.get_promotiom_after_move(x, y)
+function interface.get_promotion(x, y)
+    return nil -- the machine shows its promotion piece after the move
+end
+
+function interface.test_promotion(x, y)
+    On()
     emu.wait(0.5)
     interface.prom = true
     for i = 1, 4 do
-        if output:get_value("s1.9") ~= 0 then
+        if output_value("s1.9") ~= 0 then
             send_input(":IN.0", 0x02, 0.5)
             return "Q"
-        elseif output:get_value("s1.7") ~= 0 then
+        elseif output_value("s1.7") ~= 0 then
             send_input(":IN.0", 0x40, 0.5)
             return "R"
-        elseif output:get_value("s1.6") ~= 0 then
+        elseif output_value("s1.6") ~= 0 then
             send_input(":IN.1", 0x40, 0.5)
             return "B"
-        elseif output:get_value("s1.4") ~= 0 then
+        elseif output_value("s1.4") ~= 0 then
             send_input(":IN.0", 0x01, 0.5)
             return "N"
         end
@@ -352,36 +318,6 @@ function interface.promote(x, y, piece)
     end
     interface.prom = false
     sb_promote(":board", x, y, piece)
-end
-
-function setpiece2integer(fen)
-    local piece = 0
-    if fen == "r" then
-        piece = -3 -- rook b
-    elseif fen == "n" then
-        piece = -5 -- knight b
-    elseif fen == "b" then
-        piece = -4 -- bishop b
-    elseif fen == "q" then
-        piece = -2 -- queen b
-    elseif fen == "k" then
-        piece = -1 -- king b
-    elseif fen == "p" then
-        piece = -6 -- pawn b
-    elseif fen == "R" then
-        piece = 3 -- rook w
-    elseif fen == "N" then
-        piece = 5 -- knight w
-    elseif fen == "B" then
-        piece = 4 -- bishop w
-    elseif fen == "Q" then
-        piece = 2 -- queen w
-    elseif fen == "K" then
-        piece = 1 -- king w
-    elseif fen == "P" then
-        piece = 6 -- pawn w
-    end
-    return piece
 end
 
 function digit_ascii(digit)
@@ -487,6 +423,7 @@ function interface.feature(fx, value)
 end
 
 function interface.set_pos(mode)
+    On()
     if mode == 0 then
         send_input(":IN.0", 0x04, 0.5) -- Set Up
         send_input(":IN.1", 0x80, 0.5) -- Clear Board
