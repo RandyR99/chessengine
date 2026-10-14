@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = 1
 interface.cur_level = nil
 
@@ -8,43 +13,57 @@ function interface.setlevel()
 		return
 	end
 	interface.cur_level = interface.level
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
 	repeat
 		send_input(":IN.1", 0x80, 0.6) -- Level
-		local cur_level = 0
-		for y=0,7 do
-			if output:get_value("1." .. tostring(7 - y)) ~= 0 then
-				cur_level = cur_level + 1
+		-- level bar on the rank LEDs; wait until the count is stable
+		local cur_level, stable = -1, 0
+		repeat
+			emu.wait(0.05)
+			local n = 0
+			for y = 0, 7 do
+				if output_value("1." .. y) ~= 0 then
+					n = n + 1
+				end
 			end
-		end
-	until cur_level == interface.level
+			if (n == cur_level) then
+				stable = stable + 1
+			else
+				cur_level, stable = n, 0
+			end
+		until (stable >= 4)
+	until (cur_level == interface.level)
+	machine.video.throttled = throttled_state
 end
 
 function interface.setup_machine()
 	sb_reset_board(":board")
-    send_input(":RESET", 0x01, 0.6) -- New Game
+	send_input(":RESET", 0x01, 0.6) -- New Game
 	emu.wait(1.0)
 
 	interface.cur_level = 1
 	interface.setlevel()
 end
 
-if false then -- not reliable!
+-- Disabled: the board RAM write works with full armies, but in sparse
+-- positions the ROM then plays king moves into check (k7/2Q5/8/8/8/6p1/8/5K2 b:
+-- Ka8-b8) or never moves (forced e.p.). It must keep more state than the board.
+if false then
 function interface.set_pos(mode)
-	if mode == 0 then
-		return (":board")
-	else
-		local ram = emu.item(machine.devices[':maincpu'].items['0/00000000-0000ffff'])
-		local fig = {0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x00,0x06,0x05,0x04,0x03,0x02,0x01}
-		for x=1,8 do
-			for y=1,8 do
-				local p=get_piece_id(x,y)
-				local z=fig[p+7]
-				ram:write(16*(x-1)+y-1,z)
-			end
+	if (mode == 0) then
+		return ":board"
+	end
+	-- board at 16 * (x - 1) + y - 1: P1 N2 B3 R4 Q5 K6, black + 8
+	local ram = machine.devices[":maincpu"].spaces["data"]
+	local fig = { 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x00, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01 }
+	for x = 1, 8 do
+		for y = 1, 8 do
+			ram:write_u8(16 * (x - 1) + y - 1, fig[get_piece_id(x, y) + 7])
 		end
-		if mode==-1 then
-			ram:write(0xf5,0x02)
-		end
+	end
+	if (mode == -1) then
+		ram:write_u8(0xf5, 0x02) -- side to move: 1 white, 2 black
 	end
 end
 end
@@ -57,8 +76,8 @@ function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_value("0." .. tostring(8 - x)) ~= 0
-	local yval = output:get_value("1." .. tostring(8 - y)) ~= 0
+	local xval = output_value("0." .. (8 - x)) ~= 0
+	local yval = output_value("1." .. (8 - y)) ~= 0
 	return xval and yval
 end
 
