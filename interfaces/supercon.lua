@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = 2
 interface.cur_level = nil
 
@@ -22,7 +27,7 @@ function interface.setlevel()
 		send_input(":IN.6", 0x02, 0.5) -- Set Level
 		local cur_level = 0
 		for y = 0, 7 do
-			if output:get_indexed_value("1.", y) ~= 0 then
+			if output_value("1." .. y) ~= 0 then
 				cur_level = cur_level + 1
 			end
 		end
@@ -43,7 +48,7 @@ function interface.setup_machine()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	send_input(":IN.6", 0x02, 1) -- Set Level
-	local d0 = output:get_value("0.2")
+	local d0 = output_value("0.2")
 	if d0 == 0 then
 		send_input(":IN.2", 0x02, 1) -- Depth Search
 	end
@@ -107,7 +112,7 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	return (output:get_indexed_value("1.", (8 - y)) ~= 0) and (output:get_indexed_value("2.", (x - 1)) ~= 0)
+	return (output_value("1." .. (8 - y)) ~= 0) and (output_value("2." .. (x - 1)) ~= 0)
 end
 
 function interface.select_piece(x, y, event)
@@ -132,10 +137,10 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion_led()
-	if     (output:get_value("0.1") ~= 0) then return 'q'
-	elseif (output:get_value("0.4") ~= 0) then return 'r'
-	elseif (output:get_value("0.2") ~= 0) then return 'b'
-	elseif (output:get_value("0.3") ~= 0) then return 'n'
+	if     (output_value("0.1") ~= 0) then return 'q'
+	elseif (output_value("0.4") ~= 0) then return 'r'
+	elseif (output_value("0.2") ~= 0) then return 'b'
+	elseif (output_value("0.3") ~= 0) then return 'n'
 	end
 	return nil
 end
@@ -161,44 +166,13 @@ function interface.promote(x, y, piece)
 	end
 end
 
-function interface.show_pv_after_move_player()
-  send_input(":IN.3", 0x100, 0.5)        -- LV
-  interface.score=0
-  interface.depth=0
-end
- 
-   
-function interface.befor_move_from_engine()
-  send_input(":IN.3", 0x100, 0.5)        -- LV
-  local d1 = output:get_value("digit1")
-  if d1 == 0 then interface.depth =  tonumber(interface.digit_string(d0),16) end
-  send_input(":IN.5", 0x100, 0.5)  -- RE
-  local d0 = output:get_value("digit0")
-  d1 = output:get_value("digit1")
-  local d2 = output:get_value("digit2")
-  local d3 = output:get_value("digit3")
-  local dotO = output:get_value("2.7")
-  local dotU = output:get_value("3.7")
-  if d3 ~=0 and d2 ~=0 and d1 ~=0 and d0 ~=0 and dotO== 0 then
-    interface.hex=interface.digit_string(d3) .. interface.digit_string(d2) .. interface.digit_string(d1) ..  interface.digit_string(d0)
-    interface.score = tonumber(interface.digit_string(d3) .. interface.digit_string(d2) .. interface.digit_string(d1) ..  interface.digit_string(d0),16)/256
-    interface.score =tostring(round( interface.score )*10)
-    interface.score =interface.score:gsub("%.","")
-    local dotU = output:get_value("3.7") -- punkt unten
-    if dotU==1 then
-      interface.score="-" .. interface.score:gsub("%.","")
-      interface.hex="-" .. interface.hex
-    end
-  end
-end
-   
 function interface.show_info(ply)
   if ply==true then
-    local d0 = output:get_value("digit0")
-    local d1 = output:get_value("digit1")
-    local d2 = output:get_value("digit2")
-    local d3 = output:get_value("digit3")
-    local dotO = output:get_value("2.7") -- punkt oben
+    local d0 = output_value("digit0")
+    local d1 = output_value("digit1")
+    local d2 = output_value("digit2")
+    local d3 = output_value("digit3")
+    local dotO = output_value("2.7") -- punkt oben
     emu.wait(0.1)
     if d1 == 0 then interface.depth =  tonumber(interface.digit_string(d0),16)
     elseif d3 ~=0 and d2 ~=0 and d1 ~=0 and d0 ~=0 and dotO== 0 then
@@ -206,7 +180,7 @@ function interface.show_info(ply)
       interface.score = tonumber(interface.digit_string(d3) .. interface.digit_string(d2) .. interface.digit_string(d1) ..  interface.digit_string(d0),16)/256
       interface.score =tostring(round( interface.score )*10)
       interface.score =interface.score:gsub("%.","")
-      local dotU = output:get_value("3.7") -- punkt unten
+      local dotU = output_value("3.7") -- punkt unten
       if dotU==1 then
         interface.score="-" .. interface.score:gsub("%.","")
         interface.hex="-" .. interface.hex

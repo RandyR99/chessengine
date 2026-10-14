@@ -20,10 +20,24 @@ function interface.get_author()
 	return "David Kittinger"
 end
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
+-- LCD characters are kept in RAM at 0xc20
+local function lcd_char(n)
+	return machine.devices[":maincpu"].spaces["program"]:read_u8(0xc20 + n)
+end
+
 function interface.getdigit(n)
 	emu.wait(0.5)
-	local ddram = emu.item(machine.devices[':maincpu'].items['0/:nvram'])
-	local d = ddram:read(0xc20 + n) & 0x7f
+	local d = lcd_char(n) & 0x7f
+	for i = 1, 10 do -- a blinking digit reads blank
+		if (d ~= 0x20) then break end
+		emu.wait(0.5)
+		d = lcd_char(n) & 0x7f
+	end
 	return d
 end
 
@@ -104,8 +118,7 @@ function interface.setup_machine()
 	send_input(":IN.6", 0x02, 0.5) -- Set Level
 	send_input(":IN.2", 0x02, 0.5) -- Depth Search
 	emu.wait(0.5)
-	local ddram = emu.item(machine.devices[':maincpu'].items['0/:nvram'])
-	if digit_ascii(ddram:read(0xc20 + 8)) == "f" then
+	if digit_ascii(lcd_char(8)) == "f" then
 		send_input(":IN.2", 0x02, 0.5) -- depth Search
 	end
 	send_input(":IN.7", 0x01, 0.5) -- Go
@@ -177,7 +190,11 @@ function interface.set_option(name, value)
 			local div = (num - mod) / 8 + 1
 			level = string.char(div + 96) .. tostring(mod) .. level:sub(3)
 		end
-		if (level:match("^[ab][1-8]$") or level:match("^b8%s%d%d/%d%d:[0-5]%d$") or level:match("^b8%s%d%d/%d%d:[0-5]%d%s%d%d/%d%d:[0-5]%d$")) then
+		if level:match("^b8%s%d%d/%d%d:[0-5]%d$") then
+			-- White and Black have their own time control: use it for both
+			level = level .. level:sub(3)
+		end
+		if (level:match("^[ab][1-8]$") or level:match("^b8%s%d%d/%d%d:[0-5]%d%s%d%d/%d%d:[0-5]%d$")) then
 			interface.level = level
 			interface.setlevel()
 		end
@@ -185,7 +202,7 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local d8 = output:get_value("digit8")
+	local d8 = output_value("digit8")
 	if     (d8 == 0x67) then return "q"
 	elseif (d8 == 0x50) then return "r"
 	elseif (d8 == 0x7c) then return "b"
@@ -201,12 +218,11 @@ end
 
 function interface.show_info(on)
 	if on then
-		local ddram = emu.item(machine.devices[':maincpu'].items['0/:nvram'])
-		if digit_ascii(ddram:read(0xc20 + 0)) == "d" and ddram:read(0xc20 + 2) < 10 then
-			interface.depth = digit_ascii(ddram:read(0xc20 + 1)) .. digit_ascii(ddram:read(0xc20 + 2)):gsub(" ", "")
-		elseif digit_ascii(ddram:read(0xc20 + 5)) == " " or digit_ascii(ddram:read(0xc20 + 5)) == "-" then
-			interface.pv = digit_ascii(ddram:read(0xc20 + 0)) .. digit_ascii(ddram:read(0xc20 + 1)) .. digit_ascii(ddram:read(0xc20 + 2)) .. digit_ascii(ddram:read(0xc20 + 3))
-			interface.score = digit_ascii(ddram:read(0xc20 + 5)) .. digit_ascii(ddram:read(0xc20 + 6)) .. digit_ascii(ddram:read(0xc20 + 7)) .. digit_ascii(ddram:read(0xc20 + 8)) .. digit_ascii(ddram:read(0xc20 + 9)):gsub(" ", "")
+		if digit_ascii(lcd_char(0)) == "d" and lcd_char(2) < 10 then
+			interface.depth = digit_ascii(lcd_char(1)) .. digit_ascii(lcd_char(2)):gsub(" ", "")
+		elseif digit_ascii(lcd_char(5)) == " " or digit_ascii(lcd_char(5)) == "-" then
+			interface.pv = digit_ascii(lcd_char(0)) .. digit_ascii(lcd_char(1)) .. digit_ascii(lcd_char(2)) .. digit_ascii(lcd_char(3))
+			interface.score = digit_ascii(lcd_char(5)) .. digit_ascii(lcd_char(6)) .. digit_ascii(lcd_char(7)) .. digit_ascii(lcd_char(8)) .. digit_ascii(lcd_char(9)):gsub(" ", "")
 		end
 		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 	end
