@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = 1
 interface.cur_level = nil
 
@@ -46,7 +51,6 @@ function interface.setup_machine()
 	interface.setlevel()
 end
 
---[[
 function interface.set_pos(mode)
 	if mode == 0 then
 		send_input(":IN.0", 0x40, 0.5) -- SET UP
@@ -55,14 +59,14 @@ function interface.set_pos(mode)
 	else
 		local throttled_state = machine.video.throttled
 		machine.video.throttled = false
-		local ram = emu.item(machine.devices[':maincpu'].items['0/0000-ffff'])
+		local mem = machine.devices[":maincpu"].spaces["program"]
 		local fig = {0x06, 0x04, 0x03, 0x05, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0b, 0x0d, 0x0c, 0x0a}
 		local adr = 0x0fc0
 		for x = 1, 8 do
 			for y = 1, 8 do
 				local p = get_piece_id(x, 9 - y)
-				local z = (ram:read(adr + 8 * (y - 1) + x - 1)) & 0xf0|fig[p + 7]
-				ram:write(adr + 8 * (y - 1) + x - 1, z)
+				local z = (mem:read_u8(adr + 8 * (y - 1) + x - 1)) & 0xf0|fig[p + 7]
+				mem:write_u8(adr + 8 * (y - 1) + x - 1, z)
 			end
 		end
 		local z
@@ -92,7 +96,6 @@ function interface.set_pos(mode)
 	end
 	machine.video.throttled = throttled_state
 end
---]]
 
 function interface.start_play(init)
 	send_input(":IN.0", 0x08, 0.5) -- Go
@@ -101,14 +104,14 @@ end
 function interface.is_selected(x, y)
 	local xval,yval
 	if (x < 7) then
-		xval = output:get_indexed_value("0.", (x - 1)) ~= 0
+		xval = output_value("0." .. tostring(x - 1)) ~= 0
 	else
-		xval = output:get_indexed_value("1.", (x - 3)) ~= 0
+		xval = output_value("1." .. tostring(x - 3)) ~= 0
 	end
 	if (y > 2) then
-		yval = output:get_indexed_value("2.", (8 - y)) ~= 0
+		yval = output_value("2." .. tostring(8 - y)) ~= 0
 	else
-		yval = output:get_indexed_value("1.", (2 - y)) ~= 0
+		yval = output_value("1." .. tostring(2 - y)) ~= 0
 	end
 	return xval and yval
 end
