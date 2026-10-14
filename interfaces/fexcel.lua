@@ -15,8 +15,6 @@ function interface.get_module()
 		return "Fidelity Excellence Display"
 	elseif machine.system.name == "fexcel12" then
 		return "Fidelity Excellence EP12"
-	elseif machine.system.name == "fexcel124" then
-		return "Fidelity Excellence EP12 v2"
 	else
 		return machine.system.description
 	end

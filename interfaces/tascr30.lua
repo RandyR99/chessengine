@@ -28,7 +28,7 @@ function interface.get_module()
 end
 
 function interface.get_author()
-	if machine.system.name == "tascr30g" or machine.system.name == "tascr40g" then
+	if machine.system.name == "tascr30g" then
 		return "Ed Schröder"
 	else
 		return "Johan de Koning"

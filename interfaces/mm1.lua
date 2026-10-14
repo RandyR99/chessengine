@@ -9,8 +9,6 @@ interface.pv = ""
 function interface.get_module()
 	if machine.system.name == "mm1" then
 		return "Mephisto MM I"
-	elseif machine.system.name == "mm1b" then
-		return "Mephisto MM I v2"
 	else
 		return machine.system.description
 	end

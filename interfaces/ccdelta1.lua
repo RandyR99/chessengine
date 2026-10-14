@@ -63,9 +63,6 @@ function interface.set_pos(mode)
 		local ram = emu.item(machine.devices[':maincpu'].spaces['program'])
 		local fig = {0xff, 0xfe, 0xfd, 0xfc, 0xfb, 0xfa, 0x00, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01}
 		local adr = 0x2040
-		if machine.system.name == "ccdelta1x" then
-			adr = 0x2c40
-		end
 		send_input(":IN.4", 0x02, 0.5) -- EP
 		for x = 1, 8 do
 			for y = 1, 8 do

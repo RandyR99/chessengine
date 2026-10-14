@@ -11,8 +11,6 @@ local lasty = 0
 function interface.get_module()
 	if machine.system.name == "concams5" then
 		return "Conchess Plymate Amsterdam 5.5"
-	elseif machine.system.name == "concams8" then
-		return "Conchess Plymate Amsterdam 8"
 	else
 		return machine.system.description
 	end
