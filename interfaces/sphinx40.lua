@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = "1"
 interface.cur_level = nil
 interface.style = 5
@@ -175,7 +180,7 @@ function interface.edit_game(on)
 	repeat
 		send_input(":IN.0", 0x04, 0.25) -- Level
 		emu.wait(0.25)
-	until output:get_value("digit0") == tmp
+	until output_value("digit0") == tmp
 	send_input(":IN.0", 0x01, 0.25) -- Clock
 	emu.wait(0.25)
 	machine.video.throttled = throttled_state
@@ -187,10 +192,10 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	if output:get_indexed_value(tostring(y - 1) .. ".", 8 - x) ~= 0 then
+	if output_value(tostring(y - 1) .. "." .. 8 - x) ~= 0 then
 		for i = 1, 6 do -- prüft ob LED blinkt (König steht im Schach)
 			emu.wait(0.1)
-			if output:get_indexed_value(tostring(y - 1) .. ".", 8 - x) == 0 then
+			if output_value(tostring(y - 1) .. "." .. 8 - x) == 0 then
 				return false
 			end
 		end
@@ -235,7 +240,7 @@ end
 function interface.test_promotion(x, y)
 	local function board_led(x, y)
 		for i = 1, 5 do
-			if (output:get_indexed_value(tostring(y - 1) .. ".", 8 - x) ~= 0) then
+			if (output_value(tostring(y - 1) .. "." .. 8 - x) ~= 0) then
 				return true
 			end
 			emu.wait(0.1)
@@ -278,15 +283,15 @@ end
 function interface.show_info(on)
 	if on then
 		send_input(":IN.2", 0x08, 1) -- Analysis
-		local d1 = output:get_value("digit0")
-		local d2 = output:get_value("digit1")
-		local d3 = output:get_value("digit2")
-		local d4 = output:get_value("digit3")
+		local d1 = output_value("digit0")
+		local d2 = output_value("digit1")
+		local d3 = output_value("digit2")
+		local d4 = output_value("digit3")
 		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-		local d5 = output:get_value("digit4")
-		local d6 = output:get_value("digit5")
-		local d7 = output:get_value("digit6")
-		local d8 = output:get_value("digit7")
+		local d5 = output_value("digit4")
+		local d6 = output_value("digit5")
+		local d7 = output_value("digit6")
+		local d8 = output_value("digit7")
 		interface.score = (digit_ascii(d5) .. digit_ascii(d6) .. digit_ascii(d7) .. digit_ascii(d8)):gsub(" ", "") .. "0"
 		return "info score cp " .. interface.score .. " depth 1 pv " .. interface.pv
 	end
