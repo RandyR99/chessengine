@@ -15,15 +15,21 @@ local l_pv = ""
 local score = ""
 local zaehler = 0
 
--- the machine switches itself off after a few idle minutes; the LCD is then blank
+-- the machine switches itself off after a few idle minutes: the LCD is then blank
+-- and the CPU is in standby (PC stands still); the LCD alone also blanks in play
 local function On()
-	for t = 1, 6 do
-		for i = 0, 23 do
-			if output_value("s0." .. i) ~= 0 or output_value("s1." .. i) ~= 0 then
-				return
-			end
+	for i = 0, 23 do
+		if output_value("s0." .. i) ~= 0 or output_value("s1." .. i) ~= 0 then
+			return
 		end
+	end
+	local state = machine.devices[":maincpu"].state["PC"]
+	local pc = state.value
+	for t = 1, 8 do
 		emu.wait(0.05)
+		if state.value ~= pc then
+			return
+		end
 	end
 	send_input(":IN.1", 0x01, 0.5) -- ON/OFF
 	emu.wait(1)
@@ -98,7 +104,6 @@ function interface.show_info(on)
             "info score cp " .. score .. " depth 1 pv " .. pv1 .. " " .. pv2 ..
                 " " .. pv3
     else
-        if doppelpunkt == 0 then send_input(":IN.1", 0x01, 0.5) end
         pv1 = ""
         pv2 = ""
         pv3 = ""
