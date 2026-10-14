@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = 1
 interface.cur_level = nil
 interface.edit = false
@@ -25,7 +30,7 @@ function interface.setlevel()
 		send_input(":IN.6", 0x02, 0.5) -- Set Level
 		local cur_level = 0
 		for y = 0, 7 do
-			if output:get_indexed_value("1.", y) ~= 0 then
+			if output_value("1." .. y) ~= 0 then
 				cur_level = cur_level + 1
 			end
 		end
@@ -35,9 +40,9 @@ function interface.setlevel()
 	if (interface.level < 0 ) then
 		tc = 0x08
 	end
-    if (emu.item(machine.devices[':maincpu'].items['0/:nvram']):read(0x58) & 0x08 ~= tc) then
-                send_input(":IN.1", 0x02, 1) -- Time Control
-    end
+	if (machine.devices[":maincpu"].spaces["program"]:read_u8(0x58) & 0x08 ~= tc) then
+		send_input(":IN.1", 0x02, 1) -- Time Control
+	end
 	machine.video.throttled = throttled_state
 end
 
@@ -108,7 +113,7 @@ function interface.edit_game(on)
 	else
 		local c1 = false
 		for i = 1, 5 do
-			if output:get_value("0.7") ~= 0 then
+			if output_value("0.7") ~= 0 then
 				c1 = true
 				break
 			end
@@ -117,7 +122,7 @@ function interface.edit_game(on)
 		send_input(":IN.7", 0x01, 0.5) -- GO
 		local c2 = false
 		for i = 1, 5 do
-			if output:get_value("0.7") ~= 0 then
+			if output_value("0.7") ~= 0 then
 				c2 = true
 				break
 			end
@@ -137,7 +142,7 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	return (output:get_indexed_value("1.", (8 - y)) ~= 0) and (output:get_indexed_value("2.", (x - 1)) ~= 0)
+	return (output_value("1." .. (8 - y)) ~= 0) and (output_value("2." .. (x - 1)) ~= 0)
 end
 
 function interface.select_piece(x, y, event)
