@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = "1"
 interface.cur_level = nil
 interface.score = "0.00"
@@ -62,13 +67,13 @@ function interface.set_pos(mode)
 					if math.abs(p) ~= math.abs(piece) then
 						send_input(":IN.0", 0x80 >> (math.abs(p) - 1), 0.5)
 					end
-					sb_press_square(":board", 0.5, x, 9 - y)
+					sb_press_square(":board", 1, x, 9 - y)
 					piece = p
 				end
 			end
 		end
 		send_input(":IN.1", 0x01, 0.5) -- Go
-		if mode * piece < 0 then
+		if mode < 0 then
 			send_input(":IN.1", 0x10, 0.5) -- Color
 		end
 		send_input(":IN.0", 0x40, 0.5) -- Sound
@@ -91,13 +96,14 @@ function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_value("1." .. tostring(x - 1)) ~= 0
-	local yval = output:get_value("0." .. tostring(8 - y)) ~= 0
+	local xval = output_value("1." .. tostring(x - 1)) ~= 0
+	local yval = output_value("0." .. tostring(8 - y)) ~= 0
 	return xval and yval
 end
 
+-- the board needs a square held for more than 350 ms (MAME driver set_delay)
 function interface.select_piece(x, y, event)
-	sb_select_piece(":board", 0.5, x, y, event)
+	sb_select_piece(":board", 1, x, y, event)
 end
 
 function interface.get_options()
@@ -135,7 +141,7 @@ function interface.get_promotion(x, y)
 	local map = {"s0.1", "s1.1", "s2.1", "s3.0", "s2.0", "s0.0", "s1.0"}
 	local dig = 0x00
 	for i = 1, 7 do
-		if (output:get_value(map[i]) ~= 0) then
+		if (output_value(map[i]) ~= 0) then
 			dig = dig | (1 << (i - 1))
 		end
 	end
@@ -157,7 +163,7 @@ end
 
 function interface.show_info(on)
 	if on then
-		local ddram = emu.item(machine.devices[':maincpu'].items['0/40-13f']):read_block(0x82, 0x05)
+		local ddram = emu.item(machine.devices[':maincpu'].items['0/:maincpu:internal_ram']):read_block(0x82, 0x05)
 		if (digit_ascii(ddram:byte(1)) .. digit_ascii(ddram:byte(2))) == "d " then
 			interface.depth = digit_ascii(ddram:byte(3)) .. digit_ascii(ddram:byte(4))
 		elseif digit_ascii(ddram:byte(1)) == " " or digit_ascii(ddram:byte(1)) == "-" then

@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = 1
 interface.cur_level = nil
 local throttled = true
@@ -13,7 +18,7 @@ function interface.setlevel()
 	local y = (level - 1) % 8 + 1
 	local x = (level - y) / 8 + 1
 	send_input(":IN.0", 0x04, 0.5) -- Set Level
-	sb_press_square(":board", 0.5, x, y)
+	sb_press_square(":board", 1, x, y)
 	send_input(":IN.1", 0x01, 0.5) -- Go
 end
 
@@ -45,7 +50,7 @@ function interface.set_pos(mode)
 					if math.abs(p)~=math.abs(piece) then
 						send_input(":IN.0", 0x80>>(math.abs(p)-1), 0.5)
 					end
-					sb_press_square(":board", 0.5, x, 9-y)
+					sb_press_square(":board", 1, x, 9-y)
 					piece=p
 				end
 			end
@@ -69,13 +74,14 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_value("1." .. tostring(x - 1)) ~= 0
-	local yval = output:get_value("0." .. tostring(8 - y)) ~= 0
+	local xval = output_value("1." .. tostring(x - 1)) ~= 0
+	local yval = output_value("0." .. tostring(8 - y)) ~= 0
 	return xval and yval
 end
 
+-- the board needs a square held for more than 350 ms (MAME driver set_delay)
 function interface.select_piece(x, y, event)
-	sb_select_piece(":board", 0.5, x, y, event)
+	sb_select_piece(":board", 1, x, y, event)
 end
 
 function interface.get_options()
@@ -102,9 +108,9 @@ function interface.test_promotion(x, y)
     machine.video.throttled = false
 
 	send_input(":IN.1", 0x20, 0.5) -- Verify/Setup
-	sb_press_square(":board", 0.5, x, y)
+	sb_press_square(":board", 1, x, y)
 	for i=1,7 do
-		if (output:get_value(map[i]) ~= 0) then
+		if (output_value(map[i]) ~= 0) then
 			dig = dig | (1 << (i-1))
 		end
 	end
