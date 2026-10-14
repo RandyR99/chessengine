@@ -1,11 +1,16 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = "a2"
 interface.cur_level = nil
 interface.score = "0.00"
 interface.depth = "1"
 interface.pv = ""
-local Ticker = 0
+interface.LCTTicker = 0
 
 function interface.get_module()
 	return "CXG Sphinx Dominator"
@@ -96,7 +101,7 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	return output:get_value((y - 1) .. "." .. (x - 1)) ~= 0
+	return output_value((y - 1) .. "." .. (x - 1)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -121,10 +126,10 @@ end
 
 function interface.get_promotion(x, y)
 	local new_type = nil
-	if     (output:get_value("8.4") ~= 0) then new_type = 'q'
-	elseif (output:get_value("8.3") ~= 0) then new_type = 'r'
-	elseif (output:get_value("8.2") ~= 0) then new_type = 'b'
-	elseif (output:get_value("8.1") ~= 0) then new_type = 'n'
+	if     (output_value("8.4") ~= 0) then new_type = 'q'
+	elseif (output_value("8.3") ~= 0) then new_type = 'r'
+	elseif (output_value("8.2") ~= 0) then new_type = 'b'
+	elseif (output_value("8.1") ~= 0) then new_type = 'n'
 	end
 	if (new_type ~= nil) then
 		interface.select_piece(x, y, "")
@@ -144,8 +149,8 @@ end
 
 function interface.show_info(on, color)
 	if on then
-		local dot1 = output:get_value("lcd0.16")
-		local dot2 = output:get_value("lcd1.16")
+		local dot1 = output_value("s0.16")
+		local dot2 = output_value("s1.16")
 		if (dot1 == 1 and dot2 == 1) or interface.LCTTicker >= 1 then
 			if (dot1 == 1 and dot2 == 1) then
 				interface.LCTTicker = 1
@@ -153,14 +158,14 @@ function interface.show_info(on, color)
 			send_input(":IN.1", 0x04, 0.5) -- Hint
 			emu.wait(0.25)
 			if interface.LCTTicker == 1 then
-				local d1 = output:get_value("digit0")
-				local d2 = output:get_value("digit1")
-				local d3 = output:get_value("digit2")
-				local d4 = output:get_value("digit3")
-				local d5 = output:get_value("digit4")
-				local d6 = output:get_value("digit5")
-				local d7 = output:get_value("digit6")
-				local d8 = output:get_value("digit7")
+				local d1 = output_value("digit0")
+				local d2 = output_value("digit1")
+				local d3 = output_value("digit2")
+				local d4 = output_value("digit3")
+				local d5 = output_value("digit4")
+				local d6 = output_value("digit5")
+				local d7 = output_value("digit6")
+				local d8 = output_value("digit7")
 				interface.score = digit_ascii(d5) .. digit_ascii(d6) .. digit_ascii(d7) .. digit_ascii(d8)
 				if color == "B" then
 				    if tonumber(interface.score) ~= nil then
@@ -182,8 +187,8 @@ function interface.show_info(on, color)
 				interface.LCTTicker = 5
 		 		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 			elseif interface.LCTTicker == 5 then
-				d7 = output:get_value("digit6")
-				d8 = output:get_value("digit7")
+				d7 = output_value("digit6")
+				d8 = output_value("digit7")
 				interface.depth = digit_ascii(d7) .. digit_ascii(d8):gsub(" ","")
 				interface.LCTTicker = 0
 				return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
