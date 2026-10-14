@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = 1
 interface.cur_level = nil
 interface.firststart = true
@@ -21,8 +26,8 @@ function interface.setlevel()
 	machine.video.throttled = false
 	local level = math.abs(interface.level)
 	send_input(":IN.6", 0x02, 1) -- Set Level
-	local infinite = output:get_value("0.6") == 0 and output:get_value("0.5") ~= 0
-	local training = output:get_value("8.1") ~= 0
+	local infinite = output_value("0.6") == 0 and output_value("0.5") ~= 0
+	local training = output_value("8.1") ~= 0
 	if (level == 0) then
 		if (not infinite) then
 			send_input(":IN.3", 0x02, 1) -- Infinite
@@ -118,7 +123,7 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	return output:get_indexed_value(tostring(x - 1) .. ".", 8 - y) ~= 0
+	return output_value(tostring(x - 1) .. "." .. tostring(8 - y)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -142,9 +147,9 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local ram = emu.item(machine.devices[':maincpu'].items['0/0000-ffff'])
+	local mem = machine.devices[":maincpu"].spaces["program"]
 	local adr = 0x0370
-	local piece = (ram:read(adr - 16 * (y - 1) + x - 1)) & 0x07
+	local piece = mem:read_u8(adr - 16 * (y - 1) + x - 1) & 0x07
 	if     piece == 0x05 then return 'q'
 	elseif piece == 0x03 then return 'r'
 	elseif piece == 0x04 then return 'b'
