@@ -1,5 +1,10 @@
 interface = load_interface("sforteb")
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	return "Novag Scorpio 68000"
 end
@@ -97,9 +102,15 @@ function interface.setlevel()
 	machine.video.throttled = throttled_state
 end
 
+function interface.edit_game()
+	send_input(":IN.7", 0x02, 0.6) -- Player/Player
+	send_input(":IN.7", 0x02, 0.6) -- Player/Player
+	emu.wait(1)
+end
+
 function interface.is_selected(x, y)
-	local xval = output:get_value(tostring(8 - x) .. ".0") ~= 0
-	local yval = output:get_value(tostring(y - 1) .. ".1") ~= 0
+	local xval = output_value(tostring(8 - x) .. ".0") ~= 0
+	local yval = output_value(tostring(y - 1) .. ".1") ~= 0
 	return xval and yval
 end
 

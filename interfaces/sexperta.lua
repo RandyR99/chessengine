@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = "a1"
 interface.cur_level = nil
 interface.sel = 0
@@ -206,7 +211,7 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	return output:get_indexed_value(tostring(y - 1) .. ".", 8 - x) ~= 0
+	return output_value(tostring(y - 1) .. "." .. tostring(8 - x)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
