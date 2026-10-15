@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = "a1"
 interface.cur_level = nil
 
@@ -77,8 +82,8 @@ function interface.edit_game()
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_indexed_value("1.", x - 1) ~= 0
-	local yval = output:get_indexed_value("0.", y - 1) ~= 0
+	local xval = output_value("1." .. (x - 1)) ~= 0
+	local yval = output_value("0." .. (y - 1)) ~= 0
 	return xval and yval
 end
 
@@ -104,7 +109,7 @@ function interface.test_promotion(x, y)
 	send_input(":IN.1", 0x04, 0.5) -- Verify
 	sb_press_square(":board", 0.5, x, y)
 	local piece
-	local p = output:get_value("digit0")
+	local p = output_value("digit0")
 	if     (p == 0x67) then piece = "Q"
 	elseif (p == 0x50) then piece = "R"
 	elseif (p == 0x7c) then piece = "B"
