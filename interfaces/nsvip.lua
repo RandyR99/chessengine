@@ -4,7 +4,8 @@ local prog = machine.system.name
 interface.turn = true
 interface.level = 1
 interface.cur_level = nil
-local ram = emu.item(machine.devices[':maincpu'].items['0/:nvram'])
+local mem = machine.devices[':maincpu'].spaces['program']
+local ram_base = 0x2000 -- battery-backed RAM
 local adr1 = 0x2a8
 local adr2 = 0x367
 if prog == "nsvipb" then
@@ -97,23 +98,12 @@ function interface.start_play(init)
 	send_input(":IN.0", 0x01, 0.6) -- Go
 end
 
-function getdigit1()
-	local map = {"s0.1","s1.1","s2.1","s3.0","s2.0","s0.0","s1.0"}
-	local dig = 0x00
-	for i=1,7 do
-		if (output:get_value(map[i]) ~= 0) then
-			dig = dig | (1 << (i-1))
-		end
-	end
-	return dig
-end
-
 function interface.is_selected(x, y)
 	if interface.edit then
 		return false
 	end
-	local von = ram:read(adr1+count)
-	local bis = ram:read(adr2+count)
+	local von = mem:read_u8(ram_base+adr1+count)
+	local bis = mem:read_u8(ram_base+adr2+count)
 	local d1 = (von&0x07) + 1
 	local d2 = 8 - ((von&0x70)>>4)
 	local d3 = (bis&0x07) + 1
@@ -121,11 +111,52 @@ function interface.is_selected(x, y)
 	return (x == d1 and y == d2) or (x == d3 and y == d4)
 end
 
+-- true if the machine's move list holds the move at the current index
+local function move_stored(m)
+	local von = mem:read_u8(ram_base+adr1+m.idx)
+	local bis = mem:read_u8(ram_base+adr2+m.idx)
+	return (von&0x07)+1 == m.fx and 8-((von&0x70)>>4) == m.fy and (bis&0x07)+1 == m.tx and 8-((bis&0x70)>>4) == m.ty
+end
+
+local function key_square(x, y)
+	send_input(":IN.2", 0x01<<(x-1), 0.6)
+	send_input(":IN.2", 0x01<<(y-1), 0.6)
+end
+
+-- the machine sometimes misses a key: check the move list and enter the move again
+local function verify_move(m, piece)
+	if m.idx >= maxcount then return end
+	for try = 1, 3 do
+		local t = machine.time:as_double() + 1.5
+		repeat
+			if move_stored(m) then return end
+			emu.wait(0.1)
+		until machine.time:as_double() > t
+		send_input(":IN.0", 0x08, 0.6) -- Clear
+		key_square(m.fx, m.fy)
+		key_square(m.tx, m.ty)
+		if piece then interface.promote_key(piece) end
+	end
+end
+
+local pending = nil
+local from = nil
+
 function interface.select_piece(x, y, event)
 	if (event ~= "capture" and event ~= "get_castling" and event ~= "put_castling" and event ~= "en_passant") then
 		if interface.turn then
-			send_input(":IN.2", 0x01<<(x-1), 0.6)
-			send_input(":IN.2", 0x01<<(y-1), 0.6)
+			key_square(x, y)
+			if event == "get" then
+				from = { x = x, y = y }
+			elseif event == "put" and from then
+				local m = { fx = from.x, fy = from.y, tx = x, ty = y, idx = count }
+				from = nil
+				if math.abs(get_piece_id(m.fx, m.fy)) == 6 and (y == 8 or y == 1) then
+					pending = m -- a promotion is stored after the piece key: check in promote()
+				else
+					verify_move(m)
+				end
+			end
 		end
 		if event == "put" then
 			if not interface.edit then
@@ -171,21 +202,37 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	emu.wait(0.6)
-	local dig = getdigit1()
-	if     (dig == 0x67) then return 'q'
-	elseif (dig == 0x50) then return 'r'
-	elseif (dig == 0x7c) then return 'b'
-	elseif (dig == 0x54) then return 'n'
+	-- the LCD still shows the move (its first digit is the FROM file), so read the
+	-- promoted piece from the 0x88 board in RAM (rank 8 first, piece type in the low nibble)
+	local t = machine.time:as_double() + 2
+	repeat
+		local p = mem:read_u8(ram_base + (8 - y) * 16 + (x - 1)) & 0x0f
+		if     (p == 4) then return 'q'
+		elseif (p == 3) then return 'r'
+		elseif (p == 2) then return 'b'
+		elseif (p == 1) then return 'n'
+		end
+		emu.wait(0.1)
+	until machine.time:as_double() > t
+	return nil
+end
+
+-- player promotions come in lowercase; the machine's own (uppercase) need no key
+function interface.promote_key(piece)
+	if     (piece == "q") then send_input(":IN.1", 0x40, 1)
+	elseif (piece == "r") then send_input(":IN.1", 0x20, 1)
+	elseif (piece == "b") then send_input(":IN.1", 0x10, 1)
+	elseif (piece == "n") then send_input(":IN.1", 0x08, 1)
 	end
 end
 
 function interface.promote(x, y, piece)
 --	sb_promote(":board", x, y, piece)
-	if     (piece == "q") then send_input(":IN.1", 0x40, 1)
-	elseif (piece == "r") then send_input(":IN.1", 0x20, 1)
-	elseif (piece == "b") then send_input(":IN.1", 0x10, 1)
-	elseif (piece == "n") then send_input(":IN.1", 0x08, 1)
+	interface.promote_key(piece)
+	if pending then
+		local m = pending
+		pending = nil
+		verify_move(m, piece)
 	end
 end
 
