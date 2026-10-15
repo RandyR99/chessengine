@@ -29,6 +29,7 @@ local plugin_path = ""
 local protocol = ""
 local co = nil
 local conth = nil
+local quitting = false
 local interface = nil
 local board = nil
 local game_started = false
@@ -42,7 +43,13 @@ local prev_move = nil
 local scr = [[
   while true do
     _G.status = io.stdin:read("*line")
+    if _G.status == nil then
+      return "" -- stdin closed: end the thread
+    end
     yield()
+    if _G.status == "quit" then
+      return "" -- a finished thread lets MAME exit
+    end
   end
 ]]
 
@@ -323,6 +330,9 @@ local function get_move_type(fx, fy, tx, ty)
 end
 
 local function recv_cmd()
+  if quitting then
+    return nil
+  end
   if conth.yield then
     return conth.result
   end
@@ -731,6 +741,7 @@ local function execute_uci_command(cmd)
     end
    
   elseif cmd == "quit" then
+    quitting = true
     manager.machine:exit()
   elseif cmd:match("^go") ~= nil then
     -- Reset both lock flags for the new search query loop
