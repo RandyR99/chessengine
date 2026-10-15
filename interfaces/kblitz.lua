@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = "a3"
 interface.cur_level = nil
 local ram = emu.item(machine.devices[':maincpu'].items['0/:maincpu:internal_ram'])
@@ -25,6 +30,8 @@ function interface.setup_machine()
 	interface.setlevel()
 end
 
+-- Options > Beg Search / End Search need the Shuttle Dial, which Lua cannot turn
+-- in MAME 0.289, so the machine can only reply to the player's moves
 function interface.start_play()
 	machine:popmessage("Set 'Options > Beg Search'!")
 end
@@ -34,7 +41,7 @@ function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
-	return output:get_value(tostring(y-1).."."..tostring(x-1)) ~= 0
+	return output_value(tostring(y-1).."."..tostring(x-1)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -56,33 +63,17 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	if     output:get_value("s1.10") ~= 0 then return "q"
-	elseif output:get_value("s2.10") ~= 0 then return "r"
-	elseif output:get_value("s0.10") ~= 0 then return "b"
-	elseif output:get_value("s3.10") ~= 0 then return "n"
+	if     output_value("s1.10") ~= 0 then return "q"
+	elseif output_value("s2.10") ~= 0 then return "r"
+	elseif output_value("s0.10") ~= 0 then return "b"
+	elseif output_value("s3.10") ~= 0 then return "n"
 	end
-end
-
-function interface.promote_special(piece)
-	if piece == "q" then
-		return
-	end
-	local throttled = machine.video.throttled
-	machine.video.throttled = true
-	local ok = false
-	repeat
-		machine:popmessage("Select promotion piece ...")
-		emu.wait(1)
-		if (piece == "r" and output:get_value("s2.10") ~= 0 and output:get_value("s1.10") == 0)
-		or (piece == "b" and output:get_value("s0.10") ~= 0 and output:get_value("s2.10") == 0)
-		or (piece == "n" and output:get_value("s3.10") ~= 0 and output:get_value("s2.10") == 0)
-		then ok = true
-		end
-	until ok
-	machine.video.throttled = throttled
 end
 
 function interface.promote(x, y, piece)
+	-- underpromotion needs the Shuttle Dial, which Lua cannot turn in MAME 0.289
+	-- (analog_field::read override bug); the machine promotes to a queen
+	promotion_error(piece)
 	sb_promote(":board", x, y, piece)
 end
 
