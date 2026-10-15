@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = 1
 interface.cur_level = nil
 
@@ -17,7 +22,7 @@ function interface.setlevel()
 	end
 	interface.cur_level = interface.level
 	local level = interface.level
-	while output:get_value(tostring(level-1) .. ".1") == 0 do
+	while output_value(tostring(level-1) .. ".1") == 0 do
 		send_input(":IN.1", 0x80, 0.6) -- Change Level
 	end
 end
@@ -32,14 +37,13 @@ function interface.setup_machine()
 	interface.setlevel()
 end
 
---[[
 function interface.set_pos(mode)
 	if mode == 0 then
 		return (":board")
 	else
 		local throttled_state = machine.video.throttled
 		machine.video.throttled = false
-		local ram = emu.item(machine.devices[':maincpu'].spaces['program'])
+		local ram = machine.devices[':maincpu'].spaces['program'] -- board at 0x00, 16*(x-1)+y-1
 		local fig = {0xc6,0x84,0x81,0x82,0x83,0x85,0x00,0x05,0x03,0x02,0x01,0x04,0x46}
 		for x = 1, 8 do
 			for y = 1, 8 do
@@ -54,7 +58,6 @@ function interface.set_pos(mode)
 		machine.video.throttled = throttled_state
 	end
 end
---]]
 
 function interface.edit_game()
 	send_input(":IN.1", 0x40, 0.6) -- Multi Move
@@ -66,8 +69,8 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_value(tostring(x - 1) .. ".0") ~= 0
-	local yval = output:get_value(tostring(y - 1) .. ".1") ~= 0
+	local xval = output_value(tostring(x - 1) .. ".0") ~= 0
+	local yval = output_value(tostring(y - 1) .. ".1") ~= 0
 	return xval and yval
 end
 
@@ -97,10 +100,10 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	if     (output:get_value("1.2") ~= 0) then return 'q'
-	elseif (output:get_value("3.2") ~= 0) then return 'r'
-	elseif (output:get_value("5.2") ~= 0) then return 'b'
-	elseif (output:get_value("7.2") ~= 0) then return 'n'
+	if     (output_value("1.2") ~= 0) then return 'q'
+	elseif (output_value("3.2") ~= 0) then return 'r'
+	elseif (output_value("5.2") ~= 0) then return 'b'
+	elseif (output_value("7.2") ~= 0) then return 'n'
 	end
 	return nil
 end
