@@ -67,6 +67,32 @@ function prompieces()
 	end
 end
 
+-- After a position setup the pawns that are not on the board go to the
+-- pawn parking columns (j = White, k = Black), like captured pawns.
+function parkpawns()
+	local count = { [6] = 0, [-6] = 0 }
+	for y = 1, 8 do
+		for x = 1, 8 do
+			local p = get_piece_id(x, y)
+			if p == 6 or p == -6 then
+				count[p] = count[p] + 1
+			end
+		end
+	end
+	for r = 8, count[6] + 1, -1 do
+		if output_value("piece_j" .. tostring(r)) == 0 then
+			send_input(":board:SPAWN", 0x01, 0.09) -- white pawn
+			sb_move_piece(":board", 10, r)
+		end
+	end
+	for r = 8, count[-6] + 1, -1 do
+		if output_value("piece_k" .. tostring(r)) == 0 then
+			send_input(":board:SPAWN", 0x01 << 6, 0.09) -- black pawn
+			sb_move_piece(":board", 11, r)
+		end
+	end
+end
+
 function interface.set_pos(mode)
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
@@ -104,7 +130,9 @@ function interface.set_pos(mode)
 			send_input(":IN.0", 0x04, 1) -- Change Color
 		end
 		send_input(":IN.1", 0x40, 1) -- Set Up
-		-- LED 1.2 (White) or 1.3 (Black) shows the side to move
+		parkpawns()
+		-- the LED the player waits for: 1.2 when White is to move, 1.3 when
+		-- Black is (the layout labels them Human and Robot)
 		led = (mode > 0) and 2 or 3
 	end
 	machine.video.throttled = throttled_state
