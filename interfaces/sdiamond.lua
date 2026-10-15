@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.level = "a1"
 interface.cur_level = nil
 local promcode = 0
@@ -15,7 +20,7 @@ function setdigit(n,z)
 	local dig = 0x00
 	repeat
 		for i=1,7 do
-			if (output:get_value(map[n][i]) ~= 0) then
+			if (output_value(map[n][i]) ~= 0) then
 				dig = dig | (1 << (i-1))
 			end
 		end
@@ -120,19 +125,24 @@ function interface.set_pos(mode)
 		send_input(":IN.2", 0x40, 0.5) -- Clear Board
 		return (":board")
 	else
+		-- the machine checks each piece as it is entered, with the colour being entered
+		-- as the side to move: a check against the side to move shows Error and the
+		-- piece is left out. So enter the side not to move first, the side to move last.
 		local piece=7
-		for y=1,8 do
-			for x=1,8 do
-				local p=get_piece_id(x,9-y)
-				if p~=0 then
-					if p*piece<0 then
-						send_input(":IN.1", 0x01, 0.5) -- Color
+		for _, side in ipairs({-mode, mode}) do
+			for y=1,8 do
+				for x=1,8 do
+					local p=get_piece_id(x,9-y)
+					if p*side>0 then
+						if p*piece<0 then
+							send_input(":IN.1", 0x01, 0.5) -- Color
+						end
+						if math.abs(p)~=math.abs(piece) then
+							setpiece(math.abs(p))
+						end
+						sb_press_square(":board", 0.5, x, 9-y)
+						piece=p
 					end
-					if math.abs(p)~=math.abs(piece) then
-						setpiece(math.abs(p))
-					end
-					sb_press_square(":board", 0.5, x, 9-y)
-					piece=p
 				end
 			end
 		end
@@ -159,8 +169,8 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_indexed_value("1.", 8 - x) ~= 0
-	local yval = output:get_indexed_value("0.", 8 - y) ~= 0
+	local xval = output_value("1." .. (8 - x)) ~= 0
+	local yval = output_value("0." .. (8 - y)) ~= 0
 	return xval and yval
 end
 
@@ -203,10 +213,10 @@ function interface.get_promotion(x, y)
 	promcode = 1
 	local p = nil
 	repeat
-		if     output:get_value("s0.7") ~= 0 then p = "q"
-		elseif output:get_value("s0.9") ~= 0 then p = "r"
-		elseif output:get_value("s0.12") ~= 0 then p = "b"
-		elseif output:get_value("s0.14") ~= 0 then p = "n"
+		if     output_value("s0.7") ~= 0 then p = "q"
+		elseif output_value("s0.9") ~= 0 then p = "r"
+		elseif output_value("s0.12") ~= 0 then p = "b"
+		elseif output_value("s0.14") ~= 0 then p = "n"
 		end
 		if p == nil then
 			emu.wait(0.25)
