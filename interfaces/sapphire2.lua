@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.turn = true
 interface.level = "a1"
 interface.cur_level = nil
@@ -19,7 +24,7 @@ function getdigit(n)
 		     {"s0.13","s1.14","s3.14","s3.13","s2.13","s1.13","s2.14"}}
 	local dig = 0x00
 	for i=1,7 do
-		if (output:get_value(map[n][i]) ~= 0) then
+		if (output_value(map[n][i]) ~= 0) then
 			dig = dig | (1 << (i-1))
 		end
 	end
@@ -36,7 +41,7 @@ function setdigit(n,z)
 	local dig = 0x00
 	repeat
 		for i=1,7 do
-			if (output:get_value(map[n][i]) ~= 0) then
+			if (output_value(map[n][i]) ~= 0) then
 				dig = dig | (1 << (i-1))
 			end
 		end
@@ -168,10 +173,11 @@ function interface.set_pos(mode)
 				end
 			end
 		end
-		send_input(":IN.0", 0x80, 0.6) -- Go
-		if mode<0 then
+		-- the colour selected when leaving Set Up is the side to move
+		if mode*piece<0 then
 			send_input(":IN.1", 0x80, 0.6) -- Color
 		end
+		send_input(":IN.0", 0x80, 0.6) -- Go
 		send_input(":IN.1", 0x10, 0.6) -- Sound
 		send_input(":IN.1", 0x10, 0.6) -- Sound
 		send_input(":IN.1", 0x10, 0.6) -- Sound
@@ -207,8 +213,9 @@ end
 function interface.select_piece(x, y, event)
 	if (event ~= "capture" and event ~= "get_castling" and event ~= "put_castling" and event ~= "en_passant") then
 		if interface.turn then
-			send_input(":IN.2", 0x80>>(x-1), 0.6)
-			send_input(":IN.2", 0x80>>(y-1), 0.6)
+			-- the Sapphire II sometimes misses a short coordinate key
+			send_input(":IN.2", 0x80>>(x-1), 1)
+			send_input(":IN.2", 0x80>>(y-1), 1)
 		end
 		if event == "put" then
 			if not interface.edit then
@@ -263,10 +270,10 @@ function interface.get_promotion(x, y)
 	promcode = 1
 	local p = nil
 	repeat
-		if     output:get_value("s0.7") ~= 0 then p = "q"
-		elseif output:get_value("s0.9") ~= 0 then p = "r"
-		elseif output:get_value("s0.12") ~= 0 then p = "b"
-		elseif output:get_value("s0.14") ~= 0 then p = "n"
+		if     output_value("s0.7") ~= 0 then p = "q"
+		elseif output_value("s0.9") ~= 0 then p = "r"
+		elseif output_value("s0.12") ~= 0 then p = "b"
+		elseif output_value("s0.14") ~= 0 then p = "n"
 		end
 		if p == nil then
 			emu.wait(0.25)
@@ -275,16 +282,51 @@ function interface.get_promotion(x, y)
 	return p
 end
 
+-- The piece keys double as function keys (Rook = Referee). A piece key the
+-- machine takes as a function only shows that function's status, and then
+-- it asks for the piece again ("Pro"), so the key is pressed until the
+-- prompt has gone.
+local function promotion_prompt()
+	for n = 1, 5 do
+		if getdigit(n) == 0x73 and getdigit(n + 1) == 0x50 then
+			return true
+		end
+	end
+	return false
+end
+
+local function wait_prompt(t)
+	for i = 1, t * 10 do
+		if promotion_prompt() then
+			return true
+		end
+		emu.wait(0.1)
+	end
+	return false
+end
+
+local function choose_piece(piece)
+	local keys = { q = 0x10, r = 0x08, b = 0x04, n = 0x02 }
+	if keys[piece] == nil then
+		return
+	end
+	wait_prompt(4)
+	for i = 1, 3 do
+		send_input(":IN.1", keys[piece], 1)
+		emu.wait(2.5) -- also lets a function status message time out
+		if not wait_prompt(1.5) then
+			return
+		end
+	end
+end
+
 function interface.promote(x, y, piece)
 	if promcode == 0 then
-		if     (piece == "q") then send_input(":IN.1", 0x10, 1)
-		elseif (piece == "r") then send_input(":IN.1", 0x08, 1)
-		elseif (piece == "b") then send_input(":IN.1", 0x04, 1)
-		elseif (piece == "n") then send_input(":IN.1", 0x02, 1)
-		end
+		choose_piece(piece)
 	end
 	promcode = 0
 --	sb_promote(":board", x, y, piece)
 end
+
 
 return interface
