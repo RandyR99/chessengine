@@ -1,9 +1,9 @@
 interface = {}
 
 -- Based on the MessNew (CB-Emu) kblitzx interface. In MAME 0.289 the cursor keys
--- became two dials. They can only be turned from Lua with the ioport.cpp fix for
--- analog set_value overrides (analog_field::read ignored mask/shift/remap);
--- kblitz.lua.0289 is the reduced interface for an unpatched MAME.
+-- became two dials. They can only be turned from Lua in MAME 0.290 or later (0.289's
+-- analog_field::read ignored mask/shift/remap for set_value overrides);
+-- kblitz.lua.0289 is the reduced interface for MAME 0.289.
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
