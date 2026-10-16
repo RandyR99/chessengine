@@ -4,6 +4,11 @@ interface.level = "d1"
 interface.cur_level = nil
 local promcode = 0
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.setlevel()
 	if (interface.cur_level == nil or interface.cur_level == interface.level) then
 		return
@@ -83,8 +88,8 @@ function interface.edit_game()
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_indexed_value("1.", x - 1) ~= 0
-	local yval = output:get_indexed_value("0.", y - 1) ~= 0
+	local xval = output_value("1." .. (x - 1)) ~= 0
+	local yval = output_value("0." .. (y - 1)) ~= 0
 	return xval and yval
 end
 
@@ -108,10 +113,10 @@ end
 
 function interface.get_promotion(x, y)
 	promcode = 1
-	if     output:get_value("s1.14") ~= 0 then return "q"
-	elseif output:get_value("s1.16") ~= 0 then return "r"
-	elseif output:get_value("s1.17") ~= 0 then return "b"
-	elseif output:get_value("s1.19") ~= 0 then return "n"
+	if     output_value("s1.14") ~= 0 then return "q"
+	elseif output_value("s1.16") ~= 0 then return "r"
+	elseif output_value("s1.17") ~= 0 then return "b"
+	elseif output_value("s1.19") ~= 0 then return "n"
 	end
 end
 
