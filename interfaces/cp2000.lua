@@ -102,13 +102,18 @@ end
 function interface.stop_play()
 end
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.is_selected_int(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	local d0 = output:get_value("digit0")
-	local d1 = output:get_value("digit1")
-	local d2 = output:get_value("digit2")
-	local d3 = output:get_value("digit3")
+	local d0 = output_value("digit0")
+	local d1 = output_value("digit1")
+	local d2 = output_value("digit2")
+	local d3 = output_value("digit3")
 	if (d0 == 0 or d1 == 0) then
 		return false
 	end
@@ -142,7 +147,8 @@ function interface.select_piece(x, y, event)
 		elseif (move_type == "en_passant") then
 			sb_remove_piece(":board", x, interface.last_get.y)
 			sb_press_square(":board", 1, x, interface.last_get.y)
-		elseif (move_type == "capture") then
+		-- captures press the destination twice; the machine's own capture-promotion only once (a second press hangs it)
+		elseif (move_type == "capture" or (move_type == "capture_promotion" and interface.turn)) then
 			sb_press_square(":board", 1, x, y)
 		end
 		if (interface.turn or interface.edit) then
