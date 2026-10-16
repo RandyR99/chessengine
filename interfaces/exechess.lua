@@ -10,8 +10,13 @@ local lasty = 1
 local inity = 1
 interface.edit = false
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
-	return "SciSys Senator Chess"
+	return "SciSys Executive Chess"
 end
 
 function interface.get_author()
@@ -31,7 +36,7 @@ function interface.setlevel()
 	send_input(":IN.2", 0x10, 0.5) -- LEVEL
 	emu.wait(1)
 	for y = 1, 8 do
-		if (output:get_value("1." .. tostring(btag[y])) ~= 0) then
+		if (output_value("1." .. tostring(btag[y])) ~= 0) then
 			cur_level = cur_level + 1
 		end
 	end
@@ -182,16 +187,16 @@ function interface.is_pos_selected(x, y, piece)
 end
 
 function interface.is_selected(x, y)
-	if (output:get_value("3.12") ~= 0) then -- COMP?
+	if (output_value("3.12") ~= 0) then -- COMP?
 		return false
 	end
 	local xtag = { 1, 4, 0, 5, 2, 6, 3, 7 }
 	local btag = { 35, 27, 31, 57, 54, 52, 49, 47 }
 	local wtag = { 13,  9, 16,  6, 19,  3, 22,  0 }
 	local piece = 0
-	if (output:get_value(xtag[x] .. "." .. tostring(btag[y])) ~= 0) then
+	if (output_value(xtag[x] .. "." .. tostring(btag[y])) ~= 0) then
 		piece = -1
-	elseif (output:get_value(xtag[x] .. "." .. tostring(wtag[y])) ~= 0) then
+	elseif (output_value(xtag[x] .. "." .. tostring(wtag[y])) ~= 0) then
 		piece = 1
 	end
 	return interface.is_pos_selected(x, y, piece)
@@ -272,10 +277,10 @@ end
 function interface.get_promotion(x, y)
 	local xval = { 1, 4, 0, 5, 2, 6, 3, 7 }
 	local z = tostring(xval[x]) .. "."
-	if     (y == 1 and output:get_value(z.."33") ~= 0) or (y == 8 and output:get_value(z.."46") ~= 0) then return 'q'
-	elseif (y == 1 and output:get_value(z.."10") ~= 0) or (y == 8 and output:get_value(z.."24") ~= 0) then return 'r'
-	elseif (y == 1 and output:get_value(z.."14") ~= 0) or (y == 8 and output:get_value(z.."25") ~= 0) then return 'b'
-	elseif (y == 1 and output:get_value(z.."34") ~= 0) or (y == 8 and output:get_value(z.."45") ~= 0) then return 'n'
+	if     (y == 1 and output_value(z.."33") ~= 0) or (y == 8 and output_value(z.."46") ~= 0) then return 'q'
+	elseif (y == 1 and output_value(z.."10") ~= 0) or (y == 8 and output_value(z.."24") ~= 0) then return 'r'
+	elseif (y == 1 and output_value(z.."14") ~= 0) or (y == 8 and output_value(z.."25") ~= 0) then return 'b'
+	elseif (y == 1 and output_value(z.."34") ~= 0) or (y == 8 and output_value(z.."45") ~= 0) then return 'n'
 	end
 	return nil
 end
