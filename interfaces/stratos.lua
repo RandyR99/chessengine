@@ -1,5 +1,20 @@
 interface = {}
 
+-- read len bytes of a memory share (battery RAM) as a string
+local function ram_block(tag, offset, len)
+	local share = machine.memory.shares[tag]
+	local s = ""
+	for i = 0, len - 1 do
+		s = s .. string.char(share:read_u8(offset + i))
+	end
+	return s
+end
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.invert = false
 interface.level = "a1"
 interface.cur_level = nil
@@ -166,10 +181,10 @@ function interface.is_selected(x, y)
 		x = 9 - x
 		y = 9 - y
 	end
-	local xval0 = output:get_indexed_value("4.", x - 1) ~= 0
-	local xval1 = output:get_indexed_value("5.", x - 1) ~= 0
-	local yval0 = output:get_indexed_value("2.", y - 1) ~= 0
-	local yval1 = output:get_indexed_value("3.", y - 1) ~= 0
+	local xval0 = output_value("4." .. (x - 1)) ~= 0
+	local xval1 = output_value("5." .. (x - 1)) ~= 0
+	local yval0 = output_value("2." .. (y - 1)) ~= 0
+	local yval1 = output_value("3." .. (y - 1)) ~= 0
 	return (xval0 or xval1) and (yval0 or yval1)
 end
 
@@ -195,10 +210,10 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	if     (output:get_value("0.6") ~= 0 or output:get_value("1.6") ~= 0) then return 'q'
-	elseif (output:get_value("0.5") ~= 0 or output:get_value("1.5") ~= 0) then return 'r'
-	elseif (output:get_value("0.4") ~= 0 or output:get_value("1.4") ~= 0) then return 'b'
-	elseif (output:get_value("0.3") ~= 0 or output:get_value("1.3") ~= 0) then return 'n'
+	if     (output_value("0.6") ~= 0 or output_value("1.6") ~= 0) then return 'q'
+	elseif (output_value("0.5") ~= 0 or output_value("1.5") ~= 0) then return 'r'
+	elseif (output_value("0.4") ~= 0 or output_value("1.4") ~= 0) then return 'b'
+	elseif (output_value("0.3") ~= 0 or output_value("1.3") ~= 0) then return 'n'
 	end
 	return nil
 end
@@ -277,7 +292,7 @@ function interface.read_7_7_segment()
 		[57] = "9",
 		[59] = "-"
 	}
-	local ddram = emu.item(machine.devices[':maincpu'].items['0/:nvram.u6']):read_block(0x0962, 0x2)
+	local ddram = ram_block(":nvram.u6", 0x0962, 0x2)
 	return digit[ddram:byte(1)]
 end
 
@@ -318,9 +333,9 @@ function interface.read_digit(line)
 		[112] = "9"
 	}
 	local info2 = ""
-	local ddram = emu.item(machine.devices[':maincpu'].items['0/:nvram.u6']):read_block(0x095d, 0x10)
+	local ddram = ram_block(":nvram.u6", 0x095d, 0x10)
 	local info = digit[ddram:byte(1) + 1] .. digit[ddram:byte(2) + 1] .. digit[ddram:byte(3) + 1] .. digit[ddram:byte(4) + 1] .. digit[ddram:byte(5) + 1]
-	ddram = emu.item(machine.devices[':maincpu'].items['0/:nvram.u6']):read_block(0x0963, 0x10)
+	ddram = ram_block(":nvram.u6", 0x0963, 0x10)
 	info2 = digit[ddram:byte(2) + 1] .. digit[ddram:byte(3) + 1] .. digit[ddram:byte(4) + 1] .. digit[ddram:byte(5) + 1]
 	if line == 1 then
 		return info

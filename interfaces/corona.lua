@@ -1,4 +1,25 @@
+-- Saitek Kasparov Corona (corona, coronaa, coronab)
+-- Builds on stratos.lua, as MAME's corona.cpp builds on stratos.h: corona_state is a
+-- stratos_base_state subclass and its input ports start with PORT_INCLUDE(saitek_stratos),
+-- so keys, set_pos, promotion etc. come from stratos.lua. Overridden here for the Corona's
+-- different I/O (two HELIOS chips): board LED outputs (is_selected), LCD state in :nvram
+-- instead of :nvram.u6 (read_digit, read_7_7_segment), setup_machine and setlevel.
 interface = load_interface("stratos")
+
+-- read len bytes of a memory share (battery RAM) as a string
+local function ram_block(tag, offset, len)
+	local share = machine.memory.shares[tag]
+	local s = ""
+	for i = 0, len - 1 do
+		s = s .. string.char(share:read_u8(offset + i))
+	end
+	return s
+end
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 interface.invert = false
 interface.level = "a3"
@@ -97,7 +118,7 @@ function interface.is_selected(x, y)
 		x = 9 - x
 		y = 9 - y
 	end
-	return output:get_indexed_value(tostring(2 + x) .. ".", y - 1) ~= 0
+	return output_value(tostring(2 + x) .. "." .. (y - 1)) ~= 0
 end
 
 function interface.get_options()
@@ -120,7 +141,7 @@ function interface.read_7_7_segment()
 		[37] = "9",
 		[40] = "-"
 	}
-	local ddram = emu.item(machine.devices[':maincpu'].items['0/:nvram']):read_block(0x0a40, 0x2)
+	local ddram = ram_block(":nvram", 0x0a40, 0x2)
 	return digit[ddram:byte(1)]
 end
 
@@ -172,11 +193,11 @@ function interface.read_digit(line)
 	}
 	local info = ""
 	local info2 = ""
-	local ddram = emu.item(machine.devices[':maincpu'].items['0/:nvram']):read_block(0x0a3a, 0x10)
+	local ddram = ram_block(":nvram", 0x0a3a, 0x10)
 	if digit[ddram:byte(1) + 1] ~= nil and digit[ddram:byte(2) + 1] ~= nil and digit[ddram:byte(3) + 1] ~= nil and digit[ddram:byte(5) + 1] ~= nil and digit[ddram:byte(6) + 1] ~= nil then
 		info = digit[ddram:byte(1) + 1] .. digit[ddram:byte(2) + 1] .. digit[ddram:byte(3) + 1] .. digit[ddram:byte(5) + 1] .. digit[ddram:byte(6) + 1]
 	end
-	ddram = emu.item(machine.devices[':maincpu'].items['0/:nvram']):read_block(0x0a40, 0x10)
+	ddram = ram_block(":nvram", 0x0a40, 0x10)
 	if digit[ddram:byte(2) + 1] ~= nil and digit[ddram:byte(3) + 1] ~= nil and digit[ddram:byte(5) + 1] ~= nil and digit[ddram:byte(6) + 1] ~= nil then
 		info2 = digit[ddram:byte(2) + 1] .. digit[ddram:byte(3) + 1] .. digit[ddram:byte(5) + 1] .. digit[ddram:byte(6) + 1]
 	end
