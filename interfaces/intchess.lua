@@ -5,6 +5,11 @@ interface.level = 1
 interface.cur_level = nil
 interface.edit = false
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	return "Intelligent Chess"
 end
@@ -30,9 +35,9 @@ function interface.setlevel()
 	end
 	repeat
 		send_input(":X1", 0x04, 0.5)	-- LEVEL
-		local d0 = output:get_value("digit0")
-		local d2 = output:get_value("digit2")
-		local d3 = output:get_value("digit3")
+		local d0 = output_value("digit0")
+		local d2 = output_value("digit2")
+		local d3 = output_value("digit3")
 	until (d0 == l0 and d2 == l2 and d3 == l3)
 	send_input(":X2", 0x08, 0.5)		-- ENTER
 	machine.video.throttled = throttled_state
@@ -42,6 +47,9 @@ function interface.setup_machine()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	interface.turn = true
+	-- MAME's 6522 reset leaves an asserted VIA IRQ stuck (CPU loops in its IRQ handler);
+	-- disabling all VIA interrupts (IER = 0x7f) first releases the line
+	machine.devices[":maincpu"].spaces["program"]:write_u8(0x280e, 0x7f)
 	send_input(":RESET", 0x01, 0.5)	-- RESET
 	emu.wait(0.5)
 	send_input(":X2", 0x04, 0.5)		-- NEW GAME
@@ -98,7 +106,7 @@ function interface.edit_game(on)
 	end
 	repeat
 		send_input(":X3", 0x04, 0.5) -- MODUS
-	until output:get_value("digit0") == mode
+	until output_value("digit0") == mode
 	send_input(":X2", 0x08, 0.5) -- ENTER
 	interface.edit = on
 	interface.turn = false
@@ -117,7 +125,7 @@ function interface.is_selected(x, y)
 	if (x == 1 and y == 1) then
 		computing = false
 		for i = 1, 4 do
-			if (output:get_value("digit0") == 0) then
+			if (output_value("digit0") == 0) then
 				computing = true
 				return false
 			elseif (i < 4) then
@@ -129,10 +137,10 @@ function interface.is_selected(x, y)
 	end
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	local d0 = output:get_value("digit0")
-	local d1 = output:get_value("digit1")
-	local d2 = output:get_value("digit2")
-	local d3 = output:get_value("digit3")
+	local d0 = output_value("digit0")
+	local d1 = output_value("digit1")
+	local d2 = output_value("digit2")
+	local d3 = output_value("digit3")
 	return ((xval[x] == d0 and yval[y] == d1) or (xval[x] == d2 and yval[y] == d3))
 end
 
