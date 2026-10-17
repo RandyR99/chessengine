@@ -6,6 +6,11 @@ interface.invert = false
 interface.level = "a3"
 interface.cur_level = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function calc_module()
     local mod = 0
     if machine.devices[":exp:analyst"] then
@@ -44,8 +49,8 @@ function interface.setlevel()
 	local clevy = 0
 	for cx=1,maxx do
 		for cy=1,8 do
-			local led0 = output:get_value(tostring(cx-1) .. "." .. tostring(cy-1)) ~= 0
-			local led3 = output:get_value(tostring(cx) .. "." .. tostring(cy)) ~= 0
+			local led0 = output_value(tostring(cx-1) .. "." .. tostring(cy-1)) ~= 0
+			local led3 = output_value(tostring(cx) .. "." .. tostring(cy)) ~= 0
 			if (led0 and led3) then
 				clevx = cx
 				clevy = cy
@@ -108,9 +113,11 @@ function interface.set_pos(mode)
 	if mode == 0 then
 		send_input(":IN.3", 0x04, 0.5) -- SOUND
 		emu.wait(0.5)
+		-- SET UP before the plugin rebuilds the board: in normal mode the machine watches the
+		-- squares fill up, and "start position + one white move" makes it reverse the board
+		send_input(":IN.7", 0x04, 0.5) -- SET UP
 		return (":board")
 	else
-		send_input(":IN.7", 0x04, 0.5) -- SET UP
 		send_input(":IN.3", 0x02, 0.5) -- FUNCTION
 		send_input(":IN.7", 0x02, 0.5) -- NEW GAME
 		local piece=7
@@ -161,7 +168,7 @@ function getdigit(n)
 	local map = { 13, 15, 18, 12, 17, 14, 16 }
 	local digit = 0x00
 	for i=1,7 do
-		digit = digit | (output:get_value("s" .. (8-n) .. "." .. map[i]) << (i-1))
+		digit = digit | (output_value("s" .. (8-n) .. "." .. map[i]) << (i-1))
 	end
 	return digit
 end
@@ -186,7 +193,7 @@ function interface.is_selected(x, y)
 			d1 = 0x79
 			d3 = 0x3d
 		end
-		if (output:get_value("9.1") ~= 0) then
+		if (output_value("9.1") ~= 0) then
 			d2 = 0x7f
 			d4 = 0x7f
 		else
@@ -235,7 +242,7 @@ end
 function getpiece()
 	local piece = 0x00
 	for i=1,7 do
-		if (output:get_value("s" .. (i+8) .. ".12") ~= 0) then
+		if (output_value("s" .. (i+8) .. ".12") ~= 0) then
 			piece = piece | (1 << (i-1))
 		end
 	end
