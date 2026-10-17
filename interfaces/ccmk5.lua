@@ -11,6 +11,21 @@ interface.score = "0.00"
 interface.pv = ""
 interface.edit = false
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
+-- read len bytes of main RAM (0x0000-0x3fff) as a string
+local function ram_block(addr, len)
+	local space = machine.devices[":maincpu"].spaces["program"]
+	local s = ""
+	for i = 0, len - 1 do
+		s = s .. string.char(space:read_u8(addr + i))
+	end
+	return s
+end
+
 function interface.get_module()
 	return "SciSys Chess Champion Mark V"
 end
@@ -33,7 +48,7 @@ function interface.setlevel()
 	send_input(":IN.4", 0x08, 0.25) -- CE
 	local mode = 1
 	for i = 2, 4 do
-		if (output:get_value("0.7." .. tostring(12 - i)) ~= 0x00) then
+		if (output_value("0.7." .. tostring(12 - i)) ~= 0x00) then
 			mode = i
 			break
 		end
@@ -52,10 +67,11 @@ function interface.setlevel()
 			send_input(":IN.4", 0x04, 0.25) -- Enter
 			k = k + 1
 		elseif string.match(d, "%d") then
-			if tonumber(d) <= 5 then
-				send_input(":IN.2", 1 << tonumber(d), 0.25)
-			elseif d <= 9 then
-				send_input(":IN.3", 1 << tonumber(d -6), 0.25)
+			local v = tonumber(d)
+			if v <= 5 then
+				send_input(":IN.2", 1 << v, 0.25)
+			else
+				send_input(":IN.3", 1 << (v - 6), 0.25)
 			end
 		end
 	end
@@ -78,7 +94,7 @@ function interface.setup_machine()
 	send_input(":IN.3", 0x08, 0.5) -- Yes
 	emu.wait(0.5)
 	machine.video.throttled = throttled_state
-	interface.cur_level = nil
+	interface.cur_level = "" -- not nil: setlevel() does nothing while cur_level is nil
 	interface.setlevel()
 end
 
@@ -158,12 +174,12 @@ function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
-	if (output:get_value("0.7.11") ~= 0x00) then
+	if (output_value("0.7.11") ~= 0x00) then
 		return false
 	end -- COMPUTING?
 	local ply = 1
 	interface.color = "W"
-	local ddram = emu.item(machine.devices[':maincpu'].items['0/0-3fff']):read_block(0x3e6f, 0x11)
+	local ddram = ram_block(0x3e6f, 0x11)
 	if ddram:sub(5, 5) == "@" then -- what is my color?
 		ply = 8
 		interface.color = "B"
@@ -274,7 +290,7 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local ddram = emu.item(machine.devices[':maincpu'].items['0/0-3fff']):read_block(0x3e70, 0x10)
+	local ddram = ram_block(0x3e70, 0x10)
 	local p
 	if (interface.color == "B") then
 		p = ddram:byte(12) -- piece for black promotion
@@ -301,20 +317,20 @@ function interface.promote(x, y, piece)
 end
 
 function interface.show_pv_after_move_player()
-	if output:get_value("0.7.11") == 1 then
+	if output_value("0.7.11") == 1 then
 		send_input(":IN.1", 0x08, 0.2) -- Analysis
 	end
 end
 
 function interface.show_info(on)
    if on then
-		local ddram = emu.item(machine.devices[':maincpu'].items['0/0-3fff']):read_block(0x3e6F, 0x10)
+		local ddram = ram_block(0x3e6F, 0x10)
 		if (ddram:sub(2,3)) ~= "NO" and (ddram:sub(2,3)) ~= "EI" and (ddram:sub(2,3)) ~= "AS" then
-			if (output:get_value("0.7.11") ~= 0x00) then
+			if (output_value("0.7.11") ~= 0x00) then
 				interface.score = ddram:sub(10,14):gsub(":", " ") .. "0"
 				interface.pv = ddram:sub(1,10):gsub(":", " ")
 				emu.wait(0.2)
-				if output:get_value("0.7.11") ~= 0x00 then
+				if output_value("0.7.11") ~= 0x00 then
 					return "info score cp " .. interface.score .. " depth 1" .. " pv " .. string.lower(interface.pv)
 				end
 			else
