@@ -3,6 +3,11 @@ interface = {}
 interface.level = "a3"
 interface.cur_level = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.setlevel()
 	if (interface.cur_level == nil or interface.cur_level == interface.level) then
 		return
@@ -114,8 +119,8 @@ function interface.start_play()
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_indexed_value("1.", x - 1) ~= 0
-	local yval = output:get_indexed_value("0.", y - 1) ~= 0
+	local xval = output_value("1." .. (x - 1)) ~= 0
+	local yval = output_value("0." .. (y - 1)) ~= 0
 	return xval and yval
 end
 
@@ -140,7 +145,7 @@ end
 function getpiece()
 	local piece = 0x00
 	for i=1,7 do
-		if (output:get_value("s" .. (i+8) .. ".12") ~= 0) then
+		if (output_value("s" .. (i+8) .. ".12") ~= 0) then
 			piece = piece | (1 << (i-1))
 		end
 	end
