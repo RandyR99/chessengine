@@ -3,6 +3,11 @@ interface = {}
 interface.level = 1
 interface.cur_level = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	return "SciSys President Chess"
 end
@@ -19,7 +24,7 @@ function interface.setlevel()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	local level = interface.level
-	while output:get_indexed_value("7.", level - 1) == 0 do
+	while output_value("7." .. (level - 1)) == 0 do
 		send_input(":IN.0", 0x80, 0.5) -- Level
 	end
 	machine.video.throttled = throttled_state
@@ -95,11 +100,30 @@ function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
-	return output:get_value((x - 1) .. "." .. (y - 1)) ~= 0
+	return output_value((x - 1) .. "." .. (y - 1)) ~= 0
 end
 
+local captured = false
+
 function interface.select_piece(x, y, event)
-	sb_select_piece(":board", 0.5, x, y, event)
+	if event == "capture" then
+		if interface.is_selected(x, y) then
+			return -- the machine's own capture (target square lit): the normal put works
+		end
+		-- player capture: the sensorboard lifts a captured piece for only 150 ms, too short for this machine:
+		-- lift it for 1 s, the sensor coming back on is the capturing piece being put down
+		sb_press_square(":board", 1, x, y)
+		emu.wait(1)
+		captured = true
+		return
+	end
+	if captured and event:sub(1, 3) == "put" then
+		sb_move_piece(":board", x, y) -- update the board without another sensor blink
+		captured = false
+	else
+		sb_select_piece(":board", 0.5, x, y, event)
+	end
+	emu.wait(1) -- the machine misses a lift/put that follows within ~0.8 s
 end
 
 function interface.get_options()
@@ -120,10 +144,10 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	if     (output:get_value("8.6") ~= 0) then return 'q'
-	elseif (output:get_value("8.2") ~= 0) then return 'r'
-	elseif (output:get_value("8.4") ~= 0) then return 'b'
-	elseif (output:get_value("8.3") ~= 0) then return 'n'
+	if     (output_value("8.6") ~= 0) then return 'q'
+	elseif (output_value("8.2") ~= 0) then return 'r'
+	elseif (output_value("8.4") ~= 0) then return 'b'
+	elseif (output_value("8.3") ~= 0) then return 'n'
 	end
 	return nil
 end
