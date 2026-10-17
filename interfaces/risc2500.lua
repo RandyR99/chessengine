@@ -7,14 +7,23 @@ interface.style = "normal"
 interface.cur_style = nil
 interface.stylenum = 3
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
+-- main RAM is mapped at address 0 once the boot ROM is switched off
+local function ram_u8(addr)
+	return machine.devices[":maincpu"].spaces["program"]:read_u8(addr)
+end
+
 function setdigits(n)
-	local dram = emu.item(machine.devices[':ram'].items['0/m_pointer'])
 	send_input(":IN.1", 0x80, 0.2) -- Enter
 	for i=1,n do
 		if (n == 7 and (i == 3 or i == 5)) then
 			-- skip char
 		else
-			local k = tonumber(interface.level:sub(i,i)) - (dram:read(0xeb1+i)-0x30)
+			local k = tonumber(interface.level:sub(i,i)) - (ram_u8(0xeb1+i)-0x30)
 			if (n == 7 and i == 6) then
 				if (k > 3) then
 					k = k - 6
@@ -51,12 +60,11 @@ function interface.setlevel()
 	send_input(":IN.2", 0x80, 0.2) -- Down
 	send_input(":IN.1", 0x80, 0.2) -- Enter
 	send_input(":IN.1", 0x80, 0.2) -- Enter
-	local dram = emu.item(machine.devices[':ram'].items['0/m_pointer'])
 	local s = ""
 	local b = 0
 	local i = 1
 	repeat
-		b = dram:read(0xec1 + i)
+		b = ram_u8(0xec1 + i)
 		if (b ~= 0x00) then
 			s = s .. string.char(b)
 			i = i + 1
@@ -109,12 +117,11 @@ function interface.setstyle()
 	send_input(":IN.2", 0x80, 0.2) -- Down
 	send_input(":IN.2", 0x80, 0.2) -- Down
 	send_input(":IN.1", 0x80, 0.2) -- Enter
-	local dram = emu.item(machine.devices[':ram'].items['0/m_pointer'])
 	local s = ""
 	local b = 0
 	local i = 1
 	repeat
-		b = dram:read(0xec1 + i)
+		b = ram_u8(0xec1 + i)
 		if (b ~= 0x00) then
 			s = s .. string.char(b)
 			i = i + 1
@@ -202,11 +209,10 @@ function interface.edit_game(on)
 	send_input(":IN.2", 0x80, 0.2) -- Down
 	send_input(":IN.1", 0x80, 0.2) -- Enter
 	send_input(":IN.1", 0x80, 0.2) -- Enter
-	local dram = emu.item(machine.devices[':ram'].items['0/m_pointer'])
 	local s = ""
 	local b = 0
 	for i=1,2 do
-		b = dram:read(0xec1 + i)
+		b = ram_u8(0xec1 + i)
 		if (b ~= 0x00) then
 			s = s .. string.upper(string.char(b))
 		end
@@ -233,8 +239,8 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_indexed_value("0.", x - 1) ~= 0
-	local yval = output:get_indexed_value("1.", y - 1) ~= 0
+	local xval = output_value("0." .. (x - 1)) ~= 0
+	local yval = output_value("1." .. (y - 1)) ~= 0
 	return xval and yval
 end
 
@@ -307,12 +313,11 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local dram = emu.item(machine.devices[':ram'].items['0/m_pointer'])
 	local adr = 0x0f75
 	local p
 	repeat
 		adr = adr + 1
-		p = dram:read(adr)
+		p = ram_u8(adr)
 	until (p >= 0x08 and p <= 0x0b) or p == 0x00
 	if     p == 0x08 then return 'q'
 	elseif p == 0x09 then return 'r'
@@ -360,12 +365,11 @@ function interface.show_info(on)
 end
 
 function read_display()
-    local dram = emu.item(machine.devices[':ram'].items['0/m_pointer'])
     local s = ""
     local b = 0
     local i = 1
     repeat
-        b = dram:read(0x0ec0 + i)
+        b = ram_u8(0x0ec0 + i)
         if (b ~= 0x00) then
             s = s .. string.char(b)
             i = i + 1
@@ -375,12 +379,11 @@ function read_display()
 end
 
 function read_depth()
-    local dram = emu.item(machine.devices[':ram'].items['0/m_pointer'])
     local s = ""
     local b = 0
     local i = 1
     repeat
-        b = dram:read(0x0f3b + i)
+        b = ram_u8(0x0f3b + i)
         if (b ~= 0x00) then
             s = s .. string.char(b)
             i = i + 1
@@ -390,12 +393,11 @@ function read_depth()
 end
 
 function read_pv()
-    local dram = emu.item(machine.devices[':ram'].items['0/m_pointer'])
     local s = ""
     local b = 0
     local i = 1
     repeat
-        b = dram:read(0x0f75 + i)
+        b = ram_u8(0x0f75 + i)
         if (b ~= 0x00) then
             if b == (0x08) then
                 s = s .. "q"
