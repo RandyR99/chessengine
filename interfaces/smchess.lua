@@ -5,6 +5,16 @@ interface.level = 1
 interface.cur_level = nil
 interface.edit = false
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
+-- MCU data RAM (160 x 4 bits)
+local function ram()
+	return machine.devices[":maincpu"].spaces["data"]
+end
+
 function interface.get_module()
 	return "SciSys Mini Chess"
 end
@@ -35,39 +45,48 @@ function interface.setup_machine()
 	interface.setlevel()
 end
 
---[[
 function interface.set_pos(mode)
 	if mode == 0 then
 		return ("")
 	else
 		local throttled_state = machine.video.throttled
 		machine.video.throttled = false
-		local ram = emu.item(machine.devices[':maincpu'].items['1/0000-ffff'])
 		local fig = {0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x00, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01}
 		for x = 1, 8 do
 			for y = 1, 8 do
 				local p = get_piece_id(x, y)
 				local z = fig[p + 7]
-				ram:write(16 * (x - 1) + y - 1, z)
+				ram():write_u8(16 * (x - 1) + y - 1, z)
 			end
 		end
+		-- castling rights (0x8b: 1 = O-O white, 2 = O-O-O white, 4 = O-O black, 8 = O-O-O black)
+		-- the ROM trusts these bits without checking the rook, so set only those whose king and rook are home
+		local castling = 0
+		if get_piece_id(5, 1) == 1 then
+			if get_piece_id(8, 1) == 3 then castling = castling | 0x01 end
+			if get_piece_id(1, 1) == 3 then castling = castling | 0x02 end
+		end
+		if get_piece_id(5, 8) == -1 then
+			if get_piece_id(8, 8) == -3 then castling = castling | 0x04 end
+			if get_piece_id(1, 8) == -3 then castling = castling | 0x08 end
+		end
+		ram():write_u8(0x008b, castling)
 		if mode == 1 then
-			ram:write(0x00c5, 0x01)
-			ram:write(0x0009, 0x0f)
-			ram:write(0x000b, 0x00)
-			ram:write(0x000d, 0x0f)
-			ram:write(0x000e, 0x00)
+			ram():write_u8(0x00c5, 0x01)
+			ram():write_u8(0x0009, 0x0f)
+			ram():write_u8(0x000b, 0x00)
+			ram():write_u8(0x000d, 0x0f)
+			ram():write_u8(0x000e, 0x00)
 		else
-			ram:write(0x00c5, 0x02)
-			ram:write(0x0009, 0x00)
-			ram:write(0x000b, 0x0f)
-			ram:write(0x000d, 0x00)
-			ram:write(0x000e, 0x0f)
+			ram():write_u8(0x00c5, 0x02)
+			ram():write_u8(0x0009, 0x00)
+			ram():write_u8(0x000b, 0x0f)
+			ram():write_u8(0x000d, 0x00)
+			ram():write_u8(0x000e, 0x0f)
 		end
 		machine.video.throttled = throttled_state
 	end
 end
---]]
 
 function interface.edit_game(on)
 	send_input(":IN.4", 0x04, 0.5) -- MM
@@ -86,10 +105,10 @@ end
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	local d0 = output:get_value("digit0")
-	local d1 = output:get_value("digit1")
-	local d2 = output:get_value("digit2")
-	local d3 = output:get_value("digit3")
+	local d0 = output_value("digit0")
+	local d1 = output_value("digit1")
+	local d2 = output_value("digit2")
+	local d3 = output_value("digit3")
 	return (xval[x] == d0 and yval[y] == d1) or (xval[x] == d2 and yval[y] == d3)
 end
 
@@ -144,8 +163,7 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local ram = emu.item(machine.devices[':maincpu'].items['1/0000-ffff'])
-	local piece = ram:read(16 * (x - 1) + y - 1)
+		local piece = ram():read_u8(16 * (x - 1) + y - 1)
 	if     piece == 0x05 then return 'q'
 	elseif piece == 0x04 then return 'r'
 	elseif piece == 0x03 then return 'b'
@@ -155,8 +173,8 @@ function interface.get_promotion(x, y)
 end
 
 function interface.promote(x, y, piece)
+	-- the machine always promotes to a queen by itself, nothing to enter
 	promotion_error(piece)
-	-- TODO
 end
 
 return interface
