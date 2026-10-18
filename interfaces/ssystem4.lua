@@ -2,6 +2,11 @@ interface = load_interface("ssystem3")
 
 local d0, d1, d2, d3 = 0
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function getdigit(n)
 	local map
 	if     (n == 0) then map = {"1.2","1.1","3.0","3.2","3.3","1.3","1.4"}
@@ -11,7 +16,7 @@ function getdigit(n)
 	end
 	local dig = 0x00
 	for i = 1, 7 do
-		if (output:get_value(map[i]) ~= 0) then
+		if (output_value(map[i]) ~= 0) then
 			dig = dig | (1 << (i - 1))
 		end
 	end
@@ -19,7 +24,7 @@ function getdigit(n)
 end
 
 function interface.is_selected(x, y)
-	if (output:get_value("3.1") ~= 0) then -- COMPUTING?
+	if (output_value("3.1") ~= 0) then -- COMPUTING?
 		d0, d1, d2, d3 = 0
 		return false
 	end

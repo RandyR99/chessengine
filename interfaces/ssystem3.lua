@@ -6,6 +6,11 @@ interface.level = "10"
 interface.cur_level = nil
 interface.edit = 0
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.setdigit(n)
 	if     (n == 0)	then	send_input(":IN.0", 0x08, 0.5)
 	elseif (n == 1)	then	send_input(":IN.2", 0x08, 0.5)
@@ -80,6 +85,32 @@ function interface.set_pos(mode)
 			end
 		end
 		send_input(":IN.0", 0x04, 0.5) -- ENTER
+
+		-- castling rights from king and rook on their home squares
+		local ram = machine.devices[":maincpu"].spaces["program"]
+		local adr = 0x1d
+		if machine.system.name == "ssystem4" then
+			adr = 0x21
+		end
+		local code = 0x00
+		if get_piece_id(5, 1) == 1 then
+			if get_piece_id(1, 1) == 3 then
+				code = code | 0x02
+			end
+			if get_piece_id(8, 1) == 3 then
+				code = code | 0x01
+			end
+		end
+		if get_piece_id(5, 8) == -1 then
+			if get_piece_id(1, 8) == -3 then
+				code = code | 0x08
+			end
+			if get_piece_id(8, 8) == -3 then
+				code = code | 0x04
+			end
+		end
+		ram:write_u8(adr, code)
+
 		if mode==1 then
 			send_input(":IN.2", 0x08, 0.5) -- White
 		else
@@ -134,10 +165,10 @@ end
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	local d0 = output:get_value("digit3")
-	local d1 = output:get_value("digit2")
-	local d2 = output:get_value("digit1")
-	local d3 = output:get_value("digit0")
+	local d0 = output_value("digit3")
+	local d1 = output_value("digit2")
+	local d2 = output_value("digit1")
+	local d3 = output_value("digit0")
 	return (xval[x] == d0 and yval[y] == d1) or (xval[x] == d2 and yval[y] == d3)
 end
 
@@ -194,9 +225,9 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local ram = emu.item(machine.devices[':maincpu'].items['0/:nvram'])
+	local ram = machine.devices[":maincpu"].spaces["program"]
 	local adr = 0x0067
-	local piece = (ram:read(adr+16*(y-1)+x-1))&0x07
+	local piece = ram:read_u8(adr + 16 * (y - 1) + x - 1) & 0x07
 	if     piece==0x05 then return 'q'
 	elseif piece==0x04 then return 'r'
 	elseif piece==0x03 then return 'b'
@@ -206,6 +237,10 @@ function interface.get_promotion(x, y)
 end
 
 function interface.promote(x, y, piece)
+	if interface.edit ~= 0 then
+		-- game edit: the machine takes no promotion piece (a piece key would start the next square)
+		return
+	end
 	emu.wait(1)
 	if     (piece == "q") then	send_input(":IN.3", 0x04, 1)
 	elseif (piece == "r") then	send_input(":IN.2", 0x04, 1)
