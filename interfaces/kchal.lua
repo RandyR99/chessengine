@@ -13,7 +13,7 @@ local pv2 = ""
 local pv3 = ""
 local l_pv = ""
 local score = ""
-local zaehler = 0
+local counter = 0
 
 -- the machine switches itself off after a few idle minutes: the LCD is then blank
 -- and the CPU is in standby (PC stands still); the LCD alone also blanks in play
@@ -39,62 +39,62 @@ function interface.get_author()
     return "G.Horvath"
 end
 
-function leseZeichen(n, ascii)
-    local Segmente = {
+function getdigit(n, ascii)
+    local segments = {
         {"s0.0", "s0.21", "s1.21", "s1.22", "s0.22", "s1.0", "s0.23"},
         {"s0.4", "s0.19", "s1.19", "s1.20", "s0.20", "s1.3", "s0.3"},
         {"s0.5", "s0.16", "s1.16", "s1.17", "s0.17", "s1.5", "s0.18"},
         {"s0.9", "s0.14", "s1.14", "s1.15", "s0.15", "s1.8", "s0.8"},
         {"s0.11", "s0.12", "s1.12", "s1.13", "s0.13", "s1.10", "s0.10"}
     }
-    local Zeichen = 0x00
+    local digit = 0x00
     for i = 1, 7 do
-        if (output_value(Segmente[n][i]) ~= 0) then
-            Zeichen = Zeichen | (1 << (i - 1))
+        if (output_value(segments[n][i]) ~= 0) then
+            digit = digit | (1 << (i - 1))
         end
     end
-    if ascii == 1 then return digit_ascii(Zeichen) end
+    if ascii == 1 then return digit_ascii(digit) end
 
-    return Zeichen
+    return digit
 end
 
 function interface.show_info(on)
-    local doppelpunkt = output_value("s0.6")
+    local colon = output_value("s0.6")
     if on == true then
-        local d1 = leseZeichen(1, 1)
-        local d2 = leseZeichen(2, 1)
-        local d3 = leseZeichen(3, 1)
-        local d4 = leseZeichen(4, 1)
-        local d5 = leseZeichen(5, 1)
-        local punkt = output_value("s0.7")
+        local d1 = getdigit(1, 1)
+        local d2 = getdigit(2, 1)
+        local d3 = getdigit(3, 1)
+        local d4 = getdigit(4, 1)
+        local d5 = getdigit(5, 1)
+        local dot = output_value("s0.7")
         if d2:sub(1, 1) == "?" or d2:sub(1, 1) == "?" or d2:sub(1, 1) == "?" or
             d2:sub(1, 1) == "?" then
             emu.wait(0.1)
-            d2 = leseZeichen(2, 1)
-            d3 = leseZeichen(3, 1)
-            d4 = leseZeichen(4, 1)
-            d5 = leseZeichen(5, 1)
+            d2 = getdigit(2, 1)
+            d3 = getdigit(3, 1)
+            d4 = getdigit(4, 1)
+            d5 = getdigit(5, 1)
         end
-        if doppelpunkt == 1 then
-            zaehler = 1
+        if colon == 1 then
+            counter = 1
             l_pv = ""
-        elseif punkt == 1 then
+        elseif dot == 1 then
             score = d2 .. d3 .. d4 .. d5
-            zaehler = 1
+            counter = 1
             l_pv = ""
         elseif d5 == " " then
         else
-            if zaehler == 1 and l_pv ~= d2 .. d3 .. d4 .. d5 then
+            if counter == 1 and l_pv ~= d2 .. d3 .. d4 .. d5 then
                 pv1 = d2 .. d3 .. d4 .. d5
                 l_pv = pv1
-                zaehler = 2
+                counter = 2
 
-            elseif zaehler == 2 and l_pv ~= d2 .. d3 .. d4 .. d5 then
+            elseif counter == 2 and l_pv ~= d2 .. d3 .. d4 .. d5 then
                 pv2 = d2 .. d3 .. d4 .. d5
                 l_pv = pv2
-                zaehler = 3
+                counter = 3
                 if pv2 == "____" then pv3 = "" end
-            elseif zaehler == 3 and l_pv ~= d2 .. d3 .. d4 .. d5 then
+            elseif counter == 3 and l_pv ~= d2 .. d3 .. d4 .. d5 then
                 pv3 = d2 .. d3 .. d4 .. d5
                 l_pv = pv3
 
@@ -108,7 +108,7 @@ function interface.show_info(on)
         pv2 = ""
         pv3 = ""
         l_pv = ""
-        zaehler = 1
+        counter = 1
     end
 end
 
@@ -138,11 +138,11 @@ function interface.setlevel()
     dig = val[d4 + 1]
     emu.wait(0.5)
     ioport.ports[key]:field(0x10):set_value(1) -- Right/Left on
-    repeat emu.wait(0.1) until leseZeichen(4) == dig
+    repeat emu.wait(0.1) until getdigit(4) == dig
     ioport.ports[key]:field(0x10):set_value(0) -- Right/Left off
 
     emu.wait(0.5)
-    dig = leseZeichen(5)
+    dig = getdigit(5)
     for i = 0, 9 do
         if dig == val[i + 1] then
             cl = i
@@ -376,8 +376,8 @@ function interface.feature(fx, value)
         send_input(":IN.0", 0x04, 0.5) -- feature
         emu.wait(0.5)
     end
-    local dx4 = leseZeichen(4, 1)
-    local dx5 = leseZeichen(5, 1)
+    local dx4 = getdigit(4, 1)
+    local dx5 = getdigit(5, 1)
     if tonumber(dx4 .. dx5) == value then
         send_input(":IN.1", 0x20, 0.5) -- Info
         return
@@ -401,10 +401,10 @@ function interface.feature(fx, value)
     dig = val[d4 + 1]
     emu.wait(0.5)
     ioport.ports[key]:field(0x10):set_value(1) -- Right/Left on
-    repeat emu.wait(0.1) until leseZeichen(4) == dig
+    repeat emu.wait(0.1) until getdigit(4) == dig
     ioport.ports[key]:field(0x10):set_value(0) -- Right/Left off
     emu.wait(0.5)
-    dig = leseZeichen(5)
+    dig = getdigit(5)
     for i = 0, 9 do
         if dig == val[i + 1] then
             cl = i
