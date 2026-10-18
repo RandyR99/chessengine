@@ -16,6 +16,7 @@ local function output_value(name)
 end
 
 interface.invert = false
+interface.new_game_pending = false
 interface.level = "a1"
 interface.cur_level = nil
 interface.pv_depth = 0
@@ -94,12 +95,25 @@ function interface.setlevel()
 	send_input(":IN.7", 0x04, 1) -- Normal
 	emu.wait(0.5)
 	machine.video.throttled = throttled_state
-	interface.infoAnzeige()
+	interface.select_info_display()
+end
+
+-- the battery RAM is saved without a STOP when MAME quits, and a stale or empty one leaves
+-- the machine unresponsive: force a cold boot (driver notes: hold PLAY while powering on)
+function interface.cold_boot()
+	emu.wait(1)
+	send_input(":IN.1", 0x02, 1) -- Stop
+	local play = machine.ioport.ports[":IN.4"]:field(0x01)
+	play:set_value(1) -- hold Play
+	send_input(":RESET", 0x01, 1) -- Go
+	emu.wait(2)
+	play:set_value(0)
 end
 
 function interface.setup_machine()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
+	interface.cold_boot()
 	sb_reset_board(":board")
 	interface.invert = false
 	emu.wait(3)
@@ -111,27 +125,70 @@ function interface.setup_machine()
 end
 
 function setpiece(n)
-	if     (n == 1) then send_input(":IN.3", 0x04, 0.5) -- K
-	elseif (n == 2) then send_input(":IN.3", 0x01, 0.5) -- Q
-	elseif (n == 3) then send_input(":IN.2", 0x01, 0.5) -- R
-	elseif (n == 4) then send_input(":IN.2", 0x04, 0.5) -- B
-	elseif (n == 5) then send_input(":IN.3", 0x02, 0.5) -- N
-	elseif (n == 6) then send_input(":IN.2", 0x02, 0.5) -- P
+	if     (n == 1) then send_input(":IN.3", 0x04, 1) -- K
+	elseif (n == 2) then send_input(":IN.3", 0x01, 1) -- Q
+	elseif (n == 3) then send_input(":IN.2", 0x01, 1) -- R
+	elseif (n == 4) then send_input(":IN.2", 0x04, 1) -- B
+	elseif (n == 5) then send_input(":IN.3", 0x02, 1) -- N
+	elseif (n == 6) then send_input(":IN.2", 0x02, 1) -- P
 	end
 end
 
+local function is_start_position()
+	local back = {3, 5, 4, 2, 1, 4, 5, 3}
+	for x = 1, 8 do
+		if get_piece_id(x, 1) ~= back[x] or get_piece_id(x, 2) ~= 6 or
+		   get_piece_id(x, 7) ~= -6 or get_piece_id(x, 8) ~= -back[x] then
+			return false
+		end
+		for y = 3, 6 do
+			if get_piece_id(x, y) ~= 0 then
+				return false
+			end
+		end
+	end
+	return true
+end
+
+-- a short NORMAL press is sometimes missed and the machine stays in setup mode
+-- (the last square stays lit): repeat until the board leds are off
+local function leave_setup()
+	for i = 1, 5 do
+		send_input(":IN.7", 0x04, 1) -- NORMAL
+		emu.wait(0.5)
+		local lit = false
+		for x = 1, 8 do
+			for y = 1, 8 do
+				if interface.is_selected(x, y) then -- the machine's own board leds (corona differs)
+					lit = true
+				end
+			end
+		end
+		if not lit then
+			return
+		end
+	end
+end
+
+-- short key presses during setup get dropped: all presses here last 1 s
 function interface.set_pos(mode)
---	local throttled_state = machine.video.throttled
---	machine.video.throttled = false
 	if mode == 0 then
-		send_input(":IN.0", 0x01, 0.5) -- SET UP
+		send_input(":IN.0", 0x01, 1) -- SET UP
 		emu.wait(0.5)
-		send_input(":IN.1", 0x01, 0.5) -- SOUND
+		send_input(":IN.1", 0x01, 1) -- SOUND
 		emu.wait(0.5)
-		send_input(":IN.5", 0x02, 0.5) -- FUNCTION
-		send_input(":IN.1", 0x04, 0.5) -- NEW GAME
---		machine.video.throttled = throttled_state
+		send_input(":IN.5", 0x02, 1) -- FUNCTION
+		send_input(":IN.1", 0x04, 1) -- NEW GAME
 		return (":board")
+	elseif mode == 1 and is_start_position() then
+		-- a set-up start position is taken as a new game by some versions (they then play white
+		-- from the reversed board): use New Game, and let Play rotate as in a new game
+		send_input(":IN.1", 0x01, 1) -- SOUND
+		emu.wait(0.5)
+		leave_setup()
+		send_input(":IN.1", 0x04, 1) -- NEW GAME
+		emu.wait(1)
+		interface.new_game_pending = true
 	else
 		local piece = 7
 		for y = 1, 8 do
@@ -139,23 +196,22 @@ function interface.set_pos(mode)
 				local p = get_piece_id(x, 9 - y)
 				if p ~= 0 then
 					if p * piece < 0 then
-						send_input(":IN.4", 0x02, 0.5) -- TAB/COLOR
+						send_input(":IN.4", 0x02, 1) -- TAB/COLOR
 					end
 					setpiece(math.abs(p))
-					sb_press_square(":board", 0.5, x, 9 - y)
+					sb_press_square(":board", 1, x, 9 - y)
 					piece = p
 				end
 			end
 		end
 		if mode * piece < 0 then
-			send_input(":IN.4", 0x02, 0.5) -- TAB/COLOR
+			send_input(":IN.4", 0x02, 1) -- TAB/COLOR
 		end
 		emu.wait(0.5)
-		send_input(":IN.1", 0x01, 0.5) -- SOUND
+		send_input(":IN.1", 0x01, 1) -- SOUND
 		emu.wait(0.5)
-		send_input(":IN.7", 0x04, 0.5) -- NORMAL
+		leave_setup()
 	end
---	machine.video.throttled = throttled_state
 end
 
 function interface.edit_game(on)
@@ -168,11 +224,12 @@ function interface.edit_game(on)
 end
 
 function interface.start_play(init)
-	if (init) then
+	if (init or interface.new_game_pending) then
+		interface.new_game_pending = false
 		sb_rotate_board(":board")
 		interface.invert = true
 	end
-	interface.infoAnzeige()
+	interface.select_info_display()
 	send_input(":IN.4", 0x01, 1)	-- Play
 end
 
@@ -189,6 +246,7 @@ function interface.is_selected(x, y)
 end
 
 function interface.select_piece(x, y, event)
+	interface.new_game_pending = false -- the player moves first: no board rotation
 	if interface.invert then
 		x = 9 - x
 		y = 9 - y
@@ -237,7 +295,7 @@ function interface.promote(x, y, piece)
 	sb_promote(":board", x, y, piece)
 end
 
-function interface.infoAnzeige()
+function interface.select_info_display()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	send_input(":IN.7", 0x04, 1) -- Normal

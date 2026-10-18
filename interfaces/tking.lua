@@ -1,4 +1,17 @@
+-- Kasparov Turbo King: builds on stratos.lua (tking/tkinga/tkingb are stratos.cpp clones).
+-- Overrides: setup_machine (longer boot wait), start_play, and the LCD readers for
+-- ver. D (tking), whose display buffer sits at another address than ver. B (tkinga/tkingb).
 interface = load_interface("stratos")
+
+-- read len bytes of a memory share (battery RAM) as a string
+local function ram_block(tag, offset, len)
+	local share = machine.memory.shares[tag]
+	local s = ""
+	for i = 0, len - 1 do
+		s = s .. string.char(share:read_u8(offset + i))
+	end
+	return s
+end
 
 interface.invert = false
 interface.level = "a3"
@@ -8,6 +21,7 @@ interface.pv_depth = 0
 interface.pv = ""
 
 function interface.setup_machine()
+    interface.cold_boot()
     emu.wait(10)
     send_input(":IN.1", 0x04, 1) -- New Game
     emu.wait(2)
@@ -16,28 +30,9 @@ function interface.setup_machine()
     interface.setlevel()
 end
 
-function interface.NewGame()
-    emu.wait(10)
-    send_input(":IN.1", 0x04, 1) -- New Game
-    emu.wait(2)
-    sb_reset_board(":board")
-    interface.invert = false
-    infoAnzeige_ein()
-end
-
-function infoAnzeige_ein()
-    if interface.read_digit(1) ~= " info" then
-        send_input(":IN.7", 0x04, 0.75) -- Normal
-        repeat
-            send_input(":IN.5", 0x02, 0.75) -- Function
-            send_input(":IN.6", 0x02, 0.75) -- info
-            emu.wait(0.25)
-        until interface.read_digit(1) == " info"
-    end
-end
-
 function interface.start_play(init)
-    if (init) then
+    if (init or interface.new_game_pending) then
+        interface.new_game_pending = false
         sb_rotate_board(":board")
         interface.invert = true
     end
@@ -61,8 +56,7 @@ function interface.read_7_7_segment()
             [59] = "-"
         }
         ddram =
-            emu.item(machine.devices[':maincpu'].items['0/:nvram.u6']):read_block(
-                0x0962, 0x2)
+            ram_block(":nvram.u6", 0x0962, 0x2)
         return digit[ddram:byte(1)]
     else
         local digit = {
@@ -79,16 +73,11 @@ function interface.read_7_7_segment()
             [40] = "-"
         }
         ddram =
-            emu.item(machine.devices[':maincpu'].items['0/:nvram.u6']):read_block(
-                0x0a2a, 0x2)
+            ram_block(":nvram.u6", 0x0a2a, 0x2)
         return digit[ddram:byte(1)]
     end
     return digit[ddram:byte(1)]
 end
-
--- function interface.show_info(on)
---    return "Anzeige = \n" ..interface.read_digit()  .. "\n Segment = \n" .. interface.read_7_7_segment()
--- end
 
 function interface.read_digit(line)
     local ddram
@@ -96,26 +85,22 @@ function interface.read_digit(line)
     local info2
     if (machine.system.name == "tkinga") or (machine.system.name == "tkingb") then
         ddram =
-            emu.item(machine.devices[':maincpu'].items['0/:nvram.u6']):read_block(
-                0x095c, 0x10)
+            ram_block(":nvram.u6", 0x095c, 0x10)
         info = digit_string(ddram:byte(2)) .. digit_string(ddram:byte(3)) ..
                    digit_string(ddram:byte(4)) .. digit_string(ddram:byte(5)) ..
                    digit_string(ddram:byte(6)) .. " Tking a/b"
         ddram =
-            emu.item(machine.devices[':maincpu'].items['0/:nvram.u6']):read_block(
-                0x0963, 0x10)
+            ram_block(":nvram.u6", 0x0963, 0x10)
         info2 = digit_string(ddram:byte(2)) .. digit_string(ddram:byte(3)) ..
                     digit_string(ddram:byte(4)) .. digit_string(ddram:byte(5))
     else
         ddram =
-            emu.item(machine.devices[':maincpu'].items['0/:nvram.u6']):read_block(
-                0x0a24, 0x10)
+            ram_block(":nvram.u6", 0x0a24, 0x10)
         info = digit_string(ddram:byte(1)) .. digit_string(ddram:byte(2)) ..
                    digit_string(ddram:byte(3)) .. digit_string(ddram:byte(5)) ..
                    digit_string(ddram:byte(6))
         ddram =
-            emu.item(machine.devices[':maincpu'].items['0/:nvram.u6']):read_block(
-                0x0a2a, 0x10)
+            ram_block(":nvram.u6", 0x0a2a, 0x10)
         info2 = digit_string(ddram:byte(2)) .. digit_string(ddram:byte(3)) ..
                     digit_string(ddram:byte(5)) .. digit_string(ddram:byte(6))
     end
