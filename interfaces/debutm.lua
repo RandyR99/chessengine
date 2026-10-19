@@ -4,6 +4,11 @@ interface.level = 1
 interface.cur_level = nil
 interface.set_color = 0
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.setlevel()
 	if (interface.cur_level == nil or interface.cur_level == interface.level) then
 		return
@@ -12,7 +17,7 @@ function interface.setlevel()
 	local lcd_num = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f }
 	repeat
 		send_input(":IN.0", 0x40, 0.5) -- Level
-	until output:get_value("digit3") == lcd_num[interface.level + 1]
+	until output_value("digit3") == lcd_num[interface.level + 1]
 	send_input(":IN.0", 0x01, 1) -- Analysis
 end
 
@@ -73,12 +78,31 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_indexed_value("1.", x) ~= 0
-	local yval = output:get_indexed_value("0.", y) ~= 0
+	local xval = output_value("1." .. x) ~= 0
+	local yval = output_value("0." .. y) ~= 0
 	return xval and yval
 end
 
+local ep_from = nil
+
 function interface.select_piece(x, y, event)
+	-- en passant: take the captured pawn off the board first, then move the capturing pawn
+	if (event == "get") then
+		ep_from = { x = x, y = y }
+	elseif (event == "put" and ep_from ~= nil and get_move_type(ep_from.x, ep_from.y, x, y) == "en_passant") then
+		local from = ep_from
+		ep_from = nil
+		sb_select_piece(":board", 1, from.x, from.y, "") -- put the pawn back
+		sb_select_piece(":board", 1, x, from.y, "en_passant") -- remove the captured pawn
+		sb_select_piece(":board", 1, from.x, from.y, "get")
+		sb_select_piece(":board", 1, x, y, "put")
+		if interface.set_color == -1 then
+			interface.start_play(false)
+		end
+		return
+	elseif (event == "en_passant") then
+		return -- already removed
+	end
 	sb_select_piece(":board", 1, x, y, event)
 	if interface.set_color==-1 and event == "put" then
 		interface.start_play(false)
