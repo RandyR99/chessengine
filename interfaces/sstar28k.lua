@@ -4,6 +4,11 @@ interface.invert = false
 interface.level = "a1"
 interface.cur_level = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	return "SciSys Superstar 28K"
 end
@@ -34,6 +39,24 @@ function setpiece(n)
 	end
 end
 
+local function is_start_position()
+	local back = {3, 5, 4, 2, 1, 4, 5, 3}
+	for x = 1, 8 do
+		if get_piece_id(x, 1) ~= back[x] or get_piece_id(x, 2) ~= 6 or
+		   get_piece_id(x, 7) ~= -6 or get_piece_id(x, 8) ~= -back[x] then
+			return false
+		end
+		for y = 3, 6 do
+			if get_piece_id(x, y) ~= 0 then
+				return false
+			end
+		end
+	end
+	return true
+end
+
+local new_game_pending = false
+
 function interface.set_pos(mode)
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
@@ -43,6 +66,14 @@ function interface.set_pos(mode)
 		send_input(":IN.0", 0x20, 0.75) -- New Game
 		machine.video.throttled = throttled_state
 		return (":board")
+	elseif mode == 1 and is_start_position() then
+		-- a set-up start position is taken as a new game (Move then plays white from
+		-- the reversed board): use New Game, and let Move rotate as in a new game
+		send_input(":IN.1", 0x08, 0.75) -- Set Up
+		send_input(":IN.0", 0x10, 0.75) -- Sound
+		send_input(":IN.0", 0x20, 1) -- New Game
+		emu.wait(1)
+		new_game_pending = true
 	else
 		local piece = 7
 		for y = 1, 8 do
@@ -87,7 +118,8 @@ function interface.setup_machine()
 end
 
 function interface.start_play(init)
-	if (init) then
+	if (init or new_game_pending) then
+		new_game_pending = false
 		sb_rotate_board(":board")
 		interface.invert = true
 	end
@@ -99,12 +131,13 @@ function interface.is_selected(x, y)
 		x = 9 - x
 		y = 9 - y
 	end
-	local xval = output:get_value(tostring(x - 1) .. ".0") ~= 0
-	local yval = output:get_value(tostring(y - 1) .. ".1") ~= 0
+	local xval = output_value(tostring(x - 1) .. ".0") ~= 0
+	local yval = output_value(tostring(y - 1) .. ".1") ~= 0
 	return xval and yval
 end
 
 function interface.select_piece(x, y, event)
+	new_game_pending = false -- the player moves first: no board rotation
 	if interface.invert then
 		x = 9 - x
 		y = 9 - y
@@ -133,10 +166,10 @@ end
 
 function interface.get_promotion(x, y)
 	for i = 0, 5 do
-		if     (output:get_value("9.1") ~= 0) then return 'q'
-		elseif (output:get_value("9.2") ~= 0) then return 'r'
-		elseif (output:get_value("8.0") ~= 0) then return 'b'
-		elseif (output:get_value("8.1") ~= 0) then return 'n'
+		if     (output_value("9.1") ~= 0) then return 'q'
+		elseif (output_value("9.2") ~= 0) then return 'r'
+		elseif (output_value("8.0") ~= 0) then return 'b'
+		elseif (output_value("8.1") ~= 0) then return 'n'
 		end
 		emu.wait(0.2)
 	end
