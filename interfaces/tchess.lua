@@ -7,6 +7,11 @@ interface.level = 1
 interface.cur_level = nil
 interface.edit = false
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	return "Tryom Electronic Chess"
 end
@@ -44,29 +49,52 @@ function interface.setup_machine()
 	interface.setlevel()
 end
 
---[[
+local function enter_piece(p)
+	-- Enter Position mode: White K Q B N R P = A B C D E F, Black = 1 2 3 4 5 6
+	local keys = {
+		{ ":IN.1", 0x02 }, { ":IN.1", 0x04 }, { ":IN.1", 0x08 }, { ":IN.1", 0x10 }, { ":IN.2", 0x02 }, { ":IN.2", 0x04 },
+		{ ":IN.3", 0x02 }, { ":IN.3", 0x04 }, { ":IN.3", 0x08 }, { ":IN.3", 0x10 }, { ":IN.4", 0x02 }, { ":IN.4", 0x04 } }
+	local idx = ({ 1, 2, 5, 3, 4, 6 })[math.abs(p)] -- plugin piece ids K Q R B N P -> key order K Q B N R P
+	if p < 0 then
+		idx = idx + 6
+	end
+	send_input(keys[idx][1], keys[idx][2], 0.5)
+end
+
 function interface.set_pos(mode)
 	if mode == 0 then
-		return (":board")
-	else
-		local ram = emu.item(machine.devices[':maincpu'].owner.items['0/m_ram'])
-		local fig = {0x06, 0x04, 0x03, 0x05, 0x02, 0x01, 0x00, 0x09, 0x0a, 0x0d, 0x0b, 0x0c, 0x0e}
-		local adr = 0x15
-		for y = 1, 8 do
-			for x = 1, 8 do
-				local p = get_piece_id(x, y)
-				local z = fig[p + 7]
-				ram:write(adr + 10 * (y - 1) + x - 1, z)
+		return ("") -- no sensor board
+	end
+	-- keypad setup (manual p.5): RST, level, B (blank board), then EP, piece, square, XMV for each piece
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	send_input(":IN.1", 0x01, 0.5) -- RST
+	interface.send_pos2(interface.level)
+	send_input(":IN.1", 0x04, 0.5) -- B (blank board)
+	for y = 1, 8 do
+		for x = 1, 8 do
+			local p = get_piece_id(x, y)
+			if p ~= 0 then
+				send_input(":IN.0", 0x08, 0.5) -- EP
+				enter_piece(p)
+				interface.send_pos(x, y)
+				send_input(":IN.0", 0x02, 0.5) -- XMV
 			end
 		end
-		if mode == 1 then
-			interface.color = "B"
-		else
-			interface.color = "W"
-		end
+	end
+	if mode == -1 then
+		-- after a setup White is to move: WSD (computer plays White) lets Black move next
+		send_input(":IN.2", 0x01, 0.5) -- WSD
+	end
+	machine.video.throttled = throttled_state
+	interface.turn = true
+	interface.last_get = nil
+	if mode == 1 then
+		interface.color = "B"
+	else
+		interface.color = "W"
 	end
 end
---]]
 
 function interface.edit_game(on)
 	interface.edit = on
@@ -91,12 +119,12 @@ end
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 } -- A to H
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f } -- 1 to 8
-	local d0 = output:get_value("digit0")
-	local d1 = output:get_value("digit1")
-	local d2 = output:get_value("digit2")
-	local d3 = output:get_value("digit3")
-	local d4 = output:get_value("digit4")
-	local d5 = output:get_value("digit5")
+	local d0 = output_value("digit0")
+	local d1 = output_value("digit1")
+	local d2 = output_value("digit2")
+	local d3 = output_value("digit3")
+	local d4 = output_value("digit4")
+	local d5 = output_value("digit5")
 	if (d0 == 0x3f and d1 == 0x40 and d2 == 0x3f and d3 == 0x3f) then -- "0-00", computer castles queenside
 		return (x == 5 or x == 3) and (y == 8)
 	end
