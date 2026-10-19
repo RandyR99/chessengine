@@ -4,6 +4,11 @@ interface.level = "3"
 interface.cur_level = nil
 local promcode = 0
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.setlevel()
 	if (interface.cur_level == nil or interface.cur_level == interface.level) then
 		return
@@ -23,7 +28,7 @@ function interface.setup_machine()
 	sb_reset_board(":board")
 	promcode = 0
 	emu.wait(5)
-    send_input(":IN.0", 0x20, 1)	-- New Game
+	send_input(":IN.0", 0x20, 1)	-- New Game
 
 	interface.cur_level = "3"
 	interface.setlevel()
@@ -69,9 +74,17 @@ function interface.set_pos(mode)
 	end
 end
 
-function interface.edit_game()
-	send_input(":IN.1", 0x01, 1) -- Non Auto
-	emu.wait(0.5)
+function interface.edit_game(enable)
+	-- a Non Auto press right after boot can be missed (the machine then plays the
+	-- replayed moves itself): press until its led (3.5) shows the wanted mode
+	local want = (enable ~= false)
+	for i = 1, 5 do
+		if ((output_value("3.5") ~= 0) == want) then
+			break
+		end
+		send_input(":IN.1", 0x01, 1) -- Non Auto
+		emu.wait(0.5)
+	end
 end
 
 function interface.start_play(init)
@@ -81,8 +94,8 @@ end
 function interface.is_selected(x, y)
 	local xc = {7,6,5,4,3,13,14,15}
 	local yc = {8,9,10,11,12,2,1,0}
-	local xval = output:get_value("1." .. tostring(xc[x])) ~= 0 or output:get_value("2." .. tostring(xc[x])) ~= 0
-	local yval = output:get_value("1." .. tostring(yc[y])) ~= 0 or output:get_value("2." .. tostring(yc[y])) ~= 0
+	local xval = output_value("1." .. tostring(xc[x])) ~= 0 or output_value("2." .. tostring(xc[x])) ~= 0
+	local yval = output_value("1." .. tostring(yc[y])) ~= 0 or output_value("2." .. tostring(yc[y])) ~= 0
 	return xval and yval
 end
 
