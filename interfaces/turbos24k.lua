@@ -4,6 +4,11 @@ interface.invert = false
 interface.level = "a1"
 interface.cur_level = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.setlevel()
 	if (interface.cur_level == nil or interface.cur_level == interface.level) then
 		return
@@ -19,9 +24,9 @@ function interface.setlevel()
 	local clevx = 0
 	local clevy = 0
 	for cx=1,4 do
-		local xval = output:get_value(tostring(cx - 1) .. ".1") ~= 0
+		local xval = output_value(tostring(cx - 1) .. ".1") ~= 0
 		for cy=1,8 do
-			local yval = output:get_value(tostring(cy - 1) .. ".3") ~= 0
+			local yval = output_value(tostring(cy - 1) .. ".3") ~= 0
 			if (xval and yval) then
 				clevx = cx
 				clevy = cy
@@ -129,8 +134,8 @@ function interface.is_selected(x, y)
 		x = 9 - x
 		y = 9 - y
 	end
-	local xval = output:get_value(tostring(x - 1) .. ".0") ~= 0
-	local yval = output:get_value(tostring(y - 1) .. ".2") ~= 0
+	local xval = output_value(tostring(x - 1) .. ".0") ~= 0
+	local yval = output_value(tostring(y - 1) .. ".2") ~= 0
 	return xval and yval
 end
 
@@ -158,10 +163,10 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	if     (output:get_value("8.5") ~= 0 or output:get_value("9.5") ~= 0) then return 'q'
-	elseif (output:get_value("8.3") ~= 0 or output:get_value("9.3") ~= 0) then return 'r'
-	elseif (output:get_value("8.4") ~= 0 or output:get_value("9.4") ~= 0) then return 'b'
-	elseif (output:get_value("8.6") ~= 0 or output:get_value("9.6") ~= 0) then return 'n'
+	if     (output_value("8.5") ~= 0 or output_value("9.5") ~= 0) then return 'q'
+	elseif (output_value("8.3") ~= 0 or output_value("9.3") ~= 0) then return 'r'
+	elseif (output_value("8.4") ~= 0 or output_value("9.4") ~= 0) then return 'b'
+	elseif (output_value("8.6") ~= 0 or output_value("9.6") ~= 0) then return 'n'
 	end
 	return nil
 end
