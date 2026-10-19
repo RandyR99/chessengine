@@ -1,8 +1,15 @@
 interface = {}
 
 interface.turn = true
+interface.stm = 1 -- side to move: 1 White, -1 Black
+interface.edit = false
 interface.level = 1
 interface.cur_level = nil
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	return "Brea Intellect-02"
@@ -23,7 +30,7 @@ function interface.setlevel()
 	repeat
 		send_input(":IN.0", 0x10, 0.5) -- LEVEL
 		emu.wait(0.5)
-	until output:get_value("digit3") == lcd_num[interface.level]
+	until output_value("digit3") == lcd_num[interface.level]
 	send_input(":IN.1", 0x08, 0.5) -- ERASE
 	emu.wait(0.5)
 	machine.video.throttled = throttled_state
@@ -33,11 +40,64 @@ function interface.setup_machine()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	interface.turn = true
+	interface.stm = 1
+	interface.edit = false
 	send_input(":RESET", 0x01, 0.5) -- RESET
 	emu.wait(2)
 	machine.video.throttled = throttled_state
 	interface.cur_level = 1
 	interface.setlevel()
+end
+
+function interface.set_pos(mode)
+	if mode == 0 then
+		return ("") -- no sensor board
+	end
+	-- View Position mode, 9 = clear board; then walk a1..h8 with V.POS, entering each piece
+	-- (keys: P 2, N 4, B 6, R 8, Q 1, K 3; SELECT switches the colour)
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	send_input(":IN.0", 0x08, 0.5) -- V.POS
+	send_input(":IN.0", 0x20, 0.5) -- 9
+	local piece = 1
+	for y = 1, 8 do
+		for x = 1, 8 do
+			local p = get_piece_id(x, y)
+			if p ~= 0 then
+				if p * piece < 0 then
+					send_input(":IN.1", 0x04, 0.5) -- SELECT
+					piece = -piece
+				end
+				p = math.abs(p)
+				if     p == 6 then interface.send_pos(2)
+				elseif p == 5 then interface.send_pos(4)
+				elseif p == 4 then interface.send_pos(6)
+				elseif p == 3 then interface.send_pos(8)
+				elseif p == 2 then interface.send_pos(1)
+				elseif p == 1 then interface.send_pos(3)
+				end
+			end
+			send_input(":IN.0", 0x08, 0.5) -- V.POS
+		end
+	end
+	if mode ~= piece then
+		while output_value("digit2") ~= 0 do
+			send_input(":IN.0", 0x08, 0.5) -- V.POS
+		end
+		send_input(":IN.1", 0x04, 0.5) -- SELECT
+	end
+	send_input(":IN.1", 0x08, 0.5) -- ERASE
+	machine.video.throttled = throttled_state
+	interface.stm = mode
+	interface.turn = true
+end
+
+function interface.edit_game(on)
+	-- no way to enter moves without a reply: replay silently, then set up the final position
+	interface.edit = on
+	if not on then
+		interface.set_pos(interface.stm)
+	end
 end
 
 function interface.start_play(init)
@@ -52,10 +112,10 @@ end
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	local d0 = output:get_value("digit0")
-	local d1 = output:get_value("digit1")
-	local d2 = output:get_value("digit2")
-	local d3 = output:get_value("digit3")
+	local d0 = output_value("digit0")
+	local d1 = output_value("digit1")
+	local d2 = output_value("digit2")
+	local d3 = output_value("digit3")
 	return (xval[x] == d0 and yval[y] == d1) or (xval[x] == d2 and yval[y] == d3)
 end
 
@@ -72,6 +132,12 @@ function interface.send_pos(p)
 end
 
 function interface.select_piece(x, y, event)
+	if (event == "put") then
+		interface.stm = -interface.stm
+	end
+	if interface.edit then
+		return
+	end
 	if (event ~= "capture" and event ~= "get_castling" and event ~= "put_castling" and event ~= "en_passant") then
 		if (interface.turn) then
 			interface.send_pos(x)
