@@ -4,6 +4,12 @@ interface.turn = true
 interface.level = "2"
 interface.cur_level = nil
 local promcode = 0
+interface.edit = false
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	return "Elektronika IM-05"
@@ -42,6 +48,48 @@ function interface.setup_machine()
 	interface.setlevel()
 end
 
+function interface.set_pos(mode)
+	if mode == 0 then
+		return ("") -- no sensor board
+	end
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	send_input(":IN.4", 0x01, 0.5) -- MODE
+	send_input(":IN.4", 0x01, 0.5) -- MODE
+	send_input(":IN.4", 0x01, 0.5) -- MODE / Setup
+	send_input(":IN.5", 0x02, 0.5) -- CANCEL (clear board)
+	-- other pieces first, kings last
+	for i = 1, 2 do
+		for y = 1, 8 do
+			for x = 1, 8 do
+				local p = get_piece_id(x, y)
+				if (i == 2 and math.abs(p) == 1) or (i == 1 and math.abs(p) > 1) then
+					if p > 0 then
+						send_input(":IN.4", 0x04, 0.5) -- White
+					else
+						send_input(":IN.5", 0x04, 0.5) -- Black
+					end
+					interface.send_pos(7 - math.abs(p)) -- K F6, Q E5, R D4, B C3, N B2, P A1
+					interface.send_pos(x)
+					interface.send_pos(y)
+					send_input(":IN.2", 0x02, 0.5) -- CONFIRM
+				end
+			end
+		end
+	end
+	if mode == -1 then
+		send_input(":IN.5", 0x04, 0.5) -- Black (to move)
+		send_input(":IN.2", 0x02, 0.5) -- CONFIRM
+	end
+	send_input(":IN.4", 0x01, 0.5) -- MODE
+	send_input(":IN.4", 0x01, 0.5) -- MODE / Play
+	machine.video.throttled = throttled_state
+end
+
+function interface.edit_game(on)
+	interface.edit = on
+end
+
 function interface.start_play(init)
 	interface.turn = false
 	send_input(":IN.2", 0x08, 0.5) -- ENTER
@@ -55,10 +103,10 @@ end
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	local d0 = output:get_value("digit4")
-	local d1 = output:get_value("digit3")
-	local d2 = output:get_value("digit1")
-	local d3 = output:get_value("digit0")
+	local d0 = output_value("digit4")
+	local d1 = output_value("digit3")
+	local d2 = output_value("digit1")
+	local d3 = output_value("digit0")
 	if (d2 == yval[1]) then -- promotion?
 		d3 = d2
 		d2 = d1
@@ -99,9 +147,17 @@ function interface.select_piece(x, y, event)
 					emu.wait(0.5)
 					promcode = 0
 				end
-				send_input(":IN.2", 0x08, 0.5) -- ENTER
+				if interface.edit then
+					send_input(":IN.2", 0x02, 0.5) -- CONFIRM (enter the move, no reply)
+				else
+					send_input(":IN.2", 0x08, 0.5) -- ENTER
+				end
+			else
+				promcode = 0 -- the machine's own promotion: nothing to enter
 			end
-			interface.turn = not interface.turn
+			if not interface.edit then
+				interface.turn = not interface.turn
+			end
 		end
 	end
 end
@@ -123,7 +179,7 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local digit = output:get_value("digit0")
+	local digit = output_value("digit0")
 	if     (digit == 0x6d) then return 'q'
 	elseif (digit == 0x66) then return 'r'
 	elseif (digit == 0x4f) then return 'b'
