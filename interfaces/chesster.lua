@@ -4,6 +4,11 @@ interface.opt_clear_announcements = true
 interface.level = "a1"
 interface.cur_level = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	if machine.system.name == "chesster" then
 		return "Fidelity Chesster"
@@ -101,11 +106,7 @@ function interface.start_play(init)
 end
 
 function interface.clear_announcements()
-	local root = machine.devices[":"]
-	local p9_1 = root:output("9.1") -- Tracks speech technology audio queue bit state
-	local p9_1_val = p9_1 and p9_1:get() or 0
-	
-	if p9_1_val ~= 0 then
+	if (output_value("9.1") ~= 0) then
 		send_input(":IN.0", 0x01, 0.5) 	-- CLEAR
 	end
 end
@@ -114,16 +115,8 @@ function interface.is_selected(x, y)
 	if (interface.opt_clear_announcements and x == 1 and y == 1) then
 		interface.clear_announcements()
 	end
-	
-	-- MODERNIZED: Switched indexed LED node reads to table-sandboxed proxy containers
-	local root = machine.devices[":"]
-	local p0_node = root:output("0." .. tostring(y - 1))
-	local p1_node = root:output("1." .. tostring(x - 1))
-	
-	local r0_val = p0_node and p0_node:get() or 0
-	local r1_val = p1_node and p1_node:get() or 0
-	
-	return (r0_val ~= 0) and (r1_val ~= 0)
+
+	return (output_value("0." .. tostring(y - 1)) ~= 0 and output_value("1." .. tostring(x - 1)) ~= 0)
 end
 
 function interface.select_piece(x, y, event)
@@ -151,61 +144,54 @@ function interface.set_option(name, value)
 end
 
 function interface.test_promotion(x, y)
-    local function piece_led(port, code, x, y)
-        local root_dev = machine.devices[":"]
-        for n=1,8 do
-            send_input(port, code, 0.5)
-            for i=1,4 do
-                local p0_check = root_dev:output("0." .. tostring(y - 1))
-                local p1_check = root_dev:output("1." .. tostring(x - 1))
-                local c0 = p0_check and p0_check:get() or 0
-                local c1 = p1_check and p1_check:get() or 0
-                
-                if (c0 ~= 0 and c1 ~= 0) then
-                    return true
-                end
-                emu.wait(0.15)
-            end
-        end
-        return false
-    end
+	local function piece_led(port, code, x, y)
+		for n=1,8 do
+			send_input(port, code, 0.5)
+			for i=1,4 do
+				if (output_value("0." .. tostring(y - 1)) ~= 0 and output_value("1." .. tostring(x - 1)) ~= 0) then
+					return true
+				end
+				emu.wait(0.15)
+			end
+		end
+		return false
+	end
 
-    if (interface.opt_clear_announcements) then
-        interface.clear_announcements()
-    end
+	if (interface.opt_clear_announcements) then
+		interface.clear_announcements()
+	end
 
-    local p
-    -- MODERNIZED: Adjusted targeting framework to use the local environment's sandbox properties
-    local throttled_state = machine.video.throttled
-    machine.video.throttled = false
-    emu.wait(1)
-    send_input(":IN.0", 0x40, 1) -- VERIFY
+	local p
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	emu.wait(1)
+	send_input(":IN.0", 0x40, 1) -- VERIFY
 
-    if     piece_led(":IN.0", 0x20, x, y) then p = "Q"
-    elseif piece_led(":IN.0", 0x04, x, y) then p = "N"
-    elseif piece_led(":IN.0", 0x08, x, y) then p = "B"
-    elseif piece_led(":IN.0", 0x10, x, y) then p = "R"
-    else p = "Q"
-    end
+	if	 piece_led(":IN.0", 0x20, x, y) then p = "Q"
+	elseif piece_led(":IN.0", 0x04, x, y) then p = "N"
+	elseif piece_led(":IN.0", 0x08, x, y) then p = "B"
+	elseif piece_led(":IN.0", 0x10, x, y) then p = "R"
+	else p = "Q"
+	end
 
-    emu.wait(1)
-    send_input(":IN.0", 0x01, 1) -- CLEAR
-    machine.video.throttled = throttled_state
-    return p
+	emu.wait(1)
+	send_input(":IN.0", 0x01, 1) -- CLEAR
+	machine.video.throttled = throttled_state
+	return p
 end
 
 function interface.get_promotion(x, y)
-    return nil
+	return nil
 end
 
 function interface.promote(x, y, piece)
-    sb_promote(":board", x, y, piece)
-    emu.wait(1.0)
-    if     (piece == "q") then    send_input(":IN.0", 0x20, 1)
-    elseif (piece == "r") then    send_input(":IN.0", 0x10, 1)
-    elseif (piece == "b") then    send_input(":IN.0", 0x08, 1)
-    elseif (piece == "n") then    send_input(":IN.0", 0x04, 1)
-    end
+	sb_promote(":board", x, y, piece)
+	emu.wait(1.0)
+	if	 (piece == "q") then	send_input(":IN.0", 0x20, 1)
+	elseif (piece == "r") then	send_input(":IN.0", 0x10, 1)
+	elseif (piece == "b") then	send_input(":IN.0", 0x08, 1)
+	elseif (piece == "n") then	send_input(":IN.0", 0x04, 1)
+	end
 end
 
 return interface

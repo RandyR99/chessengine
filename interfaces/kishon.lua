@@ -31,7 +31,7 @@ function interface.select_piece(x, y, event)
 		emu.wait(1)
 	end
 	sb_select_piece(":board", 1, x, y, event)
-	emu.wait(0.5)
+	emu.wait(1)
 end
 
 return interface
