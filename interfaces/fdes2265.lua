@@ -1,4 +1,4 @@
-local interface = {}
+interface = {}
 
 interface.opt_clear_announcements = true
 interface.level = "a1"
@@ -6,6 +6,11 @@ interface.cur_level = nil
 interface.score = "0.00"
 interface.depth = "0"
 interface.pv = ""
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	if machine.system.name == "fdes2265" then
@@ -67,39 +72,32 @@ function interface.setlevel()
 	machine.video.throttled = throttled_state
 end
 
-function rotatingDisplay()
+local function rotating_display()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	
-	local root = machine.devices[":"]
-	if not root then return end
-	
 	send_input(":IN.0", 0x20, 1) -- option
 	send_input(":IN.0", 0x20, 1) -- option
 	
-	local b2_node = root:output("1.1")
-	local b2_val = b2_node and b2_node:get() or 0
+	local b2_val = output_value("1.1")
 	if b2_val == 0 then
 		sb_press_square(":board", 1, 2, 2)  -- b2
 		emu.wait(0.5)
 	end
 	
-	local c2_node = root:output("1.2")
-	local c2_val = c2_node and c2_node:get() or 0
+	local c2_val = output_value("1.2")
 	if c2_val == 0 then
 		sb_press_square(":board", 1, 3, 2)  -- c2
 		emu.wait(0.5)
 	end
 	
-	local e2_node = root:output("1.4")
-	local e2_val = e2_node and e2_node:get() or 0
+	local e2_val = output_value("1.4")
 	if e2_val == 0 then
 		sb_press_square(":board", 1, 5, 2)  -- e2
 		emu.wait(0.5)
 	end
 	
-	local a2_node = root:output("1.0")
-	local a2_val = a2_node and a2_node:get() or 0
+	local a2_val = output_value("1.0")
 	if a2_val ~= 0 then
 		sb_press_square(":board", 1, 1, 2)  -- a2
 		emu.wait(0.5)
@@ -118,18 +116,14 @@ function interface.setup_machine()
 	machine.video.throttled = throttled_state
 	interface.cur_level = "a1"
 	interface.setlevel()
-	rotatingDisplay()
+	rotating_display()
 	
-	local root = machine.devices[":"]
-	if not root then return end
-	
-	-- Ton ausschalten
-	local throttled_state_sound = machine.video.throttled
+	-- sound off
+	throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	send_input(":IN.0", 0x20, 1) -- OPTION
 	
-	local b1_node = root:output("1.1")
-	local b1_val = b1_node and b1_node:get() or 0
+	local b1_val = output_value("1.1")
 	if b1_val == 0 then
 		sb_press_square(":board", 1, 2, 1)  -- b1
 		emu.wait(0.5)
@@ -137,7 +131,7 @@ function interface.setup_machine()
 	
 	send_input(":IN.0", 0x01, 1) -- CLEAR
 	send_input(":IN.0", 0x01, 1) -- CLEAR
-	machine.video.throttled = throttled_state_sound
+	machine.video.throttled = throttled_state
 end
 
 function interface.set_pos(mode)
@@ -195,75 +189,23 @@ function interface.start_play(init)
 end
 
 function interface.clear_announcements()
-	local root = machine.devices[":"]
-	if not root then return end
-
-	local d2_node = root:output("digit2")
-	local d3_node = root:output("digit3")
-	local d4_node = root:output("digit4")
-	local d5_node = root:output("digit5")
-
-	local d2 = d2_node and d2_node:get() or 0
-	local d3 = d3_node and d3_node:get() or 0
-	local d4 = d4_node and d4_node:get() or 0
-	local d5 = d5_node and d5_node:get() or 0
-	
-	if ((d3 == 0x54 or d3 == 0x37) or											
-	   (d2 == 0x5e and d3 == 0x50 and d5 == 0x4f) or					
-	   (d2 == 0x5e and d3 == 0x50 and d4 == 0x6d and d5 == 0x3f)) then	
+	local d2 = output_value("digit2")
+	local d3 = output_value("digit3")
+	local d4 = output_value("digit4")
+	local d5 = output_value("digit5")
+	-- clear announcements to continue the game
+	if (((d3 == 0x54 or d3 == 0x37) and d5 ~= 0x00) or					-- '?M?x' forced checkmate found in X moves
+	   (d2 == 0x5e and d3 == 0x50 and d5 == 0x4f) or					-- 'dr?3' threefold repetition
+	   (d2 == 0x5e and d3 == 0x50 and d4 == 0x6d and d5 == 0x3f)) then	-- 'dr50' fifty-move rule
 		send_input(":IN.0", 0x01, 1)
 	end
 end
-
-interface.debounce_latch = {}
-interface.was_machine_turn = false
-interface.settle_frames = 0
 
 function interface.is_selected(x, y)
 	if (interface.opt_clear_announcements and x == 1 and y == 1) then
 		interface.clear_announcements()
 	end
-	
-	local root = machine.devices[":"]
-	if not root then return false end
-
-	local d_node = root:output("1.3")
-	local e_node = root:output("1.4")
-	local d_val = d_node and d_node:get() or 0
-	local e_val = e_node and e_node:get() or 0
-	
-	local current_machine_turn = (d_val ~= 0 or e_val ~= 0)
-
-	if interface.was_machine_turn and not current_machine_turn then
-		interface.settle_frames = 20
-	end
-	interface.was_machine_turn = current_machine_turn
-
-	if interface.settle_frames > 0 then
-		interface.settle_frames = interface.settle_frames - 1
-		return false
-	end
-
-	local r_node = root:output("0." .. tostring(y - 1))
-	local c_node = root:output("1." .. tostring(x - 1))
-	local r_val = r_node and r_node:get() or 0
-	local c_val = c_node and c_node:get() or 0
-	
-	local square_key = x .. "_" .. y
-	local is_intersecting = (r_val ~= 0 and c_val ~= 0)
-	
-	if is_intersecting then
-		local active_count = (interface.debounce_latch[square_key] or 0) + 1
-		interface.debounce_latch[square_key] = active_count
-		
-		if active_count >= 3 then
-			return true
-		end
-	else
-		interface.debounce_latch[square_key] = 0
-	end
-	
-	return false
+	return output_value("0." .. tostring(y - 1)) ~= 0 and output_value("1." .. tostring(x - 1)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -294,19 +236,10 @@ end
 
 function interface.test_promotion(x, y)
 	local function piece_led(port, code, x, y)
-		local root = machine.devices[":"]
-		if not root then return false end
-		
 		for n=1,8 do
 			send_input(port, code, 0.5)
 			for i=1,4 do
-				-- FIXED: Modern non-deprecated node object API mapping format
-				local r_node = root:output("0." .. tostring(y - 1))
-				local c_node = root:output("1." .. tostring(x - 1))
-				local r_val = r_node and r_node:get() or 0
-				local c_val = c_node and c_node:get() or 0
-				
-				if r_val ~= 0 and c_val ~= 0 then
+				if (output_value("0." .. tostring(y - 1)) ~= 0 and output_value("1." .. tostring(x - 1)) ~= 0) then
 					return true
 				end
 				emu.wait(0.15)
@@ -363,20 +296,12 @@ function interface.show_info(on)
 	interface.last_thinking_state = on
 
  	if on then
-		local root = machine.devices[":"]
-		if not root then return "" end
 
-		local dot_node = root:output("3.7")
-		local d1_node  = root:output("digit2")
-		local d2_node  = root:output("digit3")
-		local d3_node  = root:output("digit4")
-		local d4_node  = root:output("digit5")
-
-		local dot = dot_node and dot_node:get() or 0
-		local d1  = d1_node and d1_node:get() or 0
-		local d2  = d2_node and d2_node:get() or 0
-		local d3  = d3_node and d3_node:get() or 0
-		local d4  = d4_node and d4_node:get() or 0
+		local dot = output_value("3.7")
+		local d1  = output_value("digit2")
+		local d2  = output_value("digit3")
+		local d3  = output_value("digit4")
+		local d4  = output_value("digit5")
 
 		local raw_d1 = digit_ascii(d1)
 		local raw_d2 = digit_ascii(d2)

@@ -1,8 +1,13 @@
-local interface = {}
+interface = {}
 
 interface.opt_clear_announcements = true
 interface.level = "a1"
 interface.cur_level = nil
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	if machine.system.name == "fdes2000d" then
@@ -47,22 +52,18 @@ function interface.setup_machine()
 	interface.cur_level = "a1"
 	interface.setlevel()
 	
-	local root = machine.devices[":"]
-	if not root then return end
-	
-	-- Ton ausschalten
-	local throttled_state_sound = machine.video.throttled
+	-- sound off
+	throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	send_input(":IN.0", 0x20, 1) -- option
 	
-	local check_node = root:output("1.1")
-	local check_val = check_node and check_node:get() or 0
+	local check_val = output_value("1.1")
     if check_val == 0 then
 		sb_press_square(":board", 1, 2, 1)  -- b1
 		emu.wait(0.5)
 	end
 	send_input(":IN.0", 0x01, 1) -- CLEAR
-	machine.video.throttled = throttled_state_sound
+	machine.video.throttled = throttled_state
 end
 
 function interface.set_pos(mode)
@@ -120,20 +121,12 @@ function interface.start_play(init)
 end
 
 function interface.clear_announcements()
-	local root = machine.devices[":"]
-	if not root then return end
-
-	local d2_node = root:output("digit2")
-	local d3_node = root:output("digit3")
-	local d4_node = root:output("digit4")
-	local d5_node = root:output("digit5")
-
-	local d2 = d2_node and d2_node:get() or 0
-	local d3 = d3_node and d3_node:get() or 0
-	local d4 = d4_node and d4_node:get() or 0
-	local d5 = d5_node and d5_node:get() or 0
-
-	if ((d3 == 0x54 or d3 == 0x37) or											-- Forced checkmate detected ('n' or 'M')
+	local d2 = output_value("digit2")
+	local d3 = output_value("digit3")
+	local d4 = output_value("digit4")
+	local d5 = output_value("digit5")
+	-- clear announcements to continue the game
+	if (((d3 == 0x54 or d3 == 0x37) and d5 ~= 0x00) or					-- '?M?x' forced checkmate found in X moves
 	   (d2 == 0x5e and d3 == 0x50 and d5 == 0x4f) or					-- 'dr?3' threefold repetition
 	   (d2 == 0x5e and d3 == 0x50 and d4 == 0x6d and d5 == 0x3f)) then	-- 'dr50' fifty-move rule
 		send_input(":IN.0", 0x01, 1)
@@ -144,17 +137,7 @@ function interface.is_selected(x, y)
 	if (interface.opt_clear_announcements and x == 1 and y == 1) then
 		interface.clear_announcements()
 	end
-	
-	local root = machine.devices[":"]
-	if not root then return false end
-	
-	local r_node = root:output("0." .. tostring(y - 1))
-	local c_node = root:output("1." .. tostring(x - 1))
-	
-	local r_val = r_node and r_node:get() or 0
-	local c_val = c_node and c_node:get() or 0
-	
-	return r_val ~= 0 and c_val ~= 0
+	return output_value("0." .. tostring(y - 1)) ~= 0 and output_value("1." .. tostring(x - 1)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -182,18 +165,10 @@ end
 
 function interface.test_promotion(x, y)
 	local function piece_led(port, code, x, y)
-		local root = machine.devices[":"]
-		if not root then return false end
-		
 		for n=1,8 do
 			send_input(port, code, 0.5)
 			for i=1,4 do
-				local r_node = root:output("0." .. tostring(y - 1))
-				local c_node = root:output("1." .. tostring(x - 1))
-				local r_val = r_node and r_node:get() or 0
-				local c_val = c_node and c_node:get() or 0
-				
-				if r_val ~= 0 and c_val ~= 0 then
+				if (output_value("0." .. tostring(y - 1)) ~= 0 and output_value("1." .. tostring(x - 1)) ~= 0) then
 					return true
 				end
 				emu.wait(0.15)
