@@ -4,6 +4,11 @@ interface.level = "a5"
 interface.cur_level = nil
 interface.edit = false
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.setlevel()
 	if (interface.cur_level == nil or interface.cur_level == interface.level) then
 		return
@@ -71,8 +76,8 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_value("2." .. tostring(x - 1)) ~= 0
-	local yval = output:get_value("0." .. tostring(y - 1)) ~= 0
+	local xval = output_value("2." .. tostring(x - 1)) ~= 0
+	local yval = output_value("0." .. tostring(y - 1)) ~= 0
 	return xval and yval
 end
 
@@ -98,7 +103,7 @@ function interface.test_promotion(x, y)
 	local function piece_led(port, code, x, y)
 		send_input(port, code, 0.5)
 		emu.wait(0.5)
-		return (machine:outputs():get_indexed_value("0.", y - 1) == 0)
+		return (output_value("0." .. (y - 1)) == 0)
 	end
 
 	local p
