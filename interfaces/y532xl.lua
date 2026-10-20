@@ -4,6 +4,11 @@ interface.level = "TI 1"
 interface.cur_level = nil
 local Ticker = 1
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	return "Yeno 532 XL"
 end
@@ -28,7 +33,7 @@ function interface.setlevel()
 	local n = tonumber(interface.level:sub(3,4))
 	repeat
 		send_input(":IN.1", 0x02, 0.5) -- Level
-	until (output:get_value("digit3") == num)
+	until (output_value("digit3") == num)
 	if (n == 10) then
 		send_input(":IN.1", 0x80, 0.5) -- 10
 	elseif (n == 9) then
@@ -45,7 +50,7 @@ function interface.setup_machine()
 	machine.video.throttled = false
 	sb_reset_board(":board")
 	emu.wait(1)
-	if (output:get_value("digit7") ~= 0x3f) then
+	if (output_value("digit7") ~= 0x3f) then
 		send_input(":IN.1", 0x04, 1) -- New Game
 		emu.wait(1)
 	end
@@ -100,12 +105,12 @@ end
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	local d7 = output:get_value("digit7") & 0x7f
-	local d6 = output:get_value("digit6") & 0x7f
-	local d5 = output:get_value("digit5") & 0x7f
-	local d4 = output:get_value("digit4") & 0x7f
+	local d7 = output_value("digit7") & 0x7f
+	local d6 = output_value("digit6") & 0x7f
+	local d5 = output_value("digit5") & 0x7f
+	local d4 = output_value("digit4") & 0x7f
 	if (d7 == 0x73) then -- promotion
-		return output:get_value((x - 1) .. "." .. (y - 1)) ~= 0
+		return output_value((x - 1) .. "." .. (y - 1)) ~= 0
 	else
 		return (xval[x] == d7 and yval[y] == d6) or (xval[x] == d5 and yval[y] == d4)
 	end
@@ -147,8 +152,8 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	if (output:get_value("digit7") == 0x73) then
-		local piece = output:get_value("digit4")
+	if (output_value("digit7") == 0x73) then
+		local piece = output_value("digit4")
 		if     (piece == 0x67) then return 'q'
 		elseif (piece == 0x44) then return 'r'
 		elseif (piece == 0x7c) then return 'b'
@@ -173,27 +178,27 @@ function interface.show_info(on)
 		local pv
 		local score
 		local depth
-		if output:get_value("digit7") ~= 0x73 then
+		if output_value("digit7") ~= 0x73 then
 			send_input(":IN.0", 0x80, 0.2) -- Show Move
 			emu.wait(0.2)
-			local d3 = output:get_value("digit0")
-			local d2 = output:get_value("digit1")
-			local d1 = output:get_value("digit2")
-			local d0 = output:get_value("digit3")
-			local d7 = output:get_value("digit4")
-			local d6 = output:get_value("digit5")
-			local d5 = output:get_value("digit6")
-			local d4 = output:get_value("digit7")
+			local d3 = output_value("digit0")
+			local d2 = output_value("digit1")
+			local d1 = output_value("digit2")
+			local d0 = output_value("digit3")
+			local d7 = output_value("digit4")
+			local d6 = output_value("digit5")
+			local d5 = output_value("digit6")
+			local d4 = output_value("digit7")
 			Ticker = 0
 			pv = digit_ascii(d4) .. digit_ascii(d5) .. digit_ascii(d6) .. digit_ascii(d7)
 			score = digit_ascii(d0) .. digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3)
 			send_input(":IN.2", 0x04, 0.2) -- 3
 			emu.wait(0.2)
-			d3 = output:get_value("digit0")
-			d2 = output:get_value("digit1")
-			d1 = output:get_value("digit2")
-			d0 = output:get_value("digit3")
-			if output:get_value("digit7") ~= 0x73 then
+			d3 = output_value("digit0")
+			d2 = output_value("digit1")
+			d1 = output_value("digit2")
+			d0 = output_value("digit3")
+			if output_value("digit7") ~= 0x73 then
 				send_input(":IN.0", 0x80, 0.2) -- Show Move
 				depth = digit_ascii(d2) .. digit_ascii(d3)
 			end
