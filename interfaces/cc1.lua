@@ -4,6 +4,11 @@ interface.turn = true
 interface.invert = false
 interface.last_get = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	return "Fidelity Chess Challenger 1"
 end
@@ -40,17 +45,10 @@ function interface.is_selected(x, y)
 	local yval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x6f, 0x76 }
 	local xval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f }
 	
-	-- MODERNIZED: Safely fetches inputs using the sandboxed environment's local 'machine' device proxy container
-	local root = machine.devices[":"]
-	local p0 = root:output("digit0")
-	local p1 = root:output("digit1")
-	local p2 = root:output("digit2")
-	local p3 = root:output("digit3")
-	
-	local d0 = p0 and p0:get() or 0
-	local d1 = p1 and p1:get() or 0
-	local d2 = p2 and p2:get() or 0
-	local d3 = p3 and p3:get() or 0
+	local d0 = output_value("digit0")
+	local d1 = output_value("digit1")
+	local d2 = output_value("digit2")
+	local d3 = output_value("digit3")
 	
 	if (d0 == 0x3f and d1 == 0x3f and d2 == 0x3f and d3 == 0x00) then -- "000 ", computer castles queenside
 		return y == 8 and (x == 5 or x == 3)
@@ -85,7 +83,6 @@ function interface.select_piece(x, y, event)
 	if (event == "get" and interface.turn) then
 		interface.last_get = {x=x, y=y}
 	elseif (event == "put" and interface.turn) then
-		-- MODERNIZED: Strictly targets the local sandboxed 'machine' reference to bypass global scope locks
 		local throttled_state = machine.video.throttled
 		machine.video.throttled = false
 		local move_type = get_move_type(interface.last_get.x, interface.last_get.y, x, y)
