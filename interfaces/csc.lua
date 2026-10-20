@@ -4,6 +4,14 @@ interface.level = "1"
 interface.cur_level = nil
 local turn  = 0
 local check = 3
+interface.fen = false    -- the game began with a set_pos
+interface.silent = false -- history replay after a set_pos: pieces are only moved on the sensorboard
+interface.stm = 1
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	return "Fidelity Champion Sensory Chess Challenger"
@@ -23,42 +31,20 @@ function interface.setlevel()
 	local level = interface.level
 	local lev = "12345678EFGH"
 	lev = lev:find(level:sub(1,1))
-	
-	local root = machine.devices[":"]
-	local safety_counter = 0
-	
 	if (lev < 9 or lev > 10) then
-		repeat
+		for i = 1, 30 do
 			send_input(":IN.3", 0x100, 0.6) -- LV
-			emu.wait(0.1)
-			
-			-- MODERNIZED: Fetches outputs safely using proxy container variables
-			local p0 = root:output("digit0")
-			local d0_val = p0 and p0:get() or 0
-			
-			if d0_val == lcd_lev[lev] then
+			if (output_value("digit0") == lcd_lev[lev]) then
 				break
 			end
-			
-			safety_counter = safety_counter + 1
-			if safety_counter > 30 then break end
-		until false
+		end
 	else
-		repeat
+		for i = 1, 30 do
 			send_input(":IN.3", 0x100, 0.6) -- LV
-			emu.wait(0.1)
-			
-			local p0 = root:output("digit0")
-			local d0_val = p0 and p0:get() or 0
-			
-			if d0_val == lcd_lev[lev-1] then
+			if (output_value("digit0") == lcd_lev[lev-1]) then
 				break
 			end
-			
-			safety_counter = safety_counter + 1
-			if safety_counter > 30 then break end
-		until false
-		
+		end
 		send_input(":IN.3", 0x100, 0.6) -- LV
 		level = level:sub(3)
 		local d1,d2,d3
@@ -68,24 +54,15 @@ function interface.setlevel()
 				if (level:sub(1,2) ~= "00") then
 					d1=lcd_num[tonumber(level:sub(1,1))+1]
 					d2=lcd_num[tonumber(level:sub(2,2))+1]
-					
-					-- MODERNIZED: Updated un-sandboxed ioport setters to container fields
-					machine.ioports[":IN.5"]:fields()["ST"]:set_value(1)
-					
-					local sub_safety = 0
-					repeat
+					machine.ioport.ports[":IN.5"]:field(0x100):set_value(1) -- ST
+					for n = 1, 1200 do -- ST held: the digits count up
 						emu.wait(0.05)
-						local p1_node = root:output("digit1")
-						local p0_node = root:output("digit0")
-						local v1 = p1_node and p1_node:get() or 0
-						local v0 = p0_node and p0_node:get() or 0
-						
-						if (v1 == d1 and v0 == d2) then break end
-						sub_safety = sub_safety + 1
-						if sub_safety > 50 then break end
-					until false
+						if (output_value("digit1") == d1 and output_value("digit0") == d2) then
+							break
+						end
+					end
 				end
-				machine.ioports[":IN.5"]:fields()["ST"]:set_value(0)
+				machine.ioport.ports[":IN.5"]:field(0x100):set_value(0) -- ST
 				emu.wait(0.5)
 				level = level:sub(4)
 			end
@@ -94,24 +71,15 @@ function interface.setlevel()
 				d1=lcd_num[tonumber(level:sub(1,1))+1]
 				d2=lcd_num[tonumber(level:sub(3,3))+1]
 				d3=lcd_num[tonumber(level:sub(4,4))+1]
-				
-				machine.ioports[":IN.5"]:fields()["ST"]:set_value(1)
-				local tm_safety = 0
-				repeat
+				machine.ioport.ports[":IN.5"]:field(0x100):set_value(1) -- ST
+				for n = 1, 1200 do -- ST held: the digits count up
 					emu.wait(0.05)
-					local p2_node = root:output("digit2")
-					local p1_node = root:output("digit1")
-					local p0_node = root:output("digit0")
-					local v2 = p2_node and p2_node:get() or 0
-					local v1 = p1_node and p1_node:get() or 0
-					local v0 = p0_node and p0_node:get() or 0
-					
-					if (v2 == d1 and v1 == d2 and v0 == d3) then break end
-					tm_safety = tm_safety + 1
-					if tm_safety > 50 then break end
-				until false
+					if (output_value("digit2") == d1 and output_value("digit1") == d2 and output_value("digit0") == d3) then
+						break
+					end
+				end
 			end
-			machine.ioports[":IN.5"]:fields()["ST"]:set_value(0)
+			machine.ioport.ports[":IN.5"]:field(0x100):set_value(0) -- ST
 			emu.wait(0.5)
 			level = level:sub(6)
 		end
@@ -121,6 +89,9 @@ function interface.setlevel()
 end
 
 function interface.setup_machine()
+	interface.fen = false
+	interface.silent = false
+	interface.stm = 1
 	sb_reset_board(":board")
 	emu.wait(5)
 	send_input(":IN.8", 0x40, 1) -- CL
@@ -138,6 +109,8 @@ function interface.set_pos(mode)
 		send_input(":IN.2", 0x100, 0.6) -- TM
 		return (":board")
 	else
+		interface.fen = true
+		interface.stm = mode
 		local key=0x00
 		for n=1,6 do
 			if     n==1 then key=0x20 -- K
@@ -179,13 +152,32 @@ end
 
 function interface.edit_game(on)
     local throttled_state = machine.video.throttled
-    if on then
+    if (interface.fen) then
+        -- Player Mode is only allowed before the first move: after a set_pos the history is
+        -- replayed on the sensorboard alone, then RE and the final position is set up again
+        interface.silent = on
+        if (not on) then
+            machine.video.throttled = false
+            send_input(":IN.8", 0x80, 1) -- RE
+            emu.wait(2)
+            interface.cur_level = "1"
+            interface.setlevel()
+            interface.set_pos(0)
+            interface.set_pos(interface.stm)
+            machine.video.throttled = throttled_state
+        end
+    elseif on then
         send_input(":IN.0", 0x100, 0.6) -- SPK
         send_input(":IN.0", 0x100, 0.6) -- SPK
         send_input(":IN.1", 0x100, 0.6) -- RV    -- Voice off
-        send_input(":IN.3", 0x100, 0.6) -- LV
-        send_input(":IN.3", 0x100, 0.6) -- LV
-        send_input(":IN.3", 0x100, 0.6) -- LV
+        local lv = 3 -- LV three times: Player Mode (the Elite needs one press)
+        if (machine.system.name == "csce" or machine.system.name == "cscet") then
+            lv = 1
+        end
+        for i = 1, lv do
+            send_input(":IN.3", 0x100, 0.6) -- LV
+            emu.wait(0.5)
+        end
         send_input(":IN.2", 0x100, 0.6) -- TM
     else
         machine.video.throttled = false
@@ -217,13 +209,21 @@ function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
-	local root = machine.devices[":"]
-	local led_node = root:output(tostring(x - 1) .. "." .. tostring(y - 1 + 8))
-	local led_val = led_node and led_node:get() or 0
-	return led_val ~= 0
+	return output_value(tostring(x - 1) .. "." .. tostring(y - 1 + 8)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
+    if (event == "put") then
+        interface.stm = -interface.stm
+    end
+    if (interface.silent) then
+        if (event == "capture" or event == "en_passant") then
+            sb_remove_piece(":board", x, y)
+        else
+            sb_move_piece(":board", x, y)
+        end
+        return
+    end
     if (event ~= "capture") then
         if (event ~= "en_passant" and event ~= "get_castling" and event ~= "put_castling") then
             turn = turn + 1
@@ -257,11 +257,8 @@ end
 function interface.test_promotion(x, y)
 	local function piece_led(port, code, x, y)
 		send_input(port, code, 0.6)
-		local root_dev = machine.devices[":"]
 		for i=1,5 do
-			local check_node = root_dev:output(tostring(x - 1) .. "." .. tostring(y - 1 + 8))
-			local check_val = check_node and check_node:get() or 0
-			if (check_val ~= 0) then
+			if (output_value(tostring(x - 1) .. "." .. tostring(y - 1 + 8)) ~= 0) then
 				return true
 			end
 			emu.wait(0.1)
@@ -296,13 +293,30 @@ end
 
 function interface.promote(x, y, piece)
 	sb_promote(":board", x, y, piece)
+	if (interface.silent) then
+		return
+	end
 	emu.wait(1.0)
-	if     (piece == "q") then	send_input(":IN.8", 0x10, 1)
-	elseif (piece == "r") then	send_input(":IN.8", 0x02, 1)
-	elseif (piece == "b") then	send_input(":IN.8", 0x08, 1)
-	elseif (piece == "n") then	send_input(":IN.8", 0x04, 1)
+	local key = { q = 0x10, r = 0x02, b = 0x08, n = 0x04 }
+	if (key[piece] == nil) then
+		return
+	end
+	-- the promotion square flashes until the piece is taken; the first press can be
+	-- announced only ("promote to a bishop, promote pawn"), so press again while it flashes
+	for n = 1, 3 do
+		send_input(":IN.8", key[piece], 1)
+		local flashing = false
+		for i = 1, 20 do
+			emu.wait(0.1)
+			if (interface.is_selected(x, y)) then
+				flashing = true
+				break
+			end
+		end
+		if (not flashing) then
+			break
+		end
 	end
 end
 
 return interface
-
