@@ -3,6 +3,12 @@ interface = {}
 interface.level = "1"
 interface.cur_level = nil
 interface.edit = false
+interface.stm = 1 -- side to move: 1 White, -1 Black
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.setlevel()
 	if (interface.cur_level == nil or interface.cur_level == interface.level) then
@@ -13,7 +19,7 @@ function interface.setlevel()
 	interface.cur_level = interface.level
 	local level = interface.level
 	local n = (lev2 - lev1 + 16) % 16
-	if output:get_value("0.7") ~= 0 then
+	if output_value("0.7") ~= 0 then
 		n = n + 1
 	end
 	for i=1,n do
@@ -23,6 +29,8 @@ end
 
 function interface.setup_machine()
 	sb_reset_board(":board")
+	interface.stm = 1
+	interface.edit = false
 	emu.wait(1)
 --	send_input(":IN.1", 0x10, 0.5)	-- New
 
@@ -63,10 +71,17 @@ function interface.set_pos(mode)
 		end
 		send_input(":IN.1", 0x04, 0.5)	-- Take Back
 	end
+	interface.stm = mode
 end
 
 function interface.edit_game(on)
+	-- entering history moves with Take Back after each one races the machine's instant
+	-- forced replies: move the pieces silently instead, then set up the final position
 	interface.edit = on
+	if not on then
+		interface.set_pos(0)
+		interface.set_pos(interface.stm)
+	end
 end
 
 function interface.start_play(init)
@@ -74,19 +89,25 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	local xval = output:get_value("0." .. tostring(x - 1)) ~= 0
-	local yval = output:get_value("1." .. tostring(y - 1)) ~= 0
+	local xval = output_value("0." .. tostring(x - 1)) ~= 0
+	local yval = output_value("1." .. tostring(y - 1)) ~= 0
 	return xval and yval
 end
 
 function interface.select_piece(x, y, event)
-	if (event == "get_castling" or event == "put_castling") then
+	if (event == "put") then
+		interface.stm = -interface.stm
+	end
+	if interface.edit then
+		if (event == "capture" or event == "en_passant") then
+			sb_remove_piece(":board", x, y)
+		else
+			sb_move_piece(":board", x, y)
+		end
+	elseif (event == "get_castling" or event == "put_castling") then
 		sb_move_piece(":board", x, y)
 	else
 		sb_select_piece(":board", 1, x, y, event)
-		if interface.edit and event == "put" then
-			send_input(":IN.1", 0x04, 0.5)	-- Take Back
-		end
 	end
 end
 
