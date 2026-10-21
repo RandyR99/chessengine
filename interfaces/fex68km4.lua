@@ -16,7 +16,7 @@ function interface.setup_machine()
 	machine.video.throttled = false
 	sb_reset_board(":board")
 	emu.wait(1)
-	send_input(":IN.0", 0x01, 1) -- CLEAR
+	send_input(":IN.0", 0x80, 1) -- CLEAR
 	emu.wait(1)
 	machine.video.throttled = throttled_state
 	interface.cur_level = "a1"

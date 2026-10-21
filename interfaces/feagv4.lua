@@ -4,6 +4,11 @@ interface.opt_clear_announcements = true
 interface.level = "a1"
 interface.cur_level = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	if machine.system.name == "feagv4" then
 		return "Fidelity Avant Garde v2"
@@ -42,16 +47,10 @@ function interface.setdigit(n,d,m)
 	if (led == 6) then
 		led = 5
 	end
-	
-	-- MODERNIZED: Fetches outputs safely using proxy container variables
-	local root = machine.devices[":"]
-	local digit_node = root:output("digit" .. led)
-	local cd = digit_node and digit_node:get() or 0
-	
+	local cd = output_value("digit" .. led)
 	while (cd == 0x00) do
 		emu.wait(0.25)
-		digit_node = root:output("digit" .. led)
-		cd = digit_node and digit_node:get() or 0
+		cd = output_value("digit" .. led)
 	end
 	
 	n = 0
@@ -125,14 +124,10 @@ function interface.setup_machine()
 	send_input(":IN.1", 0x04, 1) -- New Game
 	emu.wait(3)
 	
-	local root = machine.devices[":"]
-	
 	-- Sound Off
 	send_input(":IN.0", 0x02, 1) -- option
 	emu.wait(0.2)
-	local p0_9 = root:output("0.9")
-	local v0_9 = p0_9 and p0_9:get() or 0
-	if v0_9 == 0 then
+	if output_value("0.9") == 0 then
 		sb_press_square(":board", 1, 2, 1)  -- b1
 		emu.wait(0.5)
 	end
@@ -142,9 +137,7 @@ function interface.setup_machine()
 	-- Ponder ON
 	send_input(":IN.0", 0x02, 1) -- option
 	emu.wait(0.2)
-	local p0_8 = root:output("0.8")
-	local v0_8 = p0_8 and p0_8:get() or 0
-	if v0_8 ~= 0 then
+	if output_value("0.8") ~= 0 then
 		sb_press_square(":board", 1, 1, 1)  -- a1
 		emu.wait(0.5)
 	end
@@ -154,9 +147,7 @@ function interface.setup_machine()
 	-- Book ON
 	send_input(":IN.0", 0x02, 1) -- option
 	emu.wait(0.2)
-	local p0_14 = root:output("0.14")
-	local v0_14 = p0_14 and p0_14:get() or 0
-	if v0_14 ~= 0 then
+	if output_value("0.14") ~= 0 then
 		sb_press_square(":board", 1, 7, 1)  -- g1
 		emu.wait(0.5)
 	end
@@ -166,9 +157,7 @@ function interface.setup_machine()
 	-- Monitor OFF
 	send_input(":IN.0", 0x02, 1) -- option
 	emu.wait(0.2)
-	local p0_10 = root:output("0.10")
-	local v0_10 = p0_10 and p0_10:get() or 0
-	if v0_10 ~= 0 then
+	if output_value("0.10") ~= 0 then
 		sb_press_square(":board", 1, 3, 1)  -- c1
 		emu.wait(0.5)
 	end
@@ -226,7 +215,7 @@ function interface.edit_game()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	send_input(":IN.0", 0x02, 0.5) -- OPTION
-	sb_press_square(":board", 1, 5, 6)
+	sb_press_square(":board", 1, 3, 1) -- c1: Monitor Mode on/off
 	send_input(":IN.1", 0x01, 0.5) -- CL
 	emu.wait(0.5)
 	machine.video.throttled = throttled_state
@@ -237,24 +226,15 @@ function interface.start_play(init)
 end
 
 function interface.clear_announcements()
-	local root = machine.devices[":"]
-	local d0_node = root:output("digit0")
-	local d1_node = root:output("digit1")
-	local d2_node = root:output("digit2")
-	local d3_node = root:output("digit3")
-	local d5_node = root:output("digit5")
-	local d6_node = root:output("digit6")
-	local d7_node = root:output("digit7")
-	local d8_node = root:output("digit8")
 
-	local d0 = d0_node and d0_node:get() or 0
-	local d1 = d1_node and d1_node:get() or 0
-	local d2 = d2_node and d2_node:get() or 0
-	local d3 = d3_node and d3_node:get() or 0
-	local d5 = d5_node and d5_node:get() or 0
-	local d6 = d6_node and d6_node:get() or 0
-	local d7 = d7_node and d7_node:get() or 0
-	local d8 = d8_node and d8_node:get() or 0
+	local d0 = output_value("digit0")
+	local d1 = output_value("digit1")
+	local d2 = output_value("digit2")
+	local d3 = output_value("digit3")
+	local d5 = output_value("digit5")
+	local d6 = output_value("digit6")
+	local d7 = output_value("digit7")
+	local d8 = output_value("digit8")
 
 	if ((d5 == 0x37 and d8 ~= 0x00) or (d0 == 0x37 and d3 ~= 0x00) or
 	   (d6 == 0x5e and d5 == 0x50 and d8 == 0x4f) or (d1 == 0x5e and d0 == 0x50 and d3 == 0x4f) or
@@ -267,9 +247,7 @@ function interface.is_selected(x, y)
 	if (interface.opt_clear_announcements and x == 1 and y == 1) then
 		interface.clear_announcements()
 	end
-	local root = machine.devices[":"]
-	local board_node = root:output((y - 1) .. "." .. (7 + x))
-	return board_node and board_node:get() ~= 0 or false
+	return output_value((y - 1) .. "." .. (7 + x)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -297,16 +275,11 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion_led()
-	local root = machine.devices[":"]
-	local p8_12 = root:output("8.12")
-	local p8_11 = root:output("8.11")
-	local p8_10 = root:output("8.10")
-	local p8_9  = root:output("8.9")
 	
-	if     (p8_12 and p8_12:get() ~= 0) then return 'q'
-	elseif (p8_11 and p8_11:get() ~= 0) then return 'r'
-	elseif (p8_10 and p8_10:get() ~= 0) then return 'b'
-	elseif (p8_9  and p8_9:get()  ~= 0) then return 'n'
+	if     (output_value("8.12") ~= 0) then return 'q'
+	elseif (output_value("8.11") ~= 0) then return 'r'
+	elseif (output_value("8.10") ~= 0) then return 'b'
+	elseif (output_value("8.9") ~= 0) then return 'n'
 	end
 	return nil
 end
