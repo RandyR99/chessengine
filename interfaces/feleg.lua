@@ -4,6 +4,11 @@ interface.opt_clear_announcements = true
 interface.level = 1
 interface.cur_level = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	if machine.system.name == "feleg" then
 		return "Fidelity Elegance"
@@ -35,15 +40,9 @@ function interface.setlevel()
 	local cur_leds = 0
 	local cur_level = 0
 	local dif_level
-	
-	local root = machine.devices[":"]
 	send_input(":IN.0", 0x08, 1) -- LV
-	
-	-- Modernized output proxy loop scanner
 	for y = 0, 7 do
-		local led_node = root:output("7." .. tostring(y))
-		local led_val = led_node and led_node:get() or 0
-		if led_val ~= 0 then
+		if output_value("7." .. y) ~= 0 then
 			cur_leds = cur_leds + (1 << y)
 		end
 	end
@@ -154,19 +153,13 @@ function interface.start_play(init)
 end
 
 function interface.clear_announcements()
-	local root = machine.devices[":"]
-	if not root then return end
-	
-	-- Modernized global value checks for mate/draw announcement lines
+	-- machine turns on all leds on the first line for mate/draw announcements
 	local all_lit = true
 	for i = 0, 7 do
-		local node = root:output(tostring(i) .. ".0")
-		if not node or node:get() == 0 then
+		if output_value(i .. ".0") == 0 then
 			all_lit = false
-			break
 		end
 	end
-	
 	if all_lit then
 		send_input(":IN.0", 0x40, 1)
 	end
@@ -176,14 +169,8 @@ function interface.is_selected(x, y)
 	if (interface.opt_clear_announcements and x == 1 and y == 1) then
 		interface.clear_announcements()
 	end
-	
-	local root = machine.devices[":"]
-	if not root then return false end
-	
-	-- Modernized hardware matrix indexing layout tracking strings cleanly
-	local node_tag = tostring(x - 1) .. "." .. tostring(y - 1)
-	local led_node = root:output(node_tag)
-	return led_node and led_node:get() ~= 0 or false
+
+	return output_value((x - 1) .. "." .. (y - 1)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -212,24 +199,20 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion_led()
-	local root = machine.devices[":"]
-	if not root then return nil end
-	
-	-- Aligned panel verify outputs via proxy objects
-	local q_node = root:output("8.6")
-	local r_node = root:output("8.5")
-	local b_node = root:output("8.4")
-	local n_node = root:output("8.3")
-	
-	if     (q_node and q_node:get() ~= 0) then return 'q'
-	elseif (r_node and r_node:get() ~= 0) then return 'r'
-	elseif (b_node and b_node:get() ~= 0) then return 'b'
-	elseif (n_node and n_node:get() ~= 0) then return 'n'
+	if     (output_value("8.6") ~= 0) then return 'q'
+	elseif (output_value("8.5") ~= 0) then return 'r'
+	elseif (output_value("8.4") ~= 0) then return 'b'
+	elseif (output_value("8.3") ~= 0) then return 'n'
 	end
 	return nil
 end
 
 function interface.get_promotion(x, y)
+	-- in a capture the piece leds show the captured piece: use test_promotion
+	-- (the square is also occupied when this is called again after the move)
+	if (get_piece_id(x, y) ~= 0) then
+		return nil
+	end
 	if (interface.opt_clear_announcements) then
 		interface.clear_announcements()
 	end
@@ -244,6 +227,35 @@ function interface.get_promotion(x, y)
 	end
 	interface.select_piece(x, y, "")
 	return new_type
+end
+
+function interface.test_promotion(x, y)
+	-- Position Verification: PV, then a piece key lights the squares with that piece
+	local function piece_led(code)
+		send_input(":IN.0", code, 0.5)
+		for i = 1, 8 do
+			if (output_value((x - 1) .. "." .. (y - 1)) ~= 0) then
+				return true
+			end
+			emu.wait(0.15)
+		end
+		return false
+	end
+
+	local p
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	emu.wait(1)
+	send_input(":IN.0", 0x10, 0.5) -- PV
+	if     piece_led(0x10) then p = "Q"
+	elseif piece_led(0x08) then p = "R"
+	elseif piece_led(0x04) then p = "B"
+	elseif piece_led(0x02) then p = "N"
+	else p = "Q"
+	end
+	send_input(":IN.0", 0x40, 0.5) -- CL
+	machine.video.throttled = throttled_state
+	return p
 end
 
 function interface.promote(x, y, piece)
