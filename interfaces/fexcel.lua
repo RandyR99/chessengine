@@ -1,4 +1,9 @@
-local interface = {}
+interface = {}
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 interface.opt_clear_announcements = true
 interface.level = 6
@@ -31,25 +36,16 @@ function interface.setlevel()
 	interface.cur_level = interface.level
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
-	
-	local root = machine.devices[":"]
-	if not root then return end
-	
 	local led_code = { 1, 2, 4, 8, 16, 32, 64, 128, 192, 96, 48, 24 }
 	local cur_leds = 0
 	local cur_level = 0
 	local dif_level
 	send_input(":IN.0", 0x10, 0.5) -- LEVEL
-	
 	for y = 0, 7 do
-		-- Modern non-deprecated node-object query layout
-		local node = root:output("0." .. tostring(y))
-		local node_val = node and node:get() or 0
-		if node_val ~= 0 then
+		if output_value("0." .. y) ~= 0 then
 			cur_leds = cur_leds + (1 << y)
 		end
 	end
-	
 	repeat
 		cur_level = cur_level + 1
 	until cur_leds == led_code[cur_level]
@@ -67,6 +63,16 @@ end
 function interface.setup_machine()
 	sb_reset_board(":board")
 	emu.wait(1)
+	if machine.system.name == "fexcelv" then
+		-- with speech on the Voice Excellence hangs a move after the player's en passant
+		-- capture: switch option B1 (sound off) on; options survive in nvram, so check first
+		send_input(":IN.0", 0x20, 0.5) -- OPTIONS
+		emu.wait(0.5)
+		if output_value("1.1") == 0 then
+			sb_press_square(":board", 0.5, 2, 1) -- B1: sound off
+		end
+		send_input(":IN.0", 0x01, 0.5) -- CLEAR
+	end
 	interface.cur_level = 6
 	interface.setlevel()
 end
@@ -76,9 +82,6 @@ function interface.set_pos(mode)
 	machine.video.throttled = false
 	if mode == 0 then
 		send_input(":IN.0", 0x20, 0.5) -- OPTIONS
-		if machine.system.name == "fexcelv" then
-			sb_press_square(":board", 0.5, 2, 1) -- Sound off
-		end
 		sb_press_square(":board", 0.5, 7, 1) -- Clear board
 		send_input(":IN.0", 0x01, 0.5) -- CLEAR
 		emu.wait(0.5)
@@ -110,11 +113,6 @@ function interface.set_pos(mode)
 			sb_press_square(":board", 0.5, 5, 1) -- Change color
 			send_input(":IN.0", 0x01, 0.5) -- CLEAR
 		end
-		if machine.system.name == "fexcelv" then
-			send_input(":IN.0", 0x20, 0.5) -- OPTIONS
-			sb_press_square(":board", 0.5, 2, 1) -- Sound on
-			send_input(":IN.0", 0x01, 0.5) -- CLEAR
-		end
 	end
 	machine.video.throttled = throttled_state
 end
@@ -134,47 +132,32 @@ function interface.start_play(init)
 end
 
 function interface.clear_announcements()
-	local root = machine.devices[":"]
-	if not root then return end
-
-	-- Modern non-deprecated node-object query layout
-	local node2_pre = root:output("1.2")
-	local node6_pre = root:output("1.6")
-	
-	local lastval2 = node2_pre and node2_pre:get() or 0
-	local lastval6 = node6_pre and node6_pre:get() or 0
-	
+	-- clear announcements to continue the game
+	local lastval2 = output_value("1.2")
+	local lastval6 = output_value("1.6")
 	emu.wait(0.3)
-	
-	local node2_post = root:output("1.2")
-	local node6_post = root:output("1.6")
-	
-	local curval2 = node2_post and node2_post:get() or 0
-	local curval6 = node6_post and node6_post:get() or 0
-	
-	if (lastval2 ~= curval2 or lastval6 ~= curval6) then
+	if (lastval2 ~= output_value("1.2") or lastval6 ~= output_value("1.6")) then
 		send_input(":IN.0", 0x01, 1)
 		emu.wait(1)
 	end
+end
+
+function interface.is_led_on(tag, idx)
+	-- returns false if the LED is off or flashing
+	for i = 1, 4 do
+		if (output_value(tag .. idx) == 0) then
+			return false
+		end
+		emu.wait(0.15)
+	end
+	return true
 end
 
 function interface.is_selected(x, y)
 	if (interface.opt_clear_announcements and x == 1 and y == 1) then
 		interface.clear_announcements()
 	end
-	
-	local root = machine.devices[":"]
-	if not root then return false end
-	
-	-- Modern non-deprecated node-object query layout
-	local r_node = root:output("0." .. tostring(y - 1))
-	local c_node = root:output("1." .. tostring(x - 1))
-	
-	local r_val = r_node and r_node:get() or 0
-	local c_val = c_node and c_node:get() or 0
-	
-	-- Reads the raw rank select lines and column bits natively in real-time
-	return r_val ~= 0 and c_val ~= 0
+	return output_value("0." .. y - 1) ~= 0 and interface.is_led_on("1.", x - 1)
 end
 
 function interface.select_piece(x, y, event)
@@ -204,19 +187,10 @@ end
 
 function interface.test_promotion(x, y)
 	local function piece_led(port, code, x, y)
-		local root = machine.devices[":"]
-		if not root then return false end
-
 		for n=1,8 do
 			send_input(port, code, 0.5)
 			for i=1,4 do
-				-- FIXED: Modern non-deprecated node object API mapping format
-				local r_node = root:output("0." .. tostring(y - 1))
-				local c_node = root:output("1." .. tostring(x - 1))
-				local r_val = r_node and r_node:get() or 0
-				local c_val = c_node and c_node:get() or 0
-
-				if r_val ~= 0 and c_val ~= 0 then
+				if (output_value("0." .. (y - 1)) ~= 0 and output_value("1." .. (x - 1)) ~= 0) then
 					return true
 				end
 				emu.wait(0.15)
@@ -232,14 +206,7 @@ function interface.test_promotion(x, y)
 	local p
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
-	emu.wait(1)
-	
-	if machine.system.name == "fexcelv" then
-		send_input(":IN.0", 0x20, 0.5) -- OPTIONS
-		sb_press_square(":board", 0.5, 2, 1) -- Voice off
-		send_input(":IN.0", 0x01, 0.5) -- CLEAR
-	end
-	send_input(":IN.0", 0x40, 1) -- VERIFY
+	send_input(":IN.0", 0x40, 0.5) -- VERIFY
 
 	if     piece_led(":IN.0", 0x20, x, y) then p = "Q"
 	elseif piece_led(":IN.0", 0x04, x, y) then p = "N"
@@ -249,11 +216,6 @@ function interface.test_promotion(x, y)
 	end
 
 	send_input(":IN.0", 0x01, 0.5) -- CLEAR
-	if machine.system.name == "fexcelv" then
-		send_input(":IN.0", 0x20, 0.5) -- OPTIONS
-		sb_press_square(":board", 0.5, 2, 1) -- Voice on
-		send_input(":IN.0", 0x01, 0.5) -- CLEAR
-	end
 	machine.video.throttled = throttled_state
 	return p
 end
@@ -272,4 +234,3 @@ function interface.promote(x, y, piece)
 end
 
 return interface
-
