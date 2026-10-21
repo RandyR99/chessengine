@@ -1,11 +1,15 @@
-local interface = {}
+interface = {}
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 interface.opt_clear_announcements = true
 interface.level = "a1"
 interface.cur_level = nil
-
--- Status flag splits cold boot from runtime resets
-interface.is_initialized = false
+interface.score = "0.00"
+interface.depth = "0"
 
 function interface.get_module()
 	if machine.system.name == "feas" then
@@ -37,14 +41,7 @@ function interface.setdigit(n,d)
 	if (led == 1) then
 		led = 0
 	end
-	
-	local root = machine.devices[":"]
-	while true do
-		local digit_node = root:output("digit" .. led)
-		local digit_val = digit_node and digit_node:get() or 0
-		if digit_val == lcd_num[d + 1] then
-			break
-		end
+	while (output_value("digit" .. led) ~= lcd_num[d + 1]) do
 		send_input(":IN.0", 0x10 << n, 0.25)  -- ST / TB / LV
 	end
 	machine.video.throttled = throttled_state
@@ -94,142 +91,27 @@ function interface.setlevel()
 end
 
 function interface.setup_machine()
-	-- Cache master framework throttle profiles safely before accelerating
-	local original_throttle_state = machine.video.throttled
-	
-	-- Force the video throttle configuration to False to run all macros unthrottled
+	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
-	local root = machine.devices[":"]
-	
-	-- =========================================================================
-	-- 0. CHECKMATE / ANNOUNCEMENT INTERCEPT SHIELD:
-	-- If a checkmate has just occurred, the background loop will have lit up the 
-	-- perimeter LEDs, deadlocking the panel keys. Forcefully pulse CL right here 
-	-- to break the ROM out of its loop and wide open the keyboard matrix lines!
-	-- =========================================================================
-	if root then
-		local edge_lit = true
-		for i = 0, 7 do
-			local node = root:output(tostring(i) .. ".15")
-			if not node or node:get() == 0 then
-				edge_lit = false
-				break
-			end
-		end
-		
-		if edge_lit then
-			-- Pulse Clear forcefully to break the checkmate loop deadlock
-			send_input(":IN.1", 0x02, 0.5) -- CL
-			emu.wait(0.5)
-		end
+	sb_reset_board(":board")
+	emu.wait(5)
+	send_input(":IN.0", 0x01, 1)  -- Game Control
+	sb_press_square(":board", 1, 4, 8)  -- D8
+	send_input(":IN.1", 0x02, 1) -- CL
+	emu.wait(0.5)
+	send_input(":IN.0", 0x01, 1) -- option
+	if output_value("4." .. 13) == 0 then
+		sb_press_square(":board", 1, 5, 3) -- e3
+		emu.wait(0.5)
 	end
-	-- =========================================================================
-	
-	interface.score = "000"
-	interface.depth = "0"
-	
-	-- 1. HARDWARE BRANCHING GATE: COLD BOOT VS RUNTIME RESET
-	if not interface.is_initialized then
-		interface.is_initialized = true
-		
-		-- Locks throttling ON for exactly 5 real seconds so you can hear the full verbal introduction!
-		machine.video.throttled = true
-		emu.wait(5.0) -- Power-up voice synthesizer delay
-		machine.video.throttled = false
-
-		send_input(":IN.0", 0x02, 0.4) -- SPEAKER
-		emu.wait(0.2)
-		sb_press_square(":board", 0.4, 8, 8) -- Voice Off (Square H8)
-		emu.wait(0.2)
-		send_input(":IN.1", 0x02, 0.4) -- CL
-		emu.wait(0.2)
-		
-		sb_reset_board(":board")
-		emu.wait(1.0)
-		
-		send_input(":IN.0", 0x01, 0.4)  -- GC
-		emu.wait(0.2)
-		sb_press_square(":board", 0.4, 4, 8)  -- D8 (Factory Format)
-		emu.wait(0.2)
-		send_input(":IN.1", 0x02, 0.4) -- CL
-		emu.wait(1.0)
-		
-		interface.cur_level = "reset"
-		interface.level = "a1"
-		interface.setlevel()
-	else
-		-- 2. RUNTIME UCINEWGAME RESET INTERCEPT TIMELINE
-		send_input(":IN.0", 0x02, 0.4) -- SPEAKER
-		emu.wait(0.2)
-		sb_press_square(":board", 0.4, 8, 8) -- Voice Off (Square H8)
-		emu.wait(0.2)
-		send_input(":IN.1", 0x02, 0.4) -- CL
-		emu.wait(0.2)
-		
-		local is_player_turn = true
-		if root then
-			local initial_ym = root:output("8.14") and root:output("8.14"):get() or 0
-			
-			for slice = 1, 15 do
-				emu.wait(0.1)
-				local current_ym = root:output("8.14") and root:output("8.14"):get() or 0
-				if current_ym ~= initial_ym then
-					is_player_turn = false
-					break
-				end
-			end
-			
-			-- Force stop mid-calculation lookahead prior to the warm clear pass
-			if not is_player_turn then
-				send_input(":IN.1", 0x04, 0.5) -- RV
-				emu.wait(0.2)
-				send_input(":IN.1", 0x02, 0.4) -- CL
-				emu.wait(0.2)
-			end
-		end
-		
-		sb_reset_board(":board")
-		emu.wait(1.0)
-		
-		send_input(":IN.0", 0x01, 0.4)        -- GC
-		emu.wait(0.2)
-		sb_press_square(":board", 0.4, 4, 6)  -- D6 (Warm Reset Clear)
-		emu.wait(0.2)
-		send_input(":IN.1", 0x02, 0.4)       -- CL
-		emu.wait(1.0)
+	if output_value("4." .. 15) == 0 then
+		sb_press_square(":board", 1, 5, 1) -- e1
+		emu.wait(0.5)
 	end
-
-	-- 3. SCORE & DEPTH TOGGLE INTERCEPT MATRIX
-	send_input(":IN.0", 0x01, 0.4)        -- GC
-	emu.wait(0.3)
-	
-	-- Verify Display Stats Rotation (Option E1 -> Node 4.15)
-	local e1_led = root:output("4.15") and root:output("4.15"):get() or 0
-	if e1_led == 0 then
-		sb_press_square(":board", 0.4, 5, 1)  -- Only press E1 if it's currently dark!
-		emu.wait(0.2)
-	end
-	
-	-- Verify Depth Multiplier Tracking (Option E3 -> Node 4.13)
-	local e3_led = root:output("4.13") and root:output("4.13"):get() or 0
-	if e3_led == 0 then
-		sb_press_square(":board", 0.4, 5, 3)  -- Only press E3 if it's currently dark!
-		emu.wait(0.2)
-	end
-	
-	send_input(":IN.1", 0x02, 0.4)       -- CL
-	emu.wait(0.3)
-
-	-- 4. RESTORE SPEAKER VOICE SPEECH AUDIO
-	send_input(":IN.0", 0x02, 0.4) -- SPEAKER
-	emu.wait(0.2)
-	sb_press_square(":board", 0.4, 7, 8) -- Voice On (Square G8)
-	emu.wait(0.2)
-	send_input(":IN.1", 0x02, 0.4) -- CL
-	emu.wait(0.2)
-	
-	-- Return master engine back to standard speed profile configurations
-	machine.video.throttled = original_throttle_state
+	send_input(":IN.1", 0x02, 1) -- clear
+	machine.video.throttled = throttled_state
+	interface.cur_level = "a1"
+	interface.setlevel()
 end
 
 function interface.set_pos(mode)
@@ -239,7 +121,7 @@ function interface.set_pos(mode)
 		send_input(":IN.0", 0x02, 0.5) -- SPEAKER
 		sb_press_square(":board", 1, 8, 8) -- Voice off
 		send_input(":IN.1", 0x02, 0.5) -- CL
-		send_input(":IN.0", 0x01, 0.5) -- GC
+		send_input(":IN.0", 0x01, 0.5) -- GAME CONTROL
 		sb_press_square(":board", 1, 4, 7) -- Clear board
 		send_input(":IN.1", 0x02, 0.5) -- CL
 		send_input(":IN.0", 0x04, 0.5) -- PB
@@ -273,7 +155,7 @@ function interface.set_pos(mode)
 		end
 		send_input(":IN.1", 0x02, 0.5) -- CL
 		if mode == -1 then
-			send_input(":IN.0", 0x01, 0.5) -- GC
+			send_input(":IN.0", 0x01, 0.5) -- GAME CONTROL
 			sb_press_square(":board", 1, 4, 5) -- Change color
 			send_input(":IN.1", 0x02, 0.5) -- CL
 		end
@@ -299,41 +181,17 @@ function interface.start_play(init)
 end
 
 function interface.clear_announcements()
-	local root = machine.devices[":"]
-	if not root then return end
-	
-	local all_lit = true
-	for i = 0, 7 do
-		local node = root:output(tostring(i) .. ".15")
-		if not node or node:get() == 0 then
-			all_lit = false
-			break
-		end
-	end
-	
-	if all_lit then
+	-- machine turns on all LEDs on the first line for mate/draw announcements
+	if (output_value("0.15") ~= 0 and output_value("1.15") ~= 0 and output_value("2.15") ~= 0 and output_value("3.15") ~= 0 and output_value("4.15") ~= 0 and output_value("5.15") ~= 0 and output_value("6.15") ~= 0 and output_value("7.15") ~= 0) then
 		send_input(":IN.1", 0x02, 1) -- CL
 	end
 end
-
-interface.signal_latch = {}
 
 function interface.is_selected(x, y)
 	if (interface.opt_clear_announcements and x == 1 and y == 1) then
 		interface.clear_announcements()
 	end
-	
-	local root = machine.devices[":"]
-	if not root then return false end
-	
-	-- Map the linear coordinate address tags matching the A/S hardware orientation
-	local file_idx = x - 1
-	local rank_idx = 16 - y
-	local node_tag = tostring(file_idx) .. "." .. tostring(rank_idx)
-	local led_node = root:output(node_tag)
-	
-	-- Read and return the raw, real-time hardware state natively with zero latching overhead
-	return led_node and led_node:get() ~= 0
+	return output_value(tostring(x - 1) .. "." .. 16 - y) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -350,7 +208,7 @@ end
 function interface.set_option(name, value)
 	if (name == "level" and value ~= "") then
 		local level = value:lower():match("^%s*(.-)%s*$"):gsub("%s%s+"," ") -- trim
-		if (level:match("^a[1-8]$") or level:match("^b[1-7]$") or level:match("^b[4-6]%s%d%d?$") or level:match("^b%s%d:%d%d$") or level:match("^b2%s%d:%d%d%s%d:%d%d$") or level:match("^b3%s%d:%d%d/%d%d$") or level:match("^b3%s%d:%d%d/%d%d%s%d:%d%d/%d%d$") or level:match("^b3%s%d:%d%d/%d%d%s%d:%d%d/%d%d%s%d:%d%d$")) then
+		if (level:match("^a[1-8]$") or level:match("^b[1-7]$") or level:match("^b[4-6]%s%d%d?$") or level:match("^b[72]%s%d:%d%d$") or level:match("^b2%s%d:%d%d%s%d:%d%d$") or level:match("^b3%s%d:%d%d/%d%d$") or level:match("^b3%s%d:%d%d/%d%d%s%d:%d%d/%d%d$") or level:match("^b3%s%d:%d%d/%d%d%s%d:%d%d/%d%d%s%d:%d%d$")) then
 			interface.level = level
 			interface.setlevel()
 		end
@@ -361,23 +219,20 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion_led()
-	local root = machine.devices[":"]
-	if not root then return nil end
-	
-	local q_node = root:output("8.9")
-	local r_node = root:output("8.10")
-	local b_node = root:output("8.11")
-	local n_node = root:output("8.12")
-	
-	if     (q_node and q_node:get() ~= 0) then return 'q'
-	elseif (r_node and r_node:get() ~= 0) then return 'r'
-	elseif (b_node and b_node:get() ~= 0) then return 'b'
-	elseif (n_node and n_node:get() ~= 0) then return 'n'
+	if     (output_value("8.9")  ~= 0) then return 'q'
+	elseif (output_value("8.10") ~= 0) then return 'r'
+	elseif (output_value("8.11") ~= 0) then return 'b'
+	elseif (output_value("8.12") ~= 0) then return 'n'
 	end
 	return nil
 end
 
 function interface.get_promotion(x, y)
+	-- in a capture the piece leds show the captured piece: use test_promotion
+	-- (the square is also occupied when this is called again after the move)
+	if (get_piece_id(x, y) ~= 0) then
+		return nil
+	end
 	if (interface.opt_clear_announcements) then
 		interface.clear_announcements()
 	end
@@ -394,6 +249,35 @@ function interface.get_promotion(x, y)
 	return new_type
 end
 
+function interface.test_promotion(x, y)
+	-- Position Verification: PV, then a piece key lights the squares with that piece
+	local function piece_led(code)
+		send_input(":IN.0", code, 0.5)
+		for i = 1, 8 do
+			if (output_value((x - 1) .. "." .. (16 - y)) ~= 0) then
+				return true
+			end
+			emu.wait(0.15)
+		end
+		return false
+	end
+
+	local p
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	emu.wait(1)
+	send_input(":IN.0", 0x08, 0.5) -- PV
+	if     piece_led(0x08) then p = "Q"
+	elseif piece_led(0x10) then p = "R"
+	elseif piece_led(0x20) then p = "B"
+	elseif piece_led(0x40) then p = "N"
+	else p = "Q"
+	end
+	send_input(":IN.1", 0x02, 0.5) -- CL
+	machine.video.throttled = throttled_state
+	return p
+end
+
 function interface.promote(x, y, piece)
 	sb_promote(":board", x, y, piece)
 	if     (piece == "q") then send_input(":IN.0", 0x08, 1)
@@ -404,82 +288,24 @@ function interface.promote(x, y, piece)
 end
 
 function interface.show_info(on)
-	if not on then return "" end
-	local root = machine.devices[":"]
-	if not root then return "" end
-
-	-- Target the true physical layout address tags for the central colons
-	local upper_dot = root:output("0.7") and root:output("0.7"):get() or 0
-	local lower_dot = root:output("1.7") and root:output("1.7"):get() or 0
-
-	-- 1. CLOCK ROTATION GUARD:
-	-- If the upper colon dot is lit, the display is completely frozen on the time clock.
-	-- Skip parsing to protect our score cache variables, but continue streaming data!
-	if upper_dot ~= 0 and lower_dot == 0 then
+	if on then
+		local dot  = output_value("1.7")
+		local dot1 = output_value("0.7")
+		local d1   = output_value("digit1")
+		local d2   = output_value("digit0")
+		local d3   = output_value("digit2")
+		local d4   = output_value("digit3")
+		if dot1 == 0 and d1 ~= 0 and d3 ~= 0 then
+			interface.score = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4):gsub(" ","")
+		elseif dot == 0 and dot1 == 0 and (d1 == 0 or d3 == 0) then
+			interface.depth = digit_ascii(d3) .. digit_ascii(d4):gsub(" ","")
+		end
 		return "info score cp " .. interface.score .. " depth " .. interface.depth
 	end
-
-	-- 2. Read the 4 raw physical display digit values natively
-	local d1 = root:output("digit1") and root:output("digit1"):get() or 0
-	local d2 = root:output("digit0") and root:output("digit0"):get() or 0
-	local d3 = root:output("digit2") and root:output("digit2"):get() or 0
-	local d4 = root:output("digit3") and root:output("digit3"):get() or 0
-
-	-- Convert active layout digit nodes to clean ascii characters
-	local ch1 = digit_ascii(d1):trim()
-	local ch2 = digit_ascii(d2):trim()
-	local ch3 = digit_ascii(d3):trim()
-	local ch4 = digit_ascii(d4):trim()
-
-	-- 3. CHARACTER SHIFT SPLIT STATE ENGINE
-	if ch3 == "" and ch4 ~= "" then
-		-- SIGNATURE A: DEPTH FRAME ACTIVE ('xx yy' layout with empty space at digit 3)
-		local raw_hex_char = ch4
-		if raw_hex_char:match("^[0-9A-Fb-d]$") then
-			local depth_val = tonumber(raw_hex_char, 16)
-			
-			if raw_hex_char == "b" then depth_val = 11
-			elseif raw_hex_char == "d" then depth_val = 13
-			end
-			
-			if depth_val and depth_val > 0 then
-				interface.depth = tostring(depth_val)
-			end
-		end
-	elseif ch3 ~= "" then
-		-- SIGNATURE B: SPLIT BASE-10 SCORE FRAME ACTIVE
-		-- Fill any empty leading spaces with clean zeros to normalize parsing
-		local hex1 = (ch1 ~= "" and ch1 or "0")
-		local hex2 = (ch2 ~= "" and ch2 or "0")
-		local hex3 = (ch3 ~= "" and ch3 or "0")
-		local hex4 = (ch4 ~= "" and ch4 or "0")
-		
-		local upper_pair_str = hex1 .. hex2
-		local lower_pair_str = hex3 .. hex4
-		
-		-- Decode both halves as hexadecimal to safely catch characters like '0F' into decimal 15
-		if upper_pair_str:match("^[0-9A-Fa-f]+$") and lower_pair_str:match("^[0-9A-Fa-f]+$") then
-			local upper_val = tonumber(upper_pair_str, 16) or 0
-			local lower_val = tonumber(lower_pair_str, 16) or 0
-			
-			-- Execute your exact Base-10 shift equation (Upper * 100 + Lower)
-			local score_num = (upper_val * 100) + lower_val
-			
-			-- If the hardware lower dot (1.7) is active, player has the advantage (negative score)
-			if lower_dot ~= 0 then
-				interface.score = "-" .. tostring(score_num)
-			else
-				interface.score = tostring(score_num)
-			end
-		end
-	end
-
-	return "info score cp " .. interface.score .. " depth " .. interface.depth
 end
 
 function digit_ascii(digit)
 	if     digit == nil then return " "
-	elseif digit ==   0 then return " "
 	elseif digit ==  63 then return "0"
 	elseif digit ==   6 then return "1"
 	elseif digit ==  91 then return "2"
@@ -491,20 +317,23 @@ function digit_ascii(digit)
 	elseif digit ==   7 then return "7"
 	elseif digit == 127 then return "8"
 	elseif digit == 103 then return "9"
-	elseif digit == 119 then return "A"
+	elseif digit == 119 then return "a"
 	elseif digit == 124 then return "b"
-	elseif digit ==  57 then return "C"
+	elseif digit ==  57 then return "c"
 	elseif digit ==  94 then return "d"
-	elseif digit == 121 then return "E"
-	elseif digit == 113 then return "F"
-	elseif digit == 123 then return "F"
+	elseif digit == 121 then return "e"
+	elseif digit == 113 then return "f"
+	elseif digit == 123 then return "f"
+	elseif digit ==  61 then return "g"
+	elseif digit == 118 then return "h"
+	elseif digit ==   0 then return " "
+	elseif digit ==  28 then return "Nr."
+	elseif digit ==  64 then return "-"
+	elseif digit == 115 then return "P"
+	elseif digit ==  55 then return "N"
+	else
+		return (" hex" .. tostring(digit) .. " ")
 	end
-	return " "
-end
-
-function string:trim()
-	return self:match("^%s*(.-)%s*$")
 end
 
 return interface
-
