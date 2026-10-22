@@ -1,5 +1,10 @@
 interface = {}
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 interface.opt_clear_announcements = true
 interface.level = 1
 interface.cur_level = nil
@@ -32,9 +37,7 @@ function interface.setlevel()
 	local dif_level
 	send_input(":IN.0", 0x08, 0.5) -- LV
 	for y = 0, 7 do
-		local led_name = "1." .. tostring(7 - y)
-		local led_state = machine.devices[":"]:output(led_name)
-		if led_state and led_state:get() ~= 0 then
+		if output_value("1." .. (7 - y)) ~= 0 then
 			cur_leds = cur_leds + (1 << y)
 		end
 	end
@@ -104,6 +107,12 @@ function interface.set_pos(mode)
 			end
 		end
 		send_input(":IN.0", 0x40, 1) -- CL
+		emu.wait(1)
+		-- On the 12 B, PB PV enters Problem Mode and CL only goes back to Option Select:
+		-- clear again until the YOUR MOVE LED is on
+		if output_value("0.3") == 0 then
+			send_input(":IN.0", 0x40, 1) -- CL
+		end
 		if mode == -1 then
 			emu.wait(1)
 			if machine.system.name == "fscc12" then
@@ -140,10 +149,9 @@ function interface.start_play(init)
 end
 
 function interface.is_led_on(tag, idx)
+	-- returns false if the LED is off or flashing
 	for i = 1, 4 do
-		local led_name = tag .. tostring(idx)
-		local led_state = machine.devices[":"]:output(led_name)
-		if not led_state or led_state:get() == 0 then
+		if (output_value(tag .. idx) == 0) then
 			return false
 		end
 		emu.wait(0.15)
@@ -156,16 +164,12 @@ function interface.clear_announcements()
 	machine.video.throttled = false
 	local lastval = {}
 	for i = 1, 6 do
-		local led_name = "0." .. tostring(i)
-		local led_state = machine.devices[":"]:output(led_name)
-		lastval[i] = (led_state and led_state:get() or 0)
+		lastval[i] = output_value("0." .. i)
 	end
 	emu.wait(0.25)
 	for i = 1, 6 do
-		local led_name = "0." .. tostring(i)
-		local led_state = machine.devices[":"]:output(led_name)
-		local current_val = (led_state and led_state:get() or 0)
-		if (current_val ~= lastval[i]) then
+		if (output_value("0." .. i) ~= lastval[i]) then
+			-- clear announcements to continue the game
 			send_input(":IN.0", 0x40, 1)
 		end
 	end
@@ -176,11 +180,7 @@ function interface.is_selected(x, y)
 	if (interface.edit == false and interface.opt_clear_announcements and x == 1 and y == 1) then
 		interface.clear_announcements()
 	end
-	local row_led_name = "1." .. tostring(8 - y)
-	local row_led_state = machine.devices[":"]:output(row_led_name)
-	local is_row_on = (row_led_state and row_led_state:get() ~= 0)
-	
-	return is_row_on and interface.is_led_on("0.", x - 1)
+	return output_value("1." .. (8 - y)) ~= 0 and interface.is_led_on("0.", x - 1)
 end
 
 function interface.select_piece(x, y, event)
@@ -208,8 +208,41 @@ function interface.set_option(name, value)
 	end
 end
 
+function interface.test_promotion(x, y)
+	-- Position Verification: PV, then each piece key until the promotion square lights
+	local function piece_led(port, code, x, y)
+		for n = 1, 8 do
+			send_input(port, code, 0.5)
+			for i = 1, 4 do
+				-- the file LED is steady for a white piece and flashes for a black one
+				if (output_value("1." .. (8 - y)) ~= 0 and output_value("0." .. (x - 1)) ~= 0) then
+					return true
+				end
+				emu.wait(0.15)
+			end
+		end
+		return false
+	end
+
+	local p
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	send_input(":IN.0", 0x10, 1) -- PV
+
+	if     piece_led(":IN.0", 0x10, x, y) then p = "Q"
+	elseif piece_led(":IN.0", 0x02, x, y) then p = "N"
+	elseif piece_led(":IN.0", 0x04, x, y) then p = "B"
+	elseif piece_led(":IN.0", 0x08, x, y) then p = "R"
+	else p = "Q"
+	end
+
+	send_input(":IN.0", 0x40, 1) -- CL
+	machine.video.throttled = throttled_state
+	return p
+end
+
 function interface.get_promotion(x, y)
-	return 'q'	-- TODO
+	return nil
 end
 
 function interface.promote(x, y, piece)
@@ -222,4 +255,3 @@ function interface.promote(x, y, piece)
 end
 
 return interface
-
