@@ -2,6 +2,13 @@ interface = {}
 
 interface.level = 1
 interface.cur_level = nil
+interface.edit = false
+interface.stm = 1 -- side to move: 1 White, -1 Black
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	return "Fidelity Sensory 6"
@@ -19,21 +26,18 @@ function interface.setlevel()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	local lcd_num = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d }
-	
-	-- Modern output proxy lookup for digit1
-	local root_device = machine.devices[":"]
-	local d1_state = root_device and root_device:output("digit1")
-	
 	repeat
 		send_input(":IN.0", 0x08, 0.6) -- LV
-	until d1_state and d1_state:get() == lcd_num[interface.level]
-	
+	until output_value("digit1") == lcd_num[interface.level]
+
 	send_input(":IN.0", 0x40, 0.5) -- CL
 	machine.video.throttled = throttled_state
 end
 
 function interface.setup_machine()
 	sb_reset_board(":board")
+	interface.stm = 1
+	interface.edit = false
 	send_input(":IN.0", 0x40, 0.5) -- CL
 	emu.wait(1)
 	interface.cur_level = 1
@@ -60,9 +64,19 @@ function interface.set_pos(mode)
 		if mode == -1 then
 			ram:write_u8(0x0003, 0x00)
 		end
+		interface.stm = mode
 		send_input(":IN.0", 0x40, 0.5) -- CL
+		machine.video.throttled = throttled_state
 	end
-	machine.video.throttled = throttled_state
+end
+
+function interface.edit_game(on)
+	-- move the history pieces silently, then set up the final position
+	interface.edit = on
+	if not on then
+		interface.set_pos(0)
+		interface.set_pos(interface.stm)
+	end
 end
 
 function interface.start_play(init)
@@ -72,20 +86,20 @@ end
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	
-	-- Modern output proxy lookups for digit0 and digit1
-	local root_device = machine.devices[":"]
-	local d0_state = root_device and root_device:output("digit0")
-	local d1_state = root_device and root_device:output("digit1")
-	
-	local d0 = d0_state and d0_state:get() or 0
-	local d1 = d1_state and d1_state:get() or 0
-	
-	return xval[x] == d0 and yval[y] == d1
+	return xval[x] == output_value("digit0") and yval[y] == output_value("digit1")
 end
 
 function interface.select_piece(x, y, event)
-	if (event == "en_passant") then
+	if (event == "put") then
+		interface.stm = -interface.stm
+	end
+	if interface.edit then
+		if (event == "capture" or event == "en_passant") then
+			sb_remove_piece(":board", x, y)
+		else
+			sb_move_piece(":board", x, y)
+		end
+	elseif (event == "en_passant") then
 		sb_remove_piece(":board", x, y)
 	elseif (event == "get_castling" or event == "put_castling") then
 		sb_move_piece(":board", x, y)
