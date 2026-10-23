@@ -3,6 +3,12 @@ interface = {}
 interface.opt_clear_announcements = true
 interface.level = 1
 interface.cur_level = nil
+interface.black_setup = false -- set up with Black to move, machine not started yet
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	if machine.system.name == "fscc9" then
@@ -32,11 +38,8 @@ function interface.setlevel()
 	local cur_level = 0
 	local dif_level
 	send_input(":IN.0", 0x08, 0.5) -- LV
-	local led_name = ""
-    for y = 0, 7 do
-        led_name = "7." .. tostring(7-y)
-        local led_state = machine.devices[":"]:output(led_name)
-		if led_state:get() ~= 0 then
+	for y = 0, 7 do
+		if output_value("7." .. 7-y) ~= 0 then
 			cur_leds = cur_leds + (1 << y)
 		end
 	end
@@ -90,12 +93,14 @@ function interface.set_pos(mode)
 		if mode == -1 then
 			ram:write_u8(0x008b, 0x10)
 		end
+		interface.black_setup = (mode == -1)
 		send_input(":IN.0", 0x40, 0.5) -- CL
+		machine.video.throttled = throttled_state
 	end
-	machine.video.throttled = throttled_state
 end
 
 function interface.edit_game(on)
+	interface.black_setup = false
 	if on then
 		local ram = machine.devices[':maincpu'].spaces['program']
 		ram:write_u8(0x00cd, ram:read_u8(0x00cd) | 0x08)
@@ -103,23 +108,14 @@ function interface.edit_game(on)
 end
 
 function interface.start_play(init)
+	interface.black_setup = false
 	send_input(":IN.0", 0x01, 1) -- RV
 end
 
 function interface.clear_announcements()
-	-- machine turns on all LEDs on the bottom row for mate/draw announcements
-	local all_nonzero = true
-	for x = 0, 7 do
-		-- Formats to "0.7", "1.7", "2.2" ... up to "7.7"
-		local led_name = x .. ".7"
-		local led_state = machine.devices[":"]:output(led_name)
-		if not led_state or led_state:get() == 0 then
-			all_nonzero = false
-			break -- Stop checking early if even one LED is off
-		end
-	end
-
-	if all_nonzero then
+	-- machine turns on all LEDs on the first line for mate/draw announcements
+	if (output_value("0.7") ~= 0 and output_value("1.7") ~= 0 and output_value("2.7") ~= 0 and output_value("3.7") ~= 0 and
+	    output_value("4.7") ~= 0 and output_value("5.7") ~= 0 and output_value("6.7") ~= 0 and output_value("7.7") ~= 0) then
 		send_input(":IN.0", 0x40, 1)
 	end
 end
@@ -128,13 +124,20 @@ function interface.is_selected(x, y)
 	if (interface.opt_clear_announcements and x == 1 and y == 1) then
 		interface.clear_announcements()
 	end
-	local led_name = tostring(x - 1) .. "." .. tostring(8 - y)
-	local led_state = machine.devices[":"]:output(led_name)
-	return led_state and led_state:get() ~= 0
+	return output_value(tostring(x - 1) .. "." .. tostring(8 - y)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
+	if (event == "get") then
+		interface.pawn_lifted = math.abs(get_piece_id(x, y)) == 6
+	end
 	sb_select_piece(":board", 1, x, y, event)
+	-- after a Black-to-move setup the machine waits for RV after the player's move
+	-- (a promotion presses it in promote, after the piece key)
+	if (event == "put" and interface.black_setup and not (interface.pawn_lifted and (y == 1 or y == 8))) then
+		interface.black_setup = false
+		send_input(":IN.0", 0x01, 1) -- RV
+	end
 end
 
 function interface.get_options()
@@ -161,11 +164,7 @@ end
 function interface.test_promotion(x, y)
 	local function board_led(x, y)
 		for i = 1, 5 do
-			-- Replaces the nested legacy get_indexed_value call
-			local led_name = tostring(x - 1) .. "." .. tostring(8 - y)
-			local led_state = machine.devices[":"]:output(led_name)
-			
-			if led_state and led_state:get() ~= 0 then
+			if output_value(tostring(x - 1) .. "." .. tostring(8 - y)) ~= 0 then
 				send_input(":IN.0", 0x40, 0.5) -- CL
 				return true
 			end
@@ -207,6 +206,10 @@ function interface.promote(x, y, piece)
 	elseif (piece == "r") then send_input(":IN.0", 0x08, 1)
 	elseif (piece == "b") then send_input(":IN.0", 0x04, 1)
 	elseif (piece == "n") then send_input(":IN.0", 0x02, 1)
+	end
+	if interface.black_setup then
+		interface.black_setup = false
+		send_input(":IN.0", 0x01, 1) -- RV
 	end
 end
 

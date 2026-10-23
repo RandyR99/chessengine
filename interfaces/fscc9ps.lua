@@ -45,12 +45,14 @@ function interface.set_pos(mode)
 		if mode == -1 then
 			ram:write_u8(0x008b, 0x10)
 		end
+		interface.black_setup = (mode == -1)
 		send_input(":IN.0", 0x40, 0.5) -- CL
+		machine.video.throttled = throttled_state
 	end
-	machine.video.throttled = throttled_state
 end
 
 function interface.edit_game(on)
+	interface.black_setup = false
 	if on then
 		local ram = machine.devices[':maincpu'].spaces['program']
 		ram:write_u8(0x00cd, ram:read_u8(0x00cd) | 0x40)
