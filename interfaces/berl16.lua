@@ -1,21 +1,5 @@
 interface = load_interface("berlinp")
 
--- Redefined helper locally to prevent environment scope lookup errors
-local function read_lcd_range(start_idx, end_idx)
-    local dev = machine.devices[':display:hd44780']
-    if not dev then return "" end
-    
-    local state_item = dev.items["0/m_ddram"]
-    if not state_item then return "" end
-    
-    local wrapped_mem = emu.item(state_item)
-    local str = ""
-    for i = start_idx, end_idx do
-        str = str .. string.char(wrapped_mem:read(i))
-    end
-    return str
-end
-
 function interface.get_module()
 	if machine.system.name == "berl16" then
 		return "Mephisto Berlin (16 Bit)"
@@ -32,14 +16,37 @@ function interface.get_author()
 	return "Richard Lang"
 end
 
--- Disabled background menu shifting to prevent layout corruption
 function interface.show_pv_after_move_emu()
-    -- Intentional No-Op to block background DOWN inputs
+    send_input(":KEY", 0x08, 0.6) -- DOWN
+    send_input(":KEY", 0x08, 0.6) -- DOWN
 end
 
 function interface.show_pv_after_move_player()
-    -- Intentional No-Op to block background DOWN inputs
+    send_input(":KEY", 0x08, 0.6) -- DOWN
+    send_input(":KEY", 0x08, 0.6) -- DOWN
+end
+
+function interface.show_info()
+    local info = nil
+    if interface.ticker == 1 then
+        local ddram = emu.item(
+                          machine.devices[':display:hd44780'].items['0/m_ddram']):read_block(
+                          0x00, 0x80)
+
+        if (ddram:sub(66, 69)) == "THEO" then
+            info = "info score cp book"
+        else
+            info = "info score cp " ..  ddram:sub(65, 69):gsub("%.", "")
+        end
+        info = info .. " depth " .. (ddram:sub(1, 2)) .. " seldepth " ..
+                   (ddram:sub(4, 5))
+        info = info .. " pv " .. string.lower(ddram:sub(70, 112))
+        if (ddram:sub(65, 65)) ~= " " and (ddram:sub(65, 65)) ~= "-" then
+            info = nil
+        end
+    end
+
+    return info
 end
 
 return interface
-

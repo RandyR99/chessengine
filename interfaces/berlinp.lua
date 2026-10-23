@@ -3,20 +3,9 @@ interface = {}
 interface.level = "NORML 01"
 interface.cur_level = nil
 
--- Helper function to read a specific range of characters from DDRAM
-local function read_lcd_range(start_idx, end_idx)
-    local dev = machine.devices[':display:hd44780']
-    if not dev then return "" end
-    
-    local state_item = dev.items["0/m_ddram"]
-    if not state_item then return "" end
-    
-    local wrapped_mem = emu.item(state_item)
-    local str = ""
-    for i = start_idx, end_idx do
-        str = str .. string.char(wrapped_mem:read(i))
-    end
-    return str
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
 end
 
 function interface.get_module()
@@ -37,21 +26,20 @@ function proglevel(level)
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	local n,z1,z2,h1,h2,dir,dif,mod,int = 0
-	
+	local ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram'])
 	while (n < 4 and level:match("%s%d%d/%d%d:%d%d") ~= nil) do
 		local temp = level:sub(2,9)
 		level = level:sub(10)
 		send_input(":KEY", 0x01, 0.6) -- ENT
 		send_input(":KEY", 0x20, 0.6) -- RIGHT
 		send_input(":KEY", 0x01, 0.6) -- ENT
-		
-		z1 = read_lcd_range(0x43, 0x44)
+		z1 = ddram:read_block(0x43, 0x02)
 		if (z1 == "AL") then
 			z1 = 0
-			h1 = 60 * (tonumber(read_lcd_range(0x4b, 0x4c))) + tonumber(read_lcd_range(0x4e, 0x4f))
+			h1 = 60 * (tonumber(ddram:read_block(0x4b, 0x02))) + tonumber(ddram:read_block(0x4e, 0x02))
 		else
 			z1 = tonumber(z1)
-			h1 = 60 * (tonumber(read_lcd_range(0x49, 0x4a))) + tonumber(read_lcd_range(0x4c, 0x4d))
+			h1 = 60 * (tonumber(ddram:read_block(0x49, 0x02))) + tonumber(ddram:read_block(0x4c, 0x02))
 		end
 		z2 = tonumber(temp:sub(1,2))
 		h2 = 60 * tonumber(temp:sub(4,5)) + tonumber(temp:sub(7,8))
@@ -151,19 +139,18 @@ function interface.setlevel()
 	send_input(":KEY", 0x20, 0.6) -- RIGHT
 	send_input(":KEY", 0x01, 0.6) -- ENT
 	send_input(":KEY", 0x01, 0.6) -- ENT
-	
-	local ddram = read_lcd_range(0x07, 0x09)
+	local ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram']):read_block(0x07, 0x03)
 	while (ddram:match(interface.level:sub(1, 3)) == nil) do
 		send_input(":KEY", 0x08, 0.6) -- DOWN
-		ddram = read_lcd_range(0x07, 0x09)
+		ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram']):read_block(0x07, 0x03)
 	end
 	if (interface.level:sub(1, 5) == "PROGR") then
 		proglevel(interface.level:sub(6))
 	else
-		ddram = read_lcd_range(0x0c, 0x0e)
+		ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram']):read_block(0x0c, 0x03)
 		while (tonumber(ddram) ~= tonumber(interface.level:sub(6, 8))) do
 			send_input(":KEY", 0x20, 0.6) -- RIGHT
-			ddram = read_lcd_range(0x0c, 0x0e)
+			ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram']):read_block(0x0c, 0x03)
 		end
 	end
 	send_input(":KEY", 0x01, 0.6) -- ENT
@@ -267,10 +254,7 @@ function interface.stop_play()
 end
 
 function interface.is_selected(x, y)
-	local led_idx = (y - 1) * 8 + (x - 1)
-	local led_name = "led" .. tostring(led_idx)
-	local led_state = machine.devices[":"]:output(led_name)
-	return led_state and led_state:get() ~= 0
+	return output_value("led" .. (y - 1) * 8 + (x - 1)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -320,7 +304,8 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local ddram = read_lcd_range(0x00, 0x7F)
+	-- HD44780 Display Data RAM
+	local ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram']):read_block(0x00, 0x80)
 	local line0 = ddram:sub(0x01, 0x10)
 	local line1 = ddram:sub(0x41, 0x50)
 	if     (line1:find('\x01') or line1:find('\x09')) then return 'q'
@@ -358,56 +343,16 @@ function interface.show_info(on)
 	if on then
 		local throttled_state = machine.video.throttled
 		machine.video.throttled = false
-		
-		-- 1. Open active evaluation summary overlay
-		send_input(":KEY", 0x02, 0.6) -- CL
-		send_input(":KEY", 0x02, 0.6) -- CL
-		send_input(":KEY", 0x20, 0.6) -- RIGHT
-		send_input(":KEY", 0x01, 1.0) -- ENT
-
-		-- 2. Cycle right three times to surface the pure evaluation/pawn-units panel page
-		send_input(":KEY", 0x20, 0.6) -- RIGHT
-		send_input(":KEY", 0x20, 0.6) -- RIGHT
-		send_input(":KEY", 0x20, 0.6) -- RIGHT
-		
-		local ddram = read_lcd_range(0x00, 0x7F)
 		local info = nil
-		local score_field = ""
-
-		-- Explicitly check for opening book markers
-		if (ddram:sub(66, 69)) == "THEO" then
-			info = "info score cp book"
-		else
-			score_field = ddram:sub(65, 69):gsub("%.", "")
-			score_field = score_field:match("^([^/]+)") or score_field
-			score_field = score_field:gsub(" ", "")
+		send_input(":KEY", 0x08, 0.6) -- DOWN
+		send_input(":KEY", 0x08, 0.6) -- DOWN
+		local ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram']):read_block(0x00, 0x80)
+		info = "info score cp " .. ddram:sub(65,69):gsub("%.", "")
+		info = info .. " depth " .. ddram:sub(1,2)
+		info = info .. " pv " .. string.lower(ddram:sub(70,112))
+		if string.lower(ddram:sub(65,65)) ~= " " and string.lower(ddram:sub(65,65)) ~= "-" then
+			info = nil
 		end
-
-		local depth_field = ddram:sub(1, 2):gsub(" ", "")
-		local pv_field = string.lower(ddram:sub(70, 112))
-		
-		-- Clean up tracking markers and branch annotations
-		pv_field = pv_field:gsub("=%d+/%d+", "")
-		
-		-- TRUNCATION FIX: Isolate strictly the first machine move from the PV array string block
-		pv_field = pv_field:match("%s*(%S+)") or ""
-
-		-- Safety Filter: If standard calc has alpha configurations, drop frame gracefully
-		local lead_char = ddram:sub(65, 65)
-		if info == nil and lead_char ~= " " and lead_char ~= "-" and not lead_char:match("%d") then
-			send_input(":KEY", 0x02, 0.6) -- CL
-			machine.video.throttled = throttled_state
-			return nil
-		end
-
-		-- Build complete UCI telemetry line if standard calculation frame
-		if info == nil then
-			info = "info score cp " .. score_field .. " depth " .. depth_field .. " pv " .. pv_field
-		end
-		
-		-- 3. Clear window overlay overlay completely back to background calculating view loop
-		send_input(":KEY", 0x02, 0.6) -- CL
-		
 		machine.video.throttled = throttled_state
 		return info
 	end
