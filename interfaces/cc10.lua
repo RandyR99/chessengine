@@ -79,6 +79,9 @@ function interface.set_pos(mode)
 					if p>0 then
 						send_input(":IN.3", 0x01, 0.6) -- EN
 					end
+				else
+					-- avcc keeps the old position in Problem Mode: clear the square
+					send_input(":IN.2", 0x01, 0.6) -- CL
 				end
 			end
 		end
