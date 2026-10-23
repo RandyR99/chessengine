@@ -3,6 +3,20 @@ interface = {}
 interface.level = 1
 interface.cur_level = nil
 interface.cur_color = 1
+interface.edit = false
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
+function interface.get_module()
+	return "Fidelity Sensory 8"
+end
+
+function interface.get_author()
+	return "Ron Nelson"
+end
 
 function interface.setlevel()
 	if (interface.cur_level == nil or interface.cur_level == interface.level) then
@@ -11,11 +25,7 @@ function interface.setlevel()
 	interface.cur_level = interface.level
 	repeat
 		send_input(":IN.0", 0x40, 0.6) -- CL
-		
-		-- Use the machine object to resolve the output proxy directly
-		local led_name = "7." .. tostring(interface.level - 1)
-		local led_state = machine.devices[":"]:output(led_name)
-	until led_state and led_state:get() ~= 0
+	until output_value("7." .. interface.level-1) ~= 0
 end
 
 function interface.setup_machine()
@@ -89,31 +99,39 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	-- Check for mate announcement by pulling the output proxies for rows 0.0 to 7.0
-	local mate_0 = machine.devices[":"]:output("0.0")
-	local mate_1 = machine.devices[":"]:output("1.0")
-	local mate_2 = machine.devices[":"]:output("2.0")
-	local mate_3 = machine.devices[":"]:output("3.0")
-	local mate_4 = machine.devices[":"]:output("4.0")
-	local mate_5 = machine.devices[":"]:output("5.0")
-	local mate_6 = machine.devices[":"]:output("6.0")
-	local mate_7 = machine.devices[":"]:output("7.0")
-
-	if ((mate_0 and mate_0:get() ~= 0 and mate_1 and mate_1:get() ~= 0 and mate_2 and mate_2:get() ~= 0 and mate_3 and mate_3:get() ~= 0) or
-	    (mate_4 and mate_4:get() ~= 0 and mate_5 and mate_5:get() ~= 0 and mate_6 and mate_6:get() ~= 0 and mate_7 and mate_7:get() ~= 0)) then
+	if (output_value("0.0") ~= 0 and output_value("1.0") ~= 0 and output_value("2.0") ~= 0 and output_value("3.0") ~= 0 or
+	    output_value("4.0") ~= 0 and output_value("5.0") ~= 0 and output_value("6.0") ~= 0 and output_value("7.0") ~= 0) then
 		-- TODO: machine turns on all LEDs for mate announcement
 		return false
 	end
+	return output_value(tostring(x - 1) .. "." .. tostring(y - 1)) ~= 0
+end
 
-	-- Check the specific square requested
-	local led_name = tostring(x - 1) .. "." .. tostring(y - 1)
-	local led_state = machine.devices[":"]:output(led_name)
-	
-	return led_state and led_state:get() ~= 0
+function interface.edit_game(on)
+	-- move the history pieces silently, then set up the final position
+	interface.edit = on
+	if not on then
+		-- set_pos(-1) changes sides with the black king on e8: start from RE
+		local stm = interface.cur_color
+		send_input(":IN.0", 0x80, 1) -- RE
+		emu.wait(1.0)
+		local level = interface.cur_level
+		interface.cur_level = 1
+		if level ~= nil then
+			interface.setlevel()
+		end
+		interface.set_pos(stm)
+	end
 end
 
 function interface.select_piece(x, y, event)
-	if (event == "en_passant") then
+	if interface.edit then
+		if (event == "capture" or event == "en_passant") then
+			sb_remove_piece(":board", x, y)
+		else
+			sb_move_piece(":board", x, y)
+		end
+	elseif (event == "en_passant") then
 		sb_remove_piece(":board", x, y)
 	elseif (event == "get_castling" or event == "put_castling") then
 		sb_move_piece(":board", x, y)
