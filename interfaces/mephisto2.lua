@@ -5,6 +5,11 @@ interface.level = "a3"
 interface.cur_level = nil
 interface.edit = false
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	if machine.system.name == "mephisto2" then
 		return "Mephisto II"
@@ -125,19 +130,10 @@ end
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	
-	-- Fetch the modern output devices safely
-	local digit3_state = machine.devices[":"]:output("digit3")
-	local digit2_state = machine.devices[":"]:output("digit2")
-	local digit1_state = machine.devices[":"]:output("digit1")
-	local digit0_state = machine.devices[":"]:output("digit0")
-
-	-- Extract value or default to 0 if the device isn't ready
-	local d0 = (digit3_state and digit3_state:get() or 0) & 0x7f
-	local d1 = (digit2_state and digit2_state:get() or 0) & 0x7f
-	local d2 = (digit1_state and digit1_state:get() or 0) & 0x7f
-	local d3 = (digit0_state and digit0_state:get() or 0) & 0x7f
-	
+	local d0 = output_value("digit3") & 0x7f
+	local d1 = output_value("digit2") & 0x7f
+	local d2 = output_value("digit1") & 0x7f
+	local d3 = output_value("digit0") & 0x7f
 	return (xval[x] == d0 and yval[y] == d1) or (xval[x] == d2 and yval[y] == d3)
 end
 

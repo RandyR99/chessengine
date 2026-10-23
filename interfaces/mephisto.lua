@@ -5,6 +5,11 @@ interface.level = "a1"
 interface.cur_level = nil
 interface.edit = false
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.setdigit(n)
 	if     (n == 0)	then send_input(":IN.3", 0x01, 0.5)
 	elseif (n == 1)	then send_input(":IN.0", 0x02, 0.5)
@@ -100,19 +105,10 @@ end
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	
-	-- Fetch the modern output devices safely
-	local digit3_state = machine.devices[":"]:output("digit3")
-	local digit2_state = machine.devices[":"]:output("digit2")
-	local digit1_state = machine.devices[":"]:output("digit1")
-	local digit0_state = machine.devices[":"]:output("digit0")
-
-	-- Extract value or default to 0 if the device isn't ready
-	local d0 = (digit3_state and digit3_state:get() or 0) & 0x7f
-	local d1 = (digit2_state and digit2_state:get() or 0) & 0x7f
-	local d2 = (digit1_state and digit1_state:get() or 0) & 0x7f
-	local d3 = (digit0_state and digit0_state:get() or 0) & 0x7f
-	
+	local d0 = output_value("digit3") & 0x7f
+	local d1 = output_value("digit2") & 0x7f
+	local d2 = output_value("digit1") & 0x7f
+	local d3 = output_value("digit0") & 0x7f
 	return (xval[x] == d0 and yval[y] == d1) or (xval[x] == d2 and yval[y] == d3)
 end
 
@@ -176,65 +172,43 @@ function interface.promote(x, y, piece)
 end
 
 function interface.show_info()
-	-- Guard: If it's the human player's turn or we aren't playing, skip parsing info
-	if interface.turn then
-		return nil
-	end
+  local info=nil
+  local d0 = output_value("digit3")
+    local d1 = output_value("digit2")
+    local d2 = output_value("digit1")
+    local d3 = output_value("digit0")
+  if digit_ascii(d0) =="0" or digit_ascii(d0) =="1" or digit_ascii(d0) =="2" or digit_ascii(d0) =="3" or digit_ascii(d0) =="4" or digit_ascii(d0) =="5" or digit_ascii(d0) =="6" or digit_ascii(d0) =="7" or digit_ascii(d0) =="8" or digit_ascii(d0) =="9" then
+  info="info depth " .. digit_ascii(d0) .. digit_ascii(d1)
+  end
+  return info
+ end
 
-	local info = nil
-	
-	-- Fetch the modern output devices safely
-	local digit3_state = machine.devices[":"]:output("digit3")
-	local digit2_state = machine.devices[":"]:output("digit2")
-	local digit1_state = machine.devices[":"]:output("digit1")
-	local digit0_state = machine.devices[":"]:output("digit0")
-
-	-- Extract values safely
-	local d0 = digit3_state and digit3_state:get() or 0
-	local d1 = digit2_state and digit2_state:get() or 0
-	local d2 = digit1_state and digit1_state:get() or 0
-	local d3 = digit0_state and digit0_state:get() or 0
-	
-	local char0 = digit_ascii(d0)
-	
-	-- Check if the first digit is a valid depth number (0-9)
-	if char0 == "0" or char0 == "1" or char0 == "2" or char0 == "3" or char0 == "4" or 
-	   char0 == "5" or char0 == "6" or char0 == "7" or char0 == "8" or char0 == "9" then
-		
-		-- Sanitize the output to remove extra trailing spaces
-		local raw_info = "info depth " .. char0 .. digit_ascii(d1)
-		info = raw_info:gsub("%s+$", "") 
-	end
-
-	-- Return the info string directly to UCI on every frame call while thinking
-	return info
-end
 
  function digit_ascii(digit)
-  local zahl=tostring(digit)
-  if     (digit == 0)   then zahl=" "
-  elseif (digit == 64)  then zahl="-"
-  elseif (digit == 63)  then zahl="0"
-  elseif (digit == 6)   then zahl="1"
-  elseif (digit == 91)  then zahl="2"
-  elseif (digit == 79)  then zahl="3"
-  elseif (digit == 102) then zahl="4"
-  elseif (digit == 109) then zahl="5"
-  elseif (digit == 125) then zahl="6"
-  elseif (digit == 7)   then zahl="7"
-  elseif (digit == 127) then zahl="8"
-  elseif (digit == 111) then zahl="9"
-  elseif (digit == 55) then zahl="n"
-  elseif (digit == 119) then zahl="a"
-  elseif (digit == 124) then zahl="b"
-  elseif (digit == 57) then zahl="c"
-  elseif (digit == 94) then zahl="d"
-  elseif (digit == 121) then zahl="e"
-  elseif (digit == 113) then zahl="f"
-  elseif (digit == 61) then zahl="g"
-  elseif (digit == 118) then zahl="h"
+  local char=tostring(digit)
+  if     (digit == 0)   then char=" "
+  elseif (digit == 64)  then char="-"
+  elseif (digit == 63)  then char="0"
+  elseif (digit == 6)   then char="1"
+  elseif (digit == 91)  then char="2"
+  elseif (digit == 79)  then char="3"
+  elseif (digit == 102) then char="4"
+  elseif (digit == 109) then char="5"
+  elseif (digit == 125) then char="6"
+  elseif (digit == 7)   then char="7"
+  elseif (digit == 127) then char="8"
+  elseif (digit == 111) then char="9"
+  elseif (digit == 55) then char="n"
+  elseif (digit == 119) then char="a"
+  elseif (digit == 124) then char="b"
+  elseif (digit == 57) then char="c"
+  elseif (digit == 94) then char="d"
+  elseif (digit == 121) then char="e"
+  elseif (digit == 113) then char="f"
+  elseif (digit == 61) then char="g"
+  elseif (digit == 118) then char="h"
   end
-  return (zahl)
+  return (char)
 end
 
 return interface

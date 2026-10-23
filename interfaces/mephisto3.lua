@@ -6,6 +6,11 @@ interface.score = "0.00"
 interface.depth = "0"
 interface.pv = ""
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	if machine.system.name == "mephisto3" then
 		return "Mephisto III"
@@ -103,6 +108,7 @@ function interface.set_pos(mode)
 end
 
 function interface.edit_game(on)
+	interface.editing = on
 	if on then
 		send_input(":IN.3", 0x04, 0.5) -- MEM
 	else
@@ -116,14 +122,14 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	local led_name = (y - 1) .. "." .. (x - 1)
-	local led_state = machine.devices[":"]:output(led_name)
-	return led_state and led_state:get() ~= 0
+	return output_value((y - 1) .. "." .. (x - 1)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
 	if (event == "get_castling" or event == "en_passant" or event == "capture") then
 		emu.wait(1)
+	elseif interface.editing then
+		emu.wait(1) -- a fast history replay loses board presses in MEM mode
 	end
 	sb_select_piece(":board", 1, x, y, event)
 end
@@ -151,28 +157,18 @@ function interface.get_promotion(x, y)
 	send_input(":IN.1", 0x01, 0.5)	-- INFO
 	send_input(":IN.0", 0x02, 0.5)	-- 1
 	send_input(":IN.3", 0x01, 0.5)	-- 0
-	
-	-- Resolve modern output proxies securely
-	local d3_state = machine.devices[":"]:output("digit3")
-	local d2_state = machine.devices[":"]:output("digit2")
-	local d0_state = machine.devices[":"]:output("digit0")
-	
-	local d3 = d3_state and d3_state:get() or 0
-	local d2 = d2_state and d2_state:get() or 0
 	local d0 = 0
-	
-	if ((d3 & 0x7f) == 0x73 and (d2 & 0x7f) == 0x50) then	-- display shows 'Pr'
-		d0 = d0_state and d0_state:get() or 0
+	local d3 = output_value("digit3") & 0x7f
+	local d2 = output_value("digit2") & 0x7f
+	if (d3 == 0x73 and d2 == 0x50) then	-- display shows 'Pr'
+		d0 = output_value("digit0") & 0x7f
 	end
-	
 	send_input(":IN.1", 0x01, 0.5)	-- INFO
 	machine.video.throttled = throttled_state
-	
-	local filtered_d0 = d0 & 0x7f
-	if     (filtered_d0 == 0x5e) then return "q"
-	elseif (filtered_d0 == 0x31) then return "r"
-	elseif (filtered_d0 == 0x38) then return "b"
-	elseif (filtered_d0 == 0x6d) then return "n"
+	if     (d0 == 0x5e) then return "q"
+	elseif (d0 == 0x31) then return "r"
+	elseif (d0 == 0x38) then return "b"
+	elseif (d0 == 0x6d) then return "n"
 	end
 	return nil
 end
@@ -189,105 +185,32 @@ function interface.promote(x, y, piece)
 	end
 end
 
--- Helper function to harvest display segments cleanly over a given timeframe (in frames)
-local function gather_display_segments(cycles)
-	local r3, r2, r1, r0 = 0, 0, 0, 0
-	for i = 1, cycles do
-		local p3 = machine.devices[":"]:output("digit3")
-		local p2 = machine.devices[":"]:output("digit2")
-		local p1 = machine.devices[":"]:output("digit1")
-		local p0 = machine.devices[":"]:output("digit0")
-		
-		r3 = r3 | (p3 and p3:get() or 0)
-		r2 = r2 | (p2 and p2:get() or 0)
-		r1 = r1 | (p1 and p1:get() or 0)
-		r0 = r0 | (p0 and p0:get() or 0)
-		
-		emu.wait(0.01)
-	end
-	return r3 & 0x7f, r2 & 0x7f, r1 & 0x7f, r0 & 0x7f
-end
-
--- Reads the display strings repeatedly over 2 seconds, requiring 2 identical consecutive reads
-local function read_validated_display(full_four_digits)
-	local previous_read = nil
-	local fallback_empty = full_four_digits and "    " or "  "
-	
-	for sample = 1, 10 do
-		local d1, d2, d3, d4 = gather_display_segments(15)
-		emu.wait(0.05)
-		
-		local visual_string
-		if full_four_digits then
-			visual_string = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-		else
-			visual_string = digit_ascii(d3) .. digit_ascii(d4)
-		end
-		
-		if visual_string:gsub(" ", "") ~= "" then
-			if previous_read == visual_string then
-				return visual_string
-			end
-			previous_read = visual_string
-		end
-	end
-	
-	if previous_read then
-		return previous_read
-	else
-		return fallback_empty
-	end
-end
-
 function interface.show_info(on)
 	if on then
 		local throttled_state = machine.video.throttled
-		machine.video.throttled = true
-		
-		-- Initialize safe, clean defaults so concatenation can NEVER fail
-		local raw_pv = "    "
-		local raw_score = "    "
-		local raw_depth = "  "
-		
-		-- =================================================================
-		-- STEP 1: COLLECT THE PRINCIPAL VARIATION (PV)
-		-- =================================================================
+		machine.video.throttled = false
 		send_input(":IN.1", 0x01, 0.2) -- Info
-		emu.wait(0.2)
-		raw_pv = read_validated_display(true)
-		interface.pv = raw_pv
-		
-		-- =================================================================
-		-- STEP 2: COLLECT THE CENTIPAWN SCORE (CP)
-		-- =================================================================
-		send_input(":IN.0", 0x02, 0.2) -- Button '1'
-		emu.wait(0.2)
-		raw_score = read_validated_display(true)
-		interface.score = raw_score:gsub(" ", "")
-		-- Safe fallback if the score was stripped down to an empty string
-		if interface.score == "" then interface.score = "0" end
-		
-		-- =================================================================
-		-- STEP 3: COLLECT THE CURRENT DEPTH
-		-- =================================================================
-		send_input(":IN.1", 0x02, 0.2) -- Button '3'
-		emu.wait(0.2)
-		raw_depth = read_validated_display(false)
-		interface.depth = raw_depth:gsub(" ", "")
-		if interface.depth == "" then interface.depth = "0" end
-		
-		-- Reset layout screen state to default game board view
-		send_input(":IN.0", 0x01, 0.2) -- CL
 		emu.wait(0.1)
-		
+		local d1 = output_value("digit3") & 0x7f
+		local d2 = output_value("digit2") & 0x7f
+		local d3 = output_value("digit1") & 0x7f
+		local d4 = output_value("digit0") & 0x7f
+		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
+		send_input(":IN.0", 0x02, 0.2) -- 1
+		emu.wait(0.1)
+		d1 = output_value("digit3") & 0x7f
+		d2 = output_value("digit2") & 0x7f
+		d3 = output_value("digit1") & 0x7f
+		d4 = output_value("digit0") & 0x7f
+		interface.score = (digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)):gsub(" ","")
+		send_input(":IN.1", 0x02, 0.2) -- 3
+		emu.wait(0.1)
+		d1 = output_value("digit1") & 0x7f
+		d2 = output_value("digit0") & 0x7f
+		interface.depth = digit_ascii(d1) .. digit_ascii(d2)
+		send_input(":IN.0", 0x01, 0.2) -- CL
 		machine.video.throttled = throttled_state
-		
-		-- Final double check to ensure NO values are nil before merging strings
-		local final_score = interface.score or "0"
-		local final_depth = interface.depth or "0"
-		local final_pv = interface.pv or ""
-		
-		return "info score cp " .. final_score .. " depth " .. final_depth .. " pv " .. final_pv
+		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 	end
 end
 
@@ -314,7 +237,7 @@ function digit_ascii(digit)
 	elseif digit == 61  then return "g"
 	elseif digit == 118 then return "h"
 	end
+	return " " -- unknown segment pattern (a nil here broke the info line and stopped the plugin)
 end
 
 return interface
-
