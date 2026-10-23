@@ -3,6 +3,11 @@ interface = load_interface("amsterd")
 interface.level = "02"
 interface.cur_level = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	if machine.system.name == "roma16" then
 		return "Mephisto Roma (16 Bit)"
@@ -30,8 +35,7 @@ function interface.setlevel()
 		local n = level:sub(i,i)
 		if (n == " " or n == ":" or n == "/") then
 			send_input(":KEY.0", 0x20, 0.5) -- ENT
-			local digit3_state = machine.devices[":"]:output("digit3")
-			if (n == " " and (digit3_state:get() & 0x7f) == 0x54) then
+			if (n == " " and (output_value("digit3") & 0x7f) == 0x54) then
 				send_input(":KEY.0", 0x20, 0.5) -- ENT
 			end
 		else
