@@ -1,5 +1,10 @@
 interface = load_interface("polgar")
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	if machine.system.name == "milano" then
 		return "Mephisto Milano"
@@ -55,18 +60,9 @@ function interface.set_pos(mode)
 end
 
 function interface.is_selected(x, y)
-	-- Map names exactly to the old logic strings: (x-1).0 and (y-1).1
-	local col_name = tostring(x - 1) .. ".0"
-	local row_name = tostring(y - 1) .. ".1"
-	
-	local col_output = machine.devices[":"]:output(col_name)
-	local row_output = machine.devices[":"]:output(row_name)
-	
-	local col_active = col_output and col_output:get() ~= 0
-	local row_active = row_output and row_output:get() ~= 0
-	
-	-- A square is selected only when both its row and column lines intersect
-	return col_active and row_active
+	local xval = output_value((x - 1) .. ".0") ~= 0
+	local yval = output_value((y - 1) .. ".1") ~= 0
+	return xval and yval
 end
 
 function interface.select_piece(x, y, event)
@@ -83,4 +79,3 @@ function interface.promote(x, y, piece)
 end
 
 return interface
-
