@@ -5,8 +5,11 @@ interface.cur_level = nil
 interface.score = "0.00"
 interface.depth = "0"
 interface.pv = ""
-interface.info_state = 0   -- 0: IDLE, 1: PV, 2: SCORE, 3: DEPTH, 4: CLEANUP
-interface.delay_counter = 0 -- Counts frames to slow down transitions
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	return "Mephisto III-S Glasgow"
@@ -110,10 +113,7 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	local led_idx = (y - 1) * 8 + (x - 1)
-	local led_name = "led" .. tostring(led_idx)
-	local led_state = machine.devices[":"]:output(led_name)
-	return led_state and led_state:get() ~= 0
+    return output_value("led" .. ((y - 1) * 8 + (x - 1))) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -128,9 +128,8 @@ end
 
 function interface.set_option(name, value)
 	if (name == "level") then
-		local level = value:match("^%s*(.-)%s*$"):gsub("%s%s+", " ") -- trim
-		-- Updated pattern to support a single digit (0-9) followed by an optional space and a timestamp
-		if (string.match(level, "^[0-9]$") or string.match(level, "^%d%s%d%d:[0-5]%d:[0-5]%d$") or string.match(level, "^%s%d%d:[0-5]%d:[0-5]%d$")) then
+		local level = value:match("^%s*(.-)%s*$"):gsub("%s%s+"," ") -- trim
+		if (string.match(level,"^[0-69]$") or string.match(level,"^[78]%s%d%d:[0-5]%d:[0-5]%d$")) then
 			interface.level = level
 			interface.setlevel()
 		end
@@ -145,12 +144,10 @@ function interface.get_promotion(x, y)
 	send_input(":KEY.1", 0x20, 0.5)	-- 1
 	local d3 = 0
 	for i = 0, 5 do
-		local digit0_state = machine.devices[":"]:output("digit0")
-		local digit1_state = machine.devices[":"]:output("digit1")
-		local d0 = (digit0_state and digit0_state:get() or 0) & 0x7f
-		local d1 = (digit1_state and digit1_state:get() or 0) & 0x7f
+		local d0 = output_value("digit0") & 0x7f
+		local d1 = output_value("digit1") & 0x7f
 		if (d0 == 0x73 and d1 == 0x50) then	-- display shows 'Pr'
-			d3 = (digit0_state and digit0state:get() or 0) & 0x7f
+			d3 = output_value("digit0") & 0x7f
 			break
 		end
 		send_input(":KEY.0", 0x04, 0.5)	-- 0
@@ -167,82 +164,45 @@ end
 
 function interface.promote(x, y, piece)
 	sb_promote(":board:board", x, y, piece)
-	if     (piece == "q") then send_input(":KEY.1", 0x40, 1)
-	elseif (piece == "r") then send_input(":KEY.0", 0x01, 1)
-	elseif (piece == "b") then send_input(":KEY.1", 0x10, 1)
-	elseif (piece == "n") then send_input(":KEY.1", 0x04, 1)
+	-- short presses: on Glasgow hardware the Lang ROMs (amsterdg, dallas16g, roma16g) take a held ENT
+	-- after a promotion in MEM mode twice and jump to the start of the game ('StA')
+	if     (piece == "q") then send_input(":KEY.1", 0x40, 0.15)
+	elseif (piece == "r") then send_input(":KEY.0", 0x01, 0.15)
+	elseif (piece == "b") then send_input(":KEY.1", 0x10, 0.15)
+	elseif (piece == "n") then send_input(":KEY.1", 0x04, 0.15)
 	end
 	if (piece == "q" or piece == "r" or piece == "b" or piece == "n") then
-		send_input(":KEY.1", 0x08, 1)
+		send_input(":KEY.1", 0x08, 0.15)
 	end
+	emu.wait(0.5)
 end
 
 function interface.show_info(on)
 	if on then
-		local digit3_state = machine.devices[":"]:output("digit3")
-		local digit2_state = machine.devices[":"]:output("digit2")
-		local digit1_state = machine.devices[":"]:output("digit1")
-		local digit0_state = machine.devices[":"]:output("digit0")
-
-		-- HELPER FUNCTION: Safely waits out the display's "off" blink phase
-		local function get_lit_digits()
-			local d1, d2, d3, d4
-			for retry = 1, 60 do -- Safe timeout loop (approx 1 second max)
-				d1 = (digit3_state and digit3_state:get() or 0) & 0x7f
-				d2 = (digit2_state and digit2_state:get() or 0) & 0x7f
-				d3 = (digit1_state and digit1_state:get() or 0) & 0x7f
-				d4 = (digit0_state and digit0_state:get() or 0) & 0x7f
-				
-				-- If at least one segment is illuminated, the display is "on"
-				if d1 ~= 0 or d2 ~= 0 or d3 ~= 0 or d4 ~= 0 then
-					return d1, d2, d3, d4
-				end
-				emu.wait(0.016) -- Wait exactly 1 video frame (60Hz) before re-checking
-			end
-			return d1, d2, d3, d4
-		end
-
-		-- SAFE CONVERSION: Ensures digit_ascii never returns nil into a concatenation sequence
-		local function safe_ascii(digit_val)
-			local char = digit_ascii(digit_val)
-			return char or " " -- Fallback to empty space if character is unmapped/nil
-		end
-
-		-- STEP 1: Enter the Info menu to get Principal Variation (PV)
-		send_input(":KEY.0", 0x02, 0.15) -- Press INFO
-		emu.wait(0.2) -- Wait for menu transition
-
-		local d1, d2, d3, d4 = get_lit_digits()
-		local current_pv = safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)
-		if string.match(current_pv, "^[a-h][1-8][a-h][1-8]$") then
-			interface.pv = current_pv
-		end
-		
-		-- STEP 2: Shift to Evaluation Score Screen
-		send_input(":KEY.1", 0x20, 0.15) -- Press 1
-		emu.wait(0.2) -- Wait for screen switch
-		
-		d1, d2, d3, d4 = get_lit_digits()
-		local current_score = (safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)):gsub(" ","")
-		if string.match(current_score, "[0-9%-]+") and not string.match(current_score, "^[a-h][1-8]") then
-			interface.score = current_score
-		end
-		
-		-- STEP 3: Shift to Depth Screen
-		send_input(":KEY.1", 0x04, 0.15) -- Press 3
-		emu.wait(0.2) -- Wait for screen switch
-		
-		d1, d2, d3, d4 = get_lit_digits()
-		local full_str = safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)
-		local clean_depth = full_str:gsub("n", ""):gsub("=", ""):gsub(" ", "")
-		if clean_depth ~= "" and tonumber(clean_depth) then
-			interface.depth = string.format("%02d", tonumber(clean_depth))
-		end
-		
-		-- STEP 4: Exit backout
-		send_input(":KEY.1", 0x02, 0.15) -- Press CL
-		emu.wait(0.1) -- Wait for escape handling
-		
+		local throttled_state = machine.video.throttled
+		machine.video.throttled = false
+		send_input(":KEY.0", 0x02, 0.5) -- INFO
+		send_input(":KEY.0", 0x02, 0.5) -- INFO
+		emu.wait(0.1)
+		local d1 = output_value("digit3") & 0x7f
+		local d2 = output_value("digit2") & 0x7f
+		local d3 = output_value("digit1") & 0x7f
+		local d4 = output_value("digit0") & 0x7f
+		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
+		send_input(":KEY.1", 0x20, 0.5) -- 1
+		emu.wait(0.1)
+		d1 = output_value("digit3") & 0x7f
+		d2 = output_value("digit2") & 0x7f
+		d3 = output_value("digit1") & 0x7f
+		d4 = output_value("digit0") & 0x7f
+		interface.score = (digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)):gsub(" ","")
+		send_input(":KEY.1", 0x04, 0.2) -- 3
+		emu.wait(0.1)
+		d1 = output_value("digit1") & 0x7f
+		d2 = output_value("digit0") & 0x7f
+		interface.depth = digit_ascii(d1) .. digit_ascii(d2)
+		send_input(":KEY.1", 0x02, 0.2) -- CL
+		machine.video.throttled = throttled_state
 		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 	end
 end
@@ -270,6 +230,7 @@ function digit_ascii(digit)
 	elseif digit == 61  then return "g"
 	elseif digit == 118 then return "h"
 	end
+	return " "
 end
 
 return interface

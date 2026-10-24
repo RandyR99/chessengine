@@ -3,12 +3,41 @@ interface = load_interface("glasgow")
 interface.level = "02"
 interface.cur_level = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	return "Mephisto Roma (16 Bit) v2"
 end
 
 function interface.get_author()
 	return "Richard Lang"
+end
+
+function interface.setlevel()
+	if (interface.cur_level == nil or interface.cur_level == interface.level) then
+		return
+	end
+	interface.cur_level = interface.level
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	local level = interface.level
+	send_input(":KEY.0", 0x20, 0.25) -- LEV
+	for i = 1, level:len() do
+		local n = level:sub(i,i)
+		if (n == " " or n == ":" or n == "/") then
+			send_input(":KEY.1", 0x08, 0.5) -- ENT
+			if (n == " " and (output_value("digit3") & 0x7f) == 0x54) then
+				send_input(":KEY.1", 0x08, 0.5) -- ENT
+			end
+		else
+			interface.setdigit(tonumber(n))
+		end
+	end
+	send_input(":KEY.1", 0x08, 0.5) -- ENT
+	machine.video.throttled = throttled_state
 end
 
 function interface.setup_machine()
