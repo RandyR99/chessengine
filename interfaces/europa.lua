@@ -4,6 +4,11 @@ interface.invert = false
 interface.level = "a3"
 interface.cur_level = nil
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.setlevel()
 	if (interface.cur_level == nil or interface.cur_level == interface.level) then
 		return
@@ -20,7 +25,15 @@ function interface.setup_machine()
 	sb_reset_board(":board")
 	interface.invert = false
 --	send_input(":IN.2", 0x01, 0.5) -- RES
+	-- the power-on test takes ~7.7 s; presses before the PLAY LED comes on are lost
 	emu.wait(6.5)
+	for i=1,40 do
+		if output_value("1.2") ~= 0 then
+			break
+		end
+		emu.wait(0.1)
+	end
+	emu.wait(0.2)
 
 	interface.cur_level = "a3"
 	interface.setlevel()
@@ -57,7 +70,13 @@ end
 
 function interface.edit_game(on)
 	if on then
-		send_input(":IN.0", 0x04, 0.5) -- MEM
+		for i=1,3 do
+			send_input(":IN.0", 0x04, 0.5) -- MEM
+			emu.wait(0.5)
+			if output_value("1.4") ~= 0 then -- MEM LED: the press can get lost
+				break
+			end
+		end
 	else
 		send_input(":IN.0", 0x01, 0.5) -- PLAY
 	end
@@ -77,13 +96,8 @@ function interface.is_selected(x, y)
 		x = 9 - x
 		y = 9 - y
 	end
-	
-	-- Modern output proxy lookups for row/column grid selection
-	local x_led = machine.devices[":"]:output("2." .. tostring(x - 1))
-	local y_led = machine.devices[":"]:output("0." .. tostring(y - 1))
-	
-	local xval = (x_led and x_led:get() or 0) ~= 0
-	local yval = (y_led and y_led:get() or 0) ~= 0
+	local xval = output_value("2." .. tostring(x - 1)) ~= 0
+	local yval = output_value("0." .. tostring(y - 1)) ~= 0
 	return xval and yval
 end
 
@@ -109,34 +123,14 @@ function interface.set_option(name, value)
 	end
 end
 
-function interface.get_promotion_led()
-	local q_led = machine.devices[":"]:output("1.6")
-	local r_led = machine.devices[":"]:output("1.5")
-	local b_led = machine.devices[":"]:output("1.4")
-	local n_led = machine.devices[":"]:output("1.3")
-
-	if     (q_led and q_led:get() ~= 0) then return 'q'
-	elseif (r_led and r_led:get() ~= 0) then return 'r'
-	elseif (b_led and b_led:get() ~= 0) then return 'b'
-	elseif (n_led and n_led:get() ~= 0) then return 'n'
-	end
-	return nil
-end
-
 function interface.get_promotion(x, y)
-	local previous_read = nil
-	
-	-- Loop to check the flashing LEDs over a window, requiring two identical consecutive reads
-	for i = 1, 10 do
-		local current_read = interface.get_promotion_led()
-		
-		if current_read ~= nil then
-			if previous_read == current_read then
-				return current_read -- Double-verified stable reading found!
-			end
-			previous_read = current_read
+	-- the Europa always promotes to a Queen (manual B3); its LED comes on after the pawn move.
+	-- 1.5 is also the check LED, so don't read the other piece LEDs
+	for i=1,5 do
+		if (output_value("1.6") ~= 0) then
+			return 'q'
 		end
-		emu.wait(0.1) -- Micro-delay to blend out multiplexing gaps
+		emu.wait(0.25)
 	end
 
 	return nil
