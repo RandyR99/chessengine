@@ -43,12 +43,12 @@ function interface.set_pos(mode)
 			send_input(":IN.3", 0x04, 0.6) -- CE
 		end
 		local fig = {0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x00,0x06,0x05,0x04,0x03,0x02,0x01}
-		local ram = emu.item(machine.devices[':maincpu'].items['1/0-ff'])
+		local ram = machine.devices[':maincpu'].spaces["data"]
 		for x=1,8 do
 			for y=1,8 do
 				local p=get_piece_id(x,y)
 				local z=fig[p+7]
-				ram:write(16*(x-1)+y-1,z)
+				ram:write_u8(16*(x-1)+y-1,z)
 			end
 		end
 	end

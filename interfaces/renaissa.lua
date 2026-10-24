@@ -11,6 +11,15 @@ local function output_value(name)
 	return out ~= nil and out:get() or 0
 end
 
+local function ram_block(tag, offset, len)
+	local share = machine.memory.shares[tag]
+	local s = ""
+	for i = 0, len - 1 do
+		s = s .. string.char(share:read_u8(offset + i))
+	end
+	return s
+end
+
 function calc_module()
     local mod = 0
     if machine.devices[":exp:analyst"] then
@@ -277,7 +286,7 @@ end
 
 function interface.show_info(on)
     if on then
-        local ddram = emu.item(machine.devices[':maincpu'].items['0/4000-5fff']):read_block(0x0b3f, 0x10)
+        local ddram = ram_block(":nvram", 0x0b3f, 0x10)
         if digit_ascii(ddram:byte(1)) ~= " " and digit_ascii(ddram:byte(1)) ~= "-" and digit_ascii(ddram:byte(1)) ~= "P" then
             interface.score = digit_ascii(ddram:byte(11)) .. digit_ascii(ddram:byte(12)) .. digit_ascii(ddram:byte(14)) .. digit_ascii(ddram:byte(15)):gsub(" ", "")
             interface.depth = digit_ascii(ddram:byte(0)) .. digit_ascii(ddram:byte(1)):gsub(" ", "")

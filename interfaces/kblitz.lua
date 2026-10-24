@@ -12,7 +12,7 @@ end
 
 interface.level = "a3"
 interface.cur_level = nil
-local ram = emu.item(machine.devices[':maincpu'].items['0/:maincpu:internal_ram'])
+local ram = machine.memory.shares[":maincpu:internal_ram"]
 
 local port = machine.ioport.ports[":IN.0"]
 local mode_dial = port.fields["Mode Dial"]
@@ -58,8 +58,8 @@ function interface.setlevel()
 	local cols_idx = {a=1, b=2, c=3, d=4, e=5, f=6, g=7, h=8}
 	local x = cols_idx[interface.level:sub(1, 1)]
 	local y = tonumber(interface.level:sub(2, 2))
-	ram:write(0x1ca, 16*(x-1)+y-1)
-	ram:write(0x1cc, 16*(x-1)+y-1)
+	ram:write_u16(0x394, 16*(x-1)+y-1)
+	ram:write_u16(0x398, 16*(x-1)+y-1)
 end
 
 function interface.setup_machine()

@@ -8,7 +8,7 @@ end
 interface.turn = true
 interface.level = "a1"
 interface.cur_level = nil
-local ram = emu.item(machine.devices[':'].items['0/:nvram'])
+local ram = machine.memory.shares[":nvram"]
 local adr = 0x6c90
 local count = 0
 interface.edit = false
@@ -201,8 +201,8 @@ function interface.is_selected(x, y)
 	if interface.edit then
 		return false
 	end
-	local von = ram:read(adr+count+1)
-	local bis = ram:read(adr+count+0)
+	local von = ram:read_u8(adr+count+1)
+	local bis = ram:read_u8(adr+count+0)
 	local d3 = (von&0x07) + 1
 	local d4 = 8 - ((von&0x70)>>4)
 	local d5 = (bis&0x07) + 1

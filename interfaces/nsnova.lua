@@ -5,6 +5,15 @@ local function output_value(name)
 	return out ~= nil and out:get() or 0
 end
 
+local function ram_block(tag, offset, len)
+	local share = machine.memory.shares[tag]
+	local s = ""
+	for i = 0, len - 1 do
+		s = s .. string.char(share:read_u8(offset + i))
+	end
+	return s
+end
+
 interface.level = "1"
 interface.cur_level = nil
 interface.score = "0.00"
@@ -163,7 +172,7 @@ end
 
 function interface.show_info(on)
 	if on then
-		local ddram = emu.item(machine.devices[':maincpu'].items['0/:maincpu:internal_ram']):read_block(0x82, 0x05)
+		local ddram = ram_block(":maincpu:internal_ram", 0x82, 0x05)
 		if (digit_ascii(ddram:byte(1)) .. digit_ascii(ddram:byte(2))) == "d " then
 			interface.depth = digit_ascii(ddram:byte(3)) .. digit_ascii(ddram:byte(4))
 		elseif digit_ascii(ddram:byte(1)) == " " or digit_ascii(ddram:byte(1)) == "-" then
