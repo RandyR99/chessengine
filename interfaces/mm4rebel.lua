@@ -79,11 +79,8 @@ function interface.set_pos(mode)
 end
 
 function interface.is_selected(x, y)
-	local led_idx = (y - 1) * 8 + (x - 1)
-	local led_name = "led" .. tostring(led_idx)
-	local led_state = machine.devices[":"]:output(led_name)
-	
-	return led_state and led_state:get() ~= 0
+	local led_state = machine.devices[":"]:output("led" .. ((y - 1) * 8 + (x - 1)))
+	return led_state ~= nil and led_state:get() ~= 0
 end
 
 function interface.get_options()

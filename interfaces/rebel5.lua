@@ -5,6 +5,11 @@ interface.cur_level = nil
 local lastx = 0
 local lasty = 0
 
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 function interface.get_module()
 	if machine.system.name == "rebel5" then
 		return "Mephisto Rebell 5.0"
@@ -46,45 +51,34 @@ function interface.setup_machine()
 	emu.wait(0.5)
 	sb_reset_board(":board:board")
 	emu.wait(1)
+	send_input(":KEY.0", 0x01, 1) -- CL
+	emu.wait(1)
 	machine.video.throttled = throttled_state
-	interface.cur_level = 1
+	interface.cur_level = "le 1"
 	interface.setlevel()
+	send_input(":KEY.0", 0x01, 1) -- CL
 end
 
 function interface.is_selected(x, y)
-	local xval = {0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76}
-	local yval = {0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f}
-	
-	local d0_state = machine.devices[":"]:output("digit0")
-	local d1_state = machine.devices[":"]:output("digit1")
-	local d2_state = machine.devices[":"]:output("digit2")
-	local d3_state = machine.devices[":"]:output("digit3")
-	local led_state = machine.devices[":"]:output("led" .. tostring(8 * (y - 1) + (x - 1)))
-	
-	local d0 = d0_state and (d0_state:get() & 0x7f) or 0
-	local d1 = d1_state and (d1_state:get() & 0x7f) or 0
-	local d2 = d2_state and (d2_state:get() & 0x7f) or 0
-	local d3 = d3_state and (d3_state:get() & 0x7f) or 0
-	local led_val = led_state and led_state:get() or 0
-	
-	return (xval[x] == d0 and yval[y] == d1) or (xval[x] == d2 and yval[y] == d3) or led_val ~= 0
+	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
+	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
+	local d0 = output_value("digit3") & 0x7f
+	local d1 = output_value("digit2") & 0x7f
+	local d2 = output_value("digit1") & 0x7f
+	local d3 = output_value("digit0") & 0x7f
+	return (xval[x] == d0 and yval[y] == d1) or (xval[x] == d2 and yval[y] == d3) or output_value("led" .. (8 * (y - 1) + (x - 1))) ~= 0
 end
 
 function interface.select_piece(x, y, event)
-	local d0_state = machine.devices[":"]:output("digit0")
-	local d1_state = machine.devices[":"]:output("digit1")
-	local d2_state = machine.devices[":"]:output("digit2")
-	local d3_state = machine.devices[":"]:output("digit3")
-	
-	local d0 = d0_state and (d0_state:get() & 0x7f) or 0
-	local d1 = d1_state and (d1_state:get() & 0x7f) or 0
-	local d2 = d2_state and (d2_state:get() & 0x7f) or 0
-	local d3 = d3_state and (d3_state:get() & 0x7f) or 0
-	
+	local d0 = output_value("digit3") & 0x7f
+	local d1 = output_value("digit2") & 0x7f
+	local d2 = output_value("digit1") & 0x7f
+	local d3 = output_value("digit0") & 0x7f
 	if ((d0 == 0x31 and d1 == 0x30 and d2 == 0x37 and d3 == 0x79) or (d0 == 0x77 and d1 == 0x06 and d2 == 0x77 and d3 == 0x06)) then -- 'TIME' or 'A1A1'
-		send_input(":KEY.1", 0x01, 0.3) -- CL
+		send_input(":KEY.0", 0x01, 1) -- CL
 	end
-	sb_select_piece(":board:board", 1, x, y, event)
+	local piece = get_piece_id(x, y)
+	sb_select_piece(":board:board", 0.9, x, y, event)
 	if (event == "get") then
 		lastx = x
 		lasty = y
