@@ -3,6 +3,12 @@ interface = {}
 interface.invert = false
 interface.level = "a4"
 interface.cur_level = nil
+local ram = machine.memory.shares[":maincpu:internal_ram"]
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	if machine.system.name == "mm6" then
@@ -16,34 +22,33 @@ function interface.get_author()
 	return "Frans Morsch"
 end
 
-function interface.setdigit(n)
-	if     (n == 0) then  send_input(":IN.1", 0x10, 0.5)
-	elseif (n == 1) then  send_input(":IN.1", 0x01, 0.5) 
-	elseif (n == 2) then  send_input(":IN.1", 0x02, 0.5) 
-	elseif (n == 3) then  send_input(":IN.1", 0x04, 0.5) 
-	elseif (n == 4) then  send_input(":IN.1", 0x80, 0.5) 
-	elseif (n == 5) then  send_input(":IN.1", 0x40, 0.5) 
-	elseif (n == 6) then  send_input(":IN.1", 0x10, 0.5) 
-	end
-end
-
 function interface.setlevel()
 	if (interface.cur_level == nil or interface.cur_level == interface.level) then
 		return
 	end
 	interface.cur_level = interface.level
-	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
-	send_input(":IN.0", 0x04, 0.5) -- LEV
-	emu.wait(0.5)
-	send_input(":IN.1", 0x08, 0.5) -- CLR
-	machine.video.throttled = throttled_state
+	local cols_idx = {a=1, b=2, c=3, d=4, e=5, f=6, g=7, h=8}
+	local x = cols_idx[interface.level:sub(1, 1)]
+	local y = tonumber(interface.level:sub(2, 2))
+
+	send_input(":IN.0", 0x04, 0.25) -- LEV
+	ram:write_u16(0x3bc, 16*(x-1)+2*(y-1))
+	send_input(":IN.1", 0x20, 0.25) -- ENT
+	send_input(":IN.0", 0x04, 0.25) -- LEV
+	emu.wait(1)
+	send_input(":IN.1", 0x08, 0.25) -- CLR
 end
 
 function interface.setup_machine()
 	sb_reset_board(":board:board")
 	interface.invert = false
-	emu.wait(2)
+--	send_input(":IN.0", 0x10, 0.5) -- NEW GAME
+	emu.wait(4)
+	-- an uninitialized EEPROM (no nvram file) shows 'Err: E' after power-on until a key is pressed,
+	-- then the board LEDs sweep for about 4.5 s (a CLR after a normal boot does nothing)
+	send_input(":IN.1", 0x08, 0.25) -- CLR
+	emu.wait(5)
+
 	interface.cur_level = "a4"
 	interface.setlevel()
 end
@@ -112,9 +117,7 @@ function interface.is_selected(x, y)
 		y = 9 - y
 	end
 	local z = (x-1)+(y-1)*8
-	
-	local led_state = machine.devices[":"]:output("led" .. tostring(z))
-	return led_state and led_state:get() ~= 0
+	return output_value("led" .. z) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -140,17 +143,11 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local s14 = machine.devices[":"]:output("s1.14")
-	local s16 = machine.devices[":"]:output("s1.16")
-	local s17 = machine.devices[":"]:output("s1.17")
-	local s19 = machine.devices[":"]:output("s1.19")
-
-	if     s14 and s14:get() ~= 0 then return "q"
-	elseif s16 and s16:get() ~= 0 then return "r"
-	elseif s17 and s17:get() ~= 0 then return "b"
-	elseif s19 and s19:get() ~= 0 then return "n"
+	if     output_value("s1.14") ~= 0 then return "q"
+	elseif output_value("s1.16") ~= 0 then return "r"
+	elseif output_value("s1.17") ~= 0 then return "b"
+	elseif output_value("s1.19") ~= 0 then return "n"
 	end
-	return nil
 end
 
 function interface.promote_special(piece)
@@ -170,4 +167,3 @@ function interface.promote(x, y, piece)
 end
 
 return interface
-
