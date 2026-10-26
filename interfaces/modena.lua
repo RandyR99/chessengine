@@ -3,8 +3,13 @@ interface = {}
 interface.level = "a2"
 interface.cur_level = nil
 interface.depth = "0"
-interface.score = "0"
+interface.score = "0.00"
 interface.pv = ""
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	if machine.system.name == "modena" then
@@ -103,7 +108,21 @@ function interface.edit_game(on)
 	emu.wait(0.5)
 end
 
+local function display_state()
+	return output_value("digit3") .. " " .. output_value("digit2") .. " " .. output_value("digit1") .. " " .. output_value("digit0")
+end
+
 function interface.start_play(init)
+	-- the Modena starts thinking on its own once the player's move is on the board (book replies are instant);
+	-- ENTER would then make it move at once. While it thinks the clock blinks, a pending move blinks too:
+	-- press CLEAR + ENTER only when the display stays steady
+	local first = display_state()
+	for i = 1, 12 do
+		emu.wait(0.1)
+		if display_state() ~= first then
+			return
+		end
+	end
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	send_input(":KEY", 0x80, 1) -- CLEAR
@@ -111,75 +130,37 @@ function interface.start_play(init)
 	machine.video.throttled = throttled_state
 end
 
--- Fast passive multi-frame segment harvester (no emu.wait)
-local function gather_display_segments(cycles)
-	local r3, r2, r1, r0 = 0, 0, 0, 0
-	local root = machine.devices[":"]
-	for i = 1, cycles do
-		local p3 = root:output("digit3")
-		local p2 = root:output("digit2")
-		local p1 = root:output("digit1")
-		local p0 = root:output("digit0")
-		
-		r3 = r3 | (p3 and p3:get() or 0)
-		r2 = r2 | (p2 and p2:get() or 0)
-		r1 = r1 | (p1 and p1:get() or 0)
-		r0 = r0 | (p0 and p0:get() or 0)
+-- the machine's move as shown on the display (e.g. 'E2E4'), nil if the display shows something else
+local function display_move()
+	local xvals = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
+	local yvals = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
+	local d = { output_value("digit3") & 0x7f, output_value("digit2") & 0x7f, output_value("digit1") & 0x7f, output_value("digit0") & 0x7f }
+	local fx, fy, tx, ty
+	for i = 1, 8 do
+		if d[1] == xvals[i] then fx = i end
+		if d[2] == yvals[i] then fy = i end
+		if d[3] == xvals[i] then tx = i end
+		if d[4] == yvals[i] then ty = i end
 	end
-	return r3 & 0x7f, r2 & 0x7f, r1 & 0x7f, r0 & 0x7f
-end
-
--- Reads the display strings repeatedly over 2 seconds, requiring 2 identical consecutive reads
-local function read_validated_display(digit_mode)
-	local previous_read = nil
-	local fallback_empty = (digit_mode == "full") and "    " or "  "
-	
-	for sample = 1, 20 do
-		-- OPTIMIZED: Reduced inner frame cycle count from 60 down to 10 to clear thread choke
-		local d1, d2, d3, d4 = gather_display_segments(10)
-		emu.wait(0.05)
-		
-		local visual_string
-		if digit_mode == "full" then
-			visual_string = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-		elseif digit_mode == "first_two" then
-			visual_string = digit_ascii(d1) .. digit_ascii(d2)
-		else
-			visual_string = digit_ascii(d3) .. digit_ascii(d4)
-		end
-		
-		if visual_string:gsub(" ", "") ~= "" then
-			if previous_read == visual_string then
-				return visual_string
-			end
-			previous_read = visual_string
-		end
+	if fx and fy and tx and ty then
+		return fx, fy, tx, ty
 	end
-	
-	if previous_read then
-		return previous_read
-	else
-		return fallback_empty
-	end
+	return nil
 end
 
 function interface.is_selected(x, y)
-	local xvals = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
-	local yvals = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }
-	
-	local d0, d1, d2, d3 = gather_display_segments(5)
-	
-	local root = machine.devices[":"]
-	local x_node = root:output("1." .. tostring(x - 1))
-	local y_node = root:output("2." .. tostring(y - 1))
-	local xval = x_node and x_node:get() ~= 0 or false
-	local yval = y_node and y_node:get() ~= 0 or false
-	
-	return (xvals[x] == d0 and yvals[y] == d1) or (xvals[x] == d2 and yvals[y] == d3) or (xval and yval)
+	-- the display keeps showing the previous move while the machine thinks: its from-square is empty now
+	local fx, fy, tx, ty = display_move()
+	if fx and get_piece_id(fx, fy) ~= 0 then
+		return (x == fx and y == fy) or (x == tx and y == ty)
+	end
+	return output_value("1." .. (x - 1)) ~= 0 and output_value("2." .. (y - 1)) ~= 0
 end
 
 function interface.select_piece(x, y, event)
 	sb_select_piece(":board", 1, x, y, event)
+	-- the 6502 scans the button board slowly: back-to-back presses (the machine's own move) get lost
+	emu.wait(1)
 end
 
 function interface.get_options()
@@ -196,7 +177,9 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local d0, d1, _, d3 = gather_display_segments(10)
+	local d0 = output_value("digit3") & 0x7f
+	local d1 = output_value("digit2") & 0x7f
+	local d3 = output_value("digit0") & 0x7f
 	if (d0 == 0x73 and d1 == 0x50) then	-- display shows 'Pr'
 		if     (d3 == 0x5e) then return "q"
 		elseif (d3 == 0x31) then return "r"
@@ -218,27 +201,33 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- show_info disabled: it presses CLEAR/INFO/ENTER while the machine thinks; the INFO display (main line)
+-- was then taken for the machine's move and the machine ignored the board presses (stalls, reversed moves).
+-- To be redone in the show_info revisit.
+--[[
 function interface.show_info(on)
 	if on then
+		local throttled_state = machine.video.throttled
+		machine.video.throttled = false
 		send_input(":KEY", 0x80, 0.3) -- CLEAR
-		emu.wait(0.1)
 		send_input(":KEY", 0x02, 0.3) -- INFO
-		emu.wait(0.2)
-		interface.pv = read_validated_display("full")
-		
-		send_input(":KEY", 0x02, 0.3) -- INFO (Second Press)
-		emu.wait(0.2)
-		local raw_score = read_validated_display("full")
-		interface.score = raw_score:gsub(" ", "")
-		
+		local d1 = output_value("digit3") & 0x7f
+		local d2 = output_value("digit2") & 0x7f
+		local d3 = output_value("digit1") & 0x7f
+		local d4 = output_value("digit0") & 0x7f
+		interface.pv = digit_ascii(d1) .. digit_ascii(d2) ..digit_ascii(d3) .. digit_ascii(d4)
+		send_input(":KEY", 0x02, 0.3) -- INFO
+		d1 = output_value("digit3") & 0x7f
+		d2 = output_value("digit2") & 0x7f
+		d3 = output_value("digit1") & 0x7f
+		d4 = output_value("digit0") & 0x7f
+		interface.score = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4):gsub(" ","")
 		send_input(":KEY", 0x40, 0.3) -- ENTER
-		emu.wait(0.2)
-		local raw_depth = read_validated_display()
-		interface.depth = raw_depth:gsub(" ", "")
-		
-		emu.wait(0.05)
-		send_input(":KEY", 0x80, 0.3) -- CLEAR
-		
+		d2 = output_value("digit2") & 0x7f
+		d3 = output_value("digit1") & 0x7f
+		d4 = output_value("digit0") & 0x7f
+		interface.depth = digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4):gsub(" ","")
+		machine.video.throttled = throttled_state
 		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 	end
 end
@@ -268,6 +257,6 @@ function digit_ascii(digit)
 	end
 	return " "
 end
+--]]
 
 return interface
-

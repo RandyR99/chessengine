@@ -158,7 +158,7 @@ end
 function interface.is_selected(x, y)
 	-- the LEDs also light the square of a pawn captured en passant, the display shows only the move
 	local fx, fy, tx, ty = display_move()
-	if fx then
+	if fx and get_piece_id(fx, fy) ~= 0 then -- an empty from-square = the previous move still shown
 		return (x == fx and y == fy) or (x == tx and y == ty)
 	end
 	return output_value("led" .. (8 * (y - 1) + (x - 1))) ~= 0
