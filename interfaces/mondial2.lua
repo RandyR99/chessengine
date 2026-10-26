@@ -3,6 +3,12 @@ interface = {}
 interface.invert = false
 interface.level = 2
 interface.cur_level = nil
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	return "Mephisto Mondial II"
@@ -33,18 +39,9 @@ function interface.setlevel()
 	machine.video.throttled = false
 	send_input(":KEY.3", 0x02, 1) -- LEV
 	emu.wait(1)
-	
-	-- MODERNIZED: Converted old get_indexed_value method to safe device output proxies
-	local root = machine.devices[":"]
-	local check1_node = root:output(tostring(0) .. ".1")
-	local check2_node = root:output(tostring(0) .. ".2")
-	
-	local check1 = check1_node and check1_node:get() or 0
-	local check2 = check2_node and check2_node:get() or 0
-
-	if (interface.level >= 9) and check1 == 0 then
+	if (interface.level >= 9) and output_value("0.1") == 0 then
 		send_input(":KEY.3", 0x02, 1) -- LEV
-	elseif (interface.level <= 8) and check2 == 0 then
+	elseif (interface.level <= 8) and output_value("0.2") == 0 then
 		send_input(":KEY.3", 0x02, 1) -- LEV
 	end
 	emu.wait(1)
@@ -117,9 +114,9 @@ end
 
 function interface.edit_game(on)
 	if on then
-		send_input(":KEY.1", 0x04, 0.9) -- MEM
+		send_input(":KEY.2", 0x04, 0.9) -- MEM
 	else
-		send_input(":KEY.2", 0x04, 0.9) -- PLAY
+		send_input(":KEY.2", 0x01, 0.9) -- PLAY
 	end
 	emu.wait(0.5)
 end
@@ -137,15 +134,8 @@ function interface.is_selected(x, y)
 		x = 9 - x
 		y = 9 - y
 	end
-	
-	-- MODERNIZED: Upgraded prefix strings to standard sandboxed output formats
-	local root = machine.devices[":"]
-	local x_node = root:output(tostring(x - 1) .. ".1")
-	local y_node = root:output(tostring(y - 1) .. ".2")
-	
-	local xval = x_node and x_node:get() ~= 0 or false
-	local yval = y_node and y_node:get() ~= 0 or false
-	
+	local xval = output_value((x - 1) .. ".1") ~= 0
+	local yval = output_value((y - 1) .. ".2") ~= 0
 	return xval and yval
 end
 
@@ -175,17 +165,11 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion_led()
-	-- MODERNIZED & ADAPTED: Refactored driver targets into grid maps matching Mondial's platform update
-	local root = machine.devices[":"]
-	local l104 = root:output("4.0")
-	local l103 = root:output("3.0")
-	local l102 = root:output("2.0")
-	local l101 = root:output("1.0")
-
-	if     l104 and l104:get() ~= 0 then return 'q'
-	elseif l103 and l103:get() ~= 0 then return 'r'
-	elseif l102 and l102:get() ~= 0 then return 'b'
-	elseif l101 and l101:get() ~= 0 then return 'n'
+	-- piece LEDs above the keys: 1.0 knight .. 4.0 queen
+	if	   (output_value("4.0") ~= 0) then return 'q'
+	elseif (output_value("3.0") ~= 0) then return 'r'
+	elseif (output_value("2.0") ~= 0) then return 'b'
+	elseif (output_value("1.0") ~= 0) then return 'n'
 	end
 	return nil
 end
@@ -207,7 +191,7 @@ function interface.promote(x, y, piece)
 		y = 9 - y
 	end
 	sb_promote(":board", x, y, piece)
-	if	   (piece == "q") then send_input(":KEY.1", 0x02, 1)
+	if	   (piece == "q") then send_input(":KEY.1", 0x01, 1)
 	elseif (piece == "r") then send_input(":KEY.0", 0x08, 1)
 	elseif (piece == "b") then send_input(":KEY.0", 0x04, 1)
 	elseif (piece == "n") then send_input(":KEY.0", 0x02, 1)
@@ -217,4 +201,3 @@ function interface.promote(x, y, piece)
 end
 
 return interface
-
