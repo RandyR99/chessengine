@@ -40,6 +40,7 @@ local ply = "W"
 local piece_from = nil
 local piece_to = nil
 local prev_move = nil
+local moved_since_position = false -- the machine sent a bestmove after the last "position" command
 local scr = [[
   while true do
     _G.status = io.stdin:read("*line")
@@ -346,6 +347,7 @@ end
 
 local function send_move(move)
   prev_move = move
+  moved_since_position = true
   if (protocol == "xboard") then
     send_cmd("move " .. move)
   elseif (protocol == "uci") then
@@ -634,6 +636,10 @@ end
 local function execute_uci_command(cmd)
   local m
 
+  if cmd:match("^position ") ~= nil then
+    moved_since_position = false
+  end
+
   if cmd:match("^position fen ") ~= nil then
     if board == nil then
       board_reset()
@@ -759,6 +765,10 @@ local function execute_uci_command(cmd)
     end
     if editmode == -1 then
       editmode = 0
+      return
+    elseif interface.ignore_late_go and moved_since_position then
+      -- the machine answered the last position on its own before this 'go' arrived;
+      -- start_play would make it move again, for the other side
       return
     elseif game_started == false or my_color ~= ply then
       if interface.start_play then

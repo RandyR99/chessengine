@@ -1,4 +1,4 @@
-interface = load_interface("van16")
+interface = load_interface("port16")
 
 interface.level = "NORML 01"
 

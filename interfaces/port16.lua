@@ -8,8 +8,17 @@ function interface.get_author()
 	return "Richard Lang"
 end
 
-function interface.set_pos(mode)
+-- Portorose 1.01 can't use the Bavaria board (see modular.cpp): keep the magnet board
+-- and enter the pieces in SETUP > CHGBD (symbol via RIGHT/LEFT, colour via DOWN, then lift+replace)
+local function set_pos_magnets(mode)
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
 	if mode == 0 then
+		if (machine.ioport.ports[":FAKE"]:read() ~= 0x00) then
+			machine.ioport.ports[":FAKE"]:field(0x01):set_value(0)
+			machine:soft_reset()
+			emu.wait(1)
+		end
 		send_input(":KEY3", 0x0200, 0.5)	-- CL
 		send_input(":KEY3", 0x0200, 0.5)	-- CL
 		send_input(":KEY3", 0x0100, 0.5)	-- DOWN
@@ -18,122 +27,99 @@ function interface.set_pos(mode)
 		send_input(":KEY2", 0x0100, 0.5)	-- RIGHT
 		send_input(":KEY1", 0x0200, 0.5)	-- ENT
 		send_input(":KEY1", 0x0100, 0.5)	-- LEFT
+		machine.video.throttled = throttled_state
 		return (":board:board")
 	else
 		send_input(":KEY1", 0x0200, 0.5)	-- ENT
-		local piece=1
-		for y=1,8 do
-			for x=1,8 do
-				local p=get_piece_id(x,9-y)
-				if p~=0 then
-					if p*piece<0 then
-						send_input(":KEY3", 0x0100, 0.5)	-- DOWN
-					end
-					local n=math.abs(p)-math.abs(piece)
-					for i=1,math.abs(n) do
-						if n>0 then
-							send_input(":KEY2", 0x0100, 0.5)	-- RIGHT
-						else
-							send_input(":KEY1", 0x0100, 0.5)	-- LEFT
+		local ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram'])
+		-- selected symbol: 0x41 colour (0x0e white, 0x0f black), 0x42 piece (0x08 king .. 0x0d pawn)
+		local function select_colour(white)
+			for i = 1, 3 do
+				if ddram:read(0x41) == (white and 0x0e or 0x0f) then
+					return
+				end
+				send_input(":KEY3", 0x0100, 0.5)	-- DOWN
+			end
+		end
+		for y = 1, 8 do
+			for x = 1, 8 do
+				local p = get_piece_id(x, 9 - y)
+				if p ~= 0 then
+					-- lifting a piece changes the selected symbol, so select it while the piece is up
+					local square = machine.ioport.ports[":board:board:RANK." .. tostring(9 - y)]:field(1 << (x - 1))
+					sb_set_ui(":board:board", 0x0001, 1)
+					square:set_value(1)
+					emu.wait(1)	-- the machine shows the lifted square's symbol late; select after that
+					for tries = 1, 3 do
+						select_colour(p > 0)
+						for i = 1, 6 do
+							local n = 0x07 + math.abs(p) - ddram:read(0x42)
+							if n == 0 then
+								break
+							elseif n % 6 <= 3 then
+								send_input(":KEY2", 0x0100, 0.5)	-- RIGHT
+							else
+								send_input(":KEY1", 0x0100, 0.5)	-- LEFT
+							end
+						end
+						emu.wait(0.5)
+						if ddram:read(0x41) == (p > 0 and 0x0e or 0x0f) and ddram:read(0x42) == 0x07 + math.abs(p) then
+							break
 						end
 					end
-					sb_press_square(":board:board", 0.5, x, 9-y)
-					piece=p
+					square:set_value(0)
+					emu.wait(1)
+					sb_set_ui(":board:board", 0x0001, 0)
 				end
 			end
 		end
-		if mode*piece<0 then
+		select_colour(mode > 0)
+		send_input(":KEY3", 0x0200, 0.5)	-- CL
+		send_input(":KEY3", 0x0200, 0.5)	-- CL
+	end
+	machine.video.throttled = throttled_state
+end
+
+function interface.set_pos(mode)
+	if machine.system.name == "port16" then
+		return set_pos_magnets(mode)
+	end
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	if mode == 0 then
+		if (machine.ioport.ports[":FAKE"]:read() ~= 0x01) then
+			machine.ioport.ports[":FAKE"]:field(0x01):set_value(1)
+			machine:soft_reset()
+			emu.wait(1)
+		end
+		send_input(":KEY3", 0x0200, 0.5)	-- CL
+		send_input(":KEY3", 0x0200, 0.5)	-- CL
+		send_input(":KEY3", 0x0100, 0.5)	-- DOWN
+		send_input(":KEY3", 0x0100, 0.5)	-- DOWN
+		send_input(":KEY1", 0x0200, 0.5)	-- ENT
+		send_input(":KEY2", 0x0100, 0.5)	-- RIGHT
+		send_input(":KEY1", 0x0200, 0.5)	-- ENT
+		send_input(":KEY1", 0x0100, 0.5)	-- LEFT
+		machine.video.throttled = throttled_state
+		return (":board:board")
+	else
+		send_input(":KEY1", 0x0200, 0.5)	-- ENT
+		if mode == -1 then
 			send_input(":KEY3", 0x0100, 0.5)	-- DOWN
 		end
 		send_input(":KEY3", 0x0200, 0.5)	-- CL
 		send_input(":KEY3", 0x0200, 0.5)	-- CL
 	end
+	machine.video.throttled = throttled_state
 end
 
 function interface.stop_play()
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
 	send_input(":KEY3", 0x0200, 0.5)	-- CL
 	send_input(":KEY3", 0x0200, 0.5)	-- CL
 	send_input(":KEY1", 0x0200, 0.5)	-- ENT
-end
-
--- Helper function to read a specific range of characters from DDRAM
-function read_lcd_range(start_idx, end_idx)
-    local dev = machine.devices[':display:hd44780']
-    if not dev then return "" end
-    
-    local state_item = dev.items["0/m_ddram"]
-    if not state_item then return "" end
-    
-    local wrapped_mem = emu.item(state_item)
-    local str = ""
-    for i = start_idx, end_idx do
-        str = str .. string.char(wrapped_mem:read(i))
-    end
-    return str
-end
-
-function interface.show_info(on)
-	if on then
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
-		
-		-- 1. Reset any latent input states with an initial CL
-		send_input(":KEY3", 0x0200, 0.6) -- CL
-		emu.wait(0.2)
-		
-		-- 2. Execute your verified macro sequence to surface evaluation stats
-		send_input(":KEY2", 0x0100, 0.5) -- RIGHT
-		send_input(":KEY1", 0x0200, 0.6) -- ENT
-		send_input(":KEY3", 0x0100, 0.6) -- DOWN
-		send_input(":KEY3", 0x0100, 0.6) -- DOWN
-		
-		-- Pacing pause to let the emulated LCD redraw character registers completely
-		emu.wait(0.4)
-		
-		local ddram = read_lcd_range(0x00, 0x7F)
-		local info = nil
-		local score_field = ""
-
-		-- Explicitly check for opening book markers on the display
-		if ddram:sub(66, 69) == "THEO" or ddram:sub(2, 5) == "BOOK" then
-			info = "info score cp book"
-		else
-			-- Clean up numeric decimal formats (e.g. "+0.25") into clean centipawns
-			score_field = ddram:sub(65, 69):gsub("%.", "")
-			score_field = score_field:match("^([^/]+)") or score_field
-			score_field = score_field:gsub(" ", "")
-		end
-
-		local depth_field = ddram:sub(1, 2):gsub(" ", "")
-		local pv_field = string.lower(ddram:sub(70, 112))
-		
-		-- Clean up trailing branch ply markers or layout notations
-		pv_field = pv_field:gsub("=%d+/%d+", "")
-		
-		-- TRUNCATION FIX: Isolate strictly the first machine move from the PV layout data block
-		pv_field = pv_field:match("%s*(%S+)") or ""
-
-		-- Safety Filter: If menu letters like "CO" are caught mid-refresh, escape cleanly
-		if score_field:match("[A-Za-z]") or score_field:match("^%s*$") then
-			send_input(":KEY3", 0x0200, 0.6) -- CL
-			send_input(":KEY3", 0x0200, 0.6) -- CL
-			machine.video.throttled = throttled_state
-			return nil
-		end
-
-		-- Assemble standard UCI communication string if data layout is clean
-		if info == nil then
-			info = "info score cp " .. score_field .. " depth " .. depth_field .. " pv " .. pv_field
-		end
-		
-		-- 3. Symmetric Menu Unwinding: Clear twice to close info mode and restore the default view
-		emu.wait(0.2)
-		send_input(":KEY3", 0x0200, 0.6) -- CL
-		send_input(":KEY3", 0x0200, 0.6) -- CL
-		
-		machine.video.throttled = throttled_state
-		return info
-	end
+	machine.video.throttled = throttled_state
 end
 
 return interface
