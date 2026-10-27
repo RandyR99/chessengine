@@ -39,8 +39,14 @@ function interface.setup_machine()
 	interface.setlevel()
 end
 
+function interface.select_piece(x, y, event)
+	-- the 2.5 MHz main CPU polls the board slowly: a 1 s press without a pause sometimes lost the put of a capture
+	sb_select_piece(":board:board", 1.5, x, y, event)
+	emu.wait(1)
+end
+
 function interface.show_info(on)
-	if on then
+	if on and interface.searching_display() then -- from polgar.lua
 		local throttled_state = machine.video.throttled
 		machine.video.throttled = false
 		send_input(":KEY", 0x80, 0.2) -- CL

@@ -267,8 +267,22 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- show_info may press keys only while the machine searches: no move in the upper row ('E4-D3') and no board LED lit;
+-- CL/INFO while the machine shows its move or while the plugin executes it on the board can make the machine miss the move
+function interface.searching_display()
+	if read_lcd_range(0x00, 0x0f):match("^.[A-H][1-8][-x:][A-H][1-8]") then
+		return false
+	end
+	for i = 0, 63 do
+		if output_value("led" .. i) ~= 0 then
+			return false
+		end
+	end
+	return true
+end
+
 function interface.show_info(on)
-	if on then
+	if on and interface.searching_display() then
 		local throttled_state = machine.video.throttled
 		machine.video.throttled = false
 		send_input(":KEY", 0x80, 0.2) -- CL
