@@ -3,9 +3,15 @@ interface = {}
 interface.invert = false
 interface.level = "c2"
 interface.cur_level = nil
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 interface.score = "0.00"
 interface.depth = "0"
 interface.pv = ""
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	if machine.system.name == "smondial" then
@@ -131,22 +137,11 @@ function interface.is_selected(x, y)
 		x = 9 - x
 		y = 9 - y
 	end
-	
-	local root = machine.devices[":"]
-	local p1 = root:output("digit1")
-	local p5 = root:output("digit5")
-	local d1_val = p1 and p1:get() or 0
-	local d5_val = p5 and p5:get() or 0
-	
-	if (d1_val & 0x80 ~= 0 and d5_val & 0x80 ~= 0) then
+	if (output_value("digit1") & 0x80 ~= 0 and output_value("digit5") & 0x80 ~= 0) then
 		return false
 	end
-	
-	local x_node = root:output(tostring(x - 1) .. ".5")
-	local y_node = root:output(tostring(y - 1) .. ".3")
-	local xval = x_node and x_node:get() ~= 0 or false
-	local yval = y_node and y_node:get() ~= 0 or false
-	
+	local xval = output_value((x - 1) .. ".5") ~= 0
+	local yval = output_value((y - 1) .. ".3") ~= 0
 	return xval and yval
 end
 
@@ -172,29 +167,19 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local root = machine.devices[":"]
-	local p0 = root:output("digit0")
-	local p1 = root:output("digit1")
-	local p4 = root:output("digit4")
-	local p5 = root:output("digit5")
-	
-	local d0 = p0 and (p0:get() & 0x7f) or 0
-	local d1 = p1 and (p1:get() & 0x7f) or 0
-	local d4 = p4 and (p4:get() & 0x7f) or 0
-	local d5 = p5 and (p5:get() & 0x7f) or 0
-	
+	local d0 = output_value("digit0") & 0x7f
+	local d1 = output_value("digit1") & 0x7f
+	local d4 = output_value("digit4") & 0x7f
+	local d5 = output_value("digit5") & 0x7f
 	local d3 = nil
-	if (d0 == 0x73 and d1 == 0x50) then	-- upper display shows 'Pr'
-		local p3 = root:output("digit3")
-		d3 = p3 and (p3:get() & 0x7f) or 0
+	if (d0 == 0x73 and d1 == 0x50) then	-- UPper display shows 'Pr'
+		d3 = output_value("digit3") & 0x7f
 	end
 	if (d4 == 0x73 and d5 == 0x50) then	-- lower display shows 'Pr'
-		local p7 = root:output("digit7")
-		d3 = p7 and (p7:get() & 0x7f) or 0
+		d3 = output_value("digit7") & 0x7f
 	end
-	
-	if     (d3 == 0x5e) then return "q"
-	elseif (d3 == 0x78) then return "r"
+	if	   (d3 == 0x5e) then return "q"
+	elseif (d3 == 0x31) then return "r"
 	elseif (d3 == 0x38) then return "b"
 	elseif (d3 == 0x6d) then return "n"
 	end
@@ -207,7 +192,7 @@ function interface.promote(x, y, piece)
 		y = 9 - y
 	end
 	sb_promote(":board", x, y, piece)
-	if     (piece == "q") then send_input(":KEY.0", 0x02, 1)
+	if	   (piece == "q") then send_input(":KEY.0", 0x02, 1)
 	elseif (piece == "r") then send_input(":KEY.3", 0x01, 1)
 	elseif (piece == "b") then send_input(":KEY.2", 0x01, 1)
 	elseif (piece == "n") then send_input(":KEY.1", 0x01, 1)
@@ -216,107 +201,65 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- show_info disabled (as on montec, same display code): its INFO press can land just after the machine shows its move
+-- (before the move LEDs light) and hide it. To be redone in the show_info revisit.
+--[[
 function interface.show_info(on)
-	if not on then return nil end
-
-	local root = machine.devices[":"]
-
-	-- DUAL-GATED ESCAPE SCANNER: Abort instantly if any chessboard LED indicator is active
-	for x_idx = 0, 7 do
-		local x_node = root:output(tostring(x_idx) .. ".5")
-		if x_node and x_node:get() ~= 0 then return nil end
+	if on then
+		local throttled_state = machine.video.throttled
+		machine.video.throttled = false
+		send_input(":KEY.3", 0x04, 0.2) -- INFO
+		emu.wait(0.3)
+		local d1 = output_value("digit0")
+		local d2 = output_value("digit1")
+		local d3 = output_value("digit2")
+		local d4 = output_value("digit3")
+		local d5 = output_value("digit4")
+		local d6 = output_value("digit5")
+		local d7 = output_value("digit6")
+		local d8 = output_value("digit7")
+		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
+		send_input(":KEY.0", 0x01, 0.2) -- 1
+		emu.wait(0.3)
+		d1 = output_value("digit2")
+		d2 = output_value("digit3")
+		d3 = output_value("digit4")
+		d4 = output_value("digit5")
+		d5 = output_value("digit6")
+		d6 = output_value("digit7")
+		interface.depth = digit_ascii(d1) .. digit_ascii(d2)
+		interface.score = digit_ascii(d3) .. digit_ascii(d4) .. digit_ascii(d5) .. digit_ascii(d6)
+		send_input(":KEY.0", 0x08, 0.2) -- CLEAR
+		emu.wait(0.3)
+		machine.video.throttled = throttled_state
+		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 	end
-
-	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
-	send_input(":KEY.3", 0x04, 0.2) -- INFO
-	emu.wait(0.3)
-	
-	local p0 = root:output("digit0")
-	local p1 = root:output("digit1")
-	local p2 = root:output("digit2")
-	local p3 = root:output("digit3")
-	local p4 = root:output("digit4")
-	local p5 = root:output("digit5")
-	local p6 = root:output("digit6")
-	local p7 = root:output("digit7")
-
-	local d1 = p0 and p0:get() or 0
-	local d2 = p1 and p1:get() or 0
-	local d3 = p2 and p2:get() or 0
-	local d4 = p3 and p3:get() or 0
-	
-	interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-	
-	send_input(":KEY.0", 0x01, 0.2) -- 1
-	emu.wait(0.3)
-	
-	-- FIXED READ TARGETS: Extract Depth from Upper Row, Score entirely from Lower Row
-	local u2 = p2 and (p2:get() & 0x7f) or 0
-	local u3 = p3 and (p3:get() & 0x7f) or 0
-	
-	local l4 = p4 and (p4:get() & 0x7f) or 0
-	local l5 = p5 and (p5:get() & 0x7f) or 0
-	local l6 = p6 and (p6:get() & 0x7f) or 0
-	local l7 = p7 and (p7:get() & 0x7f) or 0
-	
-	-- Compile depth and clean up surrounding text whitespaces
-	interface.depth = (digit_ascii(u2) .. digit_ascii(u3)):gsub(" ", "")
-	if interface.depth == "" then interface.depth = "0" end
-	
-	-- Compile score float and strip decimal character out cleanly (e.g. ' 9.69' -> '969')
-	local raw_score = digit_ascii(l4) .. digit_ascii(l5) .. digit_ascii(l6) .. digit_ascii(l7)
-	local cleaned_score = raw_score:gsub(" ", ""):gsub("%.", "")
-	
-	if cleaned_score ~= "" and not cleaned_score:match("[a-h]%d") then
-		interface.score = cleaned_score
-	end
-	if interface.score == "" then interface.score = "0" end
-	
-	-- Post-gather scanner gate: Avoid a late clear command if a move was dropped mid-macro
-	for x_idx = 0, 7 do
-		local x_node = root:output(tostring(x_idx) .. ".5")
-		if x_node and x_node:get() ~= 0 then
-			machine.video.throttled = throttled_state
-			return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-		end
-	end
-
-	send_input(":KEY.0", 0x08, 0.2) -- CLEAR
-	emu.wait(0.1)
-	
-	machine.video.throttled = throttled_state
-	return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 end
+]]
 
 function digit_ascii(digit)
-	-- Filter out decimal point flags if bleeding into the segment bitmask byte value
-	local base_digit = digit & 0x7f
-	
-	if     base_digit == 0   then return " "
-	elseif base_digit == 64  then return "-"
-	elseif base_digit == 8   then return "_"
-	elseif base_digit == 63  then return "0"
-	elseif base_digit == 6   then return "1"
-	elseif base_digit == 91  then return "2"
-	elseif base_digit == 79  then return "3"
-	elseif base_digit == 102 then return "4"
-	elseif base_digit == 109 then return "5"
-	elseif base_digit == 125 then return "6"
-	elseif base_digit == 7   then return "7"
-	elseif base_digit == 127 then return "8"
-	elseif base_digit == 111 then return "9"
-	elseif base_digit == 119 then return "a"
-	elseif base_digit == 124 then return "b"
-	elseif base_digit == 57  then return "c"
-	elseif base_digit == 94  then return "d"
-	elseif base_digit == 121 then return "e"
-	elseif base_digit == 113 then return "f"
-	elseif base_digit == 61  then return "g"
+	if     digit == 0   then return " "
+	elseif digit == 64  then return "-"
+	elseif digit == 8   then return "_"
+	elseif digit == 63  then return "0"
+	elseif digit == 6   then return "1"
+	elseif digit == 91  then return "2"
+	elseif digit == 79  then return "3"
+	elseif digit == 102 then return "4"
+	elseif digit == 109 then return "5"
+	elseif digit == 125 then return "6"
+	elseif digit == 7   then return "7"
+	elseif digit == 127 then return "8"
+	elseif digit == 111 then return "9"
+	elseif digit == 119 then return "a"
+	elseif digit == 124 then return "b"
+	elseif digit == 57  then return "c"
+	elseif digit == 94  then return "d"
+	elseif digit == 121 then return "e"
+	elseif digit == 113 then return "f"
+	elseif digit == 61  then return "g"
 	elseif digit == 118 then return "h"
 	end
-	return " "
 end
 
 return interface
-
