@@ -2,10 +2,16 @@ interface = {}
 
 interface.level = "NORMAL 0:10"
 interface.cur_level = nil
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 interface.levelnum = 1
 interface.score = "0.00"
 interface.depth = "0"
 interface.pv = ""
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 -- Helper function to read a specific range of characters from DDRAM
 local function read_lcd_range(start_idx, end_idx)
@@ -178,12 +184,23 @@ function interface.start_play(init)
 	send_input(":KEY", 0x40, 1)
 end
 
+-- the machine's move as shown in the upper LCD row (' E4-D3'), nil if it shows something else
+local function display_move()
+	local row = read_lcd_range(0x00, 0x0f)
+	local f, r1, t, r2 = row:match("^ ([A-H])([1-8])[-x:]([A-H])([1-8])%s*$")
+	if f then
+		return f:byte() - 64, tonumber(r1), t:byte() - 64, tonumber(r2)
+	end
+	return nil
+end
+
 function interface.is_selected(x, y)
-	local led_idx = (y - 1) * 8 + (x - 1)
-	local led_name = "led" .. tostring(led_idx)
-	local led_state = machine.devices[":"]:output(led_name)
-	
-	return led_state and led_state:get() ~= 0
+	-- the 10 MHz versions light the captured pawn instead of the from-square for their own en passant; the display shows the move
+	local fx, fy, tx, ty = display_move()
+	if fx and get_piece_id(fx, fy) ~= 0 then -- an empty from-square = the move is already made (or the player's move is still shown)
+		return (x == fx and y == fy) or (x == tx and y == ty)
+	end
+	return output_value("led" .. ((y - 1) * 8 + (x - 1))) ~= 0
 end
 
 function interface.select_piece(x, y, event)
