@@ -4,9 +4,15 @@ function interface.get_module()
 	if machine.system.name == "academy" then
 		return "Mephisto Academy"
 	elseif machine.system.name == "academyg" then
-		return "Mephisto Academy (deutsch)"
+		return "Mephisto Academy (German v3)"
 	elseif machine.system.name == "academyga" then
-		return "Mephisto Academy (deutsch) v2"
+		return "Mephisto Academy (German v2)"
+	elseif machine.system.name == "academygb" then
+		return "Mephisto Academy (German v1)"
+	elseif machine.system.name == "academyd" then
+		return "Mephisto Academy (Dutch)"
+	elseif machine.system.name == "academytt" then
+		return "Mephisto Academy T+T"
 	else
 		return machine.system.description
 	end
