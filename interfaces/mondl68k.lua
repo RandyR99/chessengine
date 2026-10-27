@@ -2,6 +2,12 @@ interface = {}
 
 interface.level = "2"
 interface.cur_level = nil
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
 
 function interface.get_module()
 	return "Mephisto Mondial 68000 XL"
@@ -110,14 +116,8 @@ function interface.start_play(init)
 end
 
 function interface.is_selected(x, y)
-	-- MODERNIZED: Switched old get_indexed_value syntax to string container proxy lookups
-	local root = machine.devices[":"]
-	local x_node = root:output("0." .. tostring(x - 1))
-	local y_node = root:output("1." .. tostring(y - 1))
-	
-	local xval = x_node and x_node:get() ~= 0 or false
-	local yval = y_node and y_node:get() ~= 0 or false
-	
+	local xval = output_value("0." .. (x - 1)) ~= 0
+	local yval = output_value("1." .. (y - 1)) ~= 0
 	return xval and yval
 end
 
@@ -152,17 +152,9 @@ function interface.get_promotion(x, y)
 	send_input(":IN.2", 0x04, 0.5) -- INFO
 	send_input(":IN.0", 0x01, 0.5) -- 1
 	send_input(":IN.1", 0x04, 0.5) -- 0
-	
-	-- MODERNIZED: Updated unbuffered output values securely through modern proxies
-	local root = machine.devices[":"]
-	local p0 = root:output("digit0")
-	local p1 = root:output("digit1")
-	local p3 = root:output("digit3")
-	
-	local d0 = p0 and (p0:get() & 0x7f) or 0
-	local d1 = p1 and (p1:get() & 0x7f) or 0
-	local d3 = p3 and (p3:get() & 0x7f) or 0
-	
+	local d0 = output_value("digit0") & 0x7f
+	local d1 = output_value("digit1") & 0x7f
+	local d3 = output_value("digit3") & 0x7f
 	local piece = nil
 	if (d0 == 0x73 and d1 == 0x50) then	-- display shows 'Pr'
 		if	   (d3 == 0x5e) then piece = "q"
@@ -177,19 +169,17 @@ function interface.get_promotion(x, y)
 end
 
 function interface.promote(x, y, piece)
-	-- 1. Move the pawn on the virtual board layout
 	sb_promote(":board", x, y, piece)
-	
-	-- 2. Select the appropriate hardware key button based on piece type
-	if     (piece == "q" or piece == "Q") then send_input(":IN.1", 0x02, 0.5) -- Q
-	elseif (piece == "r" or piece == "R") then send_input(":IN.0", 0x02, 0.5) -- R
-	elseif (piece == "b" or piece == "B") then send_input(":IN.3", 0x01, 0.5) -- B
-	elseif (piece == "n" or piece == "N") then send_input(":IN.2", 0x01, 0.5) -- N
+	-- player promotion: display shows 'Pr -', piece key + ENT (a square press clears the choice)
+	if	   (piece == "q") then send_input(":IN.1", 0x02, 1)
+	elseif (piece == "r") then send_input(":IN.0", 0x02, 1)
+	elseif (piece == "b") then send_input(":IN.3", 0x01, 1)
+	elseif (piece == "n") then send_input(":IN.2", 0x01, 1)
+	else
+		sb_press_square(":board", 0.5, x, y)
+		return
 	end
-	
-	-- 3. Simulate the physical hand pressing the destination square on the sensor board
-	sb_press_square(":board", 0.5, x, y)
+	send_input(":IN.3", 0x08, 1) -- ENT
 end
 
 return interface
-
