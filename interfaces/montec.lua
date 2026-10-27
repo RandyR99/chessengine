@@ -3,9 +3,16 @@ interface = {}
 interface.invert = false
 interface.level = "c2"
 interface.cur_level = nil
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 interface.pv = ""
 interface.depth = "0"
 interface.score = "0.00"
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 
 function interface.get_module()
 	if machine.system.name == "montec" then
@@ -125,20 +132,14 @@ function interface.is_selected(x, y)
 		x = 9 - x
 		y = 9 - y
 	end
-	
-	local root = machine.devices[":"]
-	local p1 = root:output("digit1")
-	local p5 = root:output("digit5")
-	
-	local d1_val = p1 and p1:get() or 0
-	local d5_val = p5 and p5:get() or 0
+	local d1_val = output_value("digit1")
+	local d5_val = output_value("digit5")
 	
 	if (d1_val & 0x80 ~= 0 and d5_val & 0x80 ~= 0) then
 		return false
 	end
 	
-	local led_node = root:output("led" .. tostring((y - 1) * 8 + (x - 1)))
-	return led_node and led_node:get() ~= 0
+	return output_value("led" .. ((y - 1) * 8 + (x - 1))) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -163,25 +164,17 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local root = machine.devices[":"]
-	local p0 = root:output("digit0")
-	local p1 = root:output("digit1")
-	local p4 = root:output("digit4")
-	local p5 = root:output("digit5")
-	
-	local d0 = p0 and (p0:get() & 0x7f) or 0
-	local d1 = p1 and (p1:get() & 0x7f) or 0
-	local d4 = p4 and (p4:get() & 0x7f) or 0
-	local d5 = p5 and (p5:get() & 0x7f) or 0
+	local d0 = output_value("digit0") & 0x7f
+	local d1 = output_value("digit1") & 0x7f
+	local d4 = output_value("digit4") & 0x7f
+	local d5 = output_value("digit5") & 0x7f
 	
 	local d3 = nil
 	if (d0 == 0x73 and d1 == 0x50) then	-- upper display shows 'Pr'
-		local p3 = root:output("digit3")
-		d3 = p3 and (p3:get() & 0x7f) or 0
+		d3 = output_value("digit3") & 0x7f
 	end
 	if (d4 == 0x73 and d5 == 0x50) then	-- lower display shows 'Pr'
-		local p7 = root:output("digit7")
-		d3 = p7 and (p7:get() & 0x7f) or 0
+		d3 = output_value("digit7") & 0x7f
 	end
 	
 	if     (d3 == 0x5e) then return "q"
@@ -205,17 +198,22 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- show_info disabled: its INFO press can land a few ms after the machine shows its move (before the move LEDs light);
+-- the machine then drops the move display, takes the move as played and starts the player's clock -> the plugin never sees it.
+-- To be redone in the show_info revisit (only press keys while the machine's own display shows it is still searching).
+--[[
 function interface.show_info(on)
 	if not on then return nil end
 
-	local root = machine.devices[":"]
-
 	-- ESCAPE GATE: Scan the 64-square LED grid. If any LED is lit, abort immediately!
 	for idx = 0, 63 do
-		local led_check = root:output("led" .. tostring(idx))
-		if led_check and led_check:get() ~= 0 then
+		if output_value("led" .. idx) ~= 0 then
 			return nil -- Abort to protect the promotion sequence
 		end
+	end
+	-- only while both displays show the clocks: a just-found move is on the display before its LEDs light up, and INFO would hide it
+	if (output_value("digit1") & 0x80 == 0 or output_value("digit5") & 0x80 == 0) then
+		return nil
 	end
 
 	local throttled_state = machine.video.throttled
@@ -223,54 +221,38 @@ function interface.show_info(on)
 	send_input(":KEY.0", 0x08, 0.3) -- INFO
 	emu.wait(0.2)
 	
-	local p0 = root:output("digit0")
-	local p1 = root:output("digit1")
-	local p2 = root:output("digit2")
-	local p3 = root:output("digit3")
-	local p4 = root:output("digit4")
-	local p5 = root:output("digit5")
-	local p6 = root:output("digit6")
-	local p7 = root:output("digit7")
-	
-	local d1 = p0 and (p0:get() & 0x7f) or 0
-	local d2 = p1 and (p1:get() & 0x7f) or 0
-	local d3 = p2 and (p2:get() & 0x7f) or 0
-	local d4 = p3 and (p3:get() & 0x7f) or 0
-	local d5 = p4 and (p4:get() & 0x7f) or 0
-	local d6 = p5 and (p5:get() or 0)
-	local d7 = p6 and (p6:get() or 0)
-	local d8 = p7 and (p7:get() or 0)
+	local d1 = output_value("digit0") & 0x7f
+	local d2 = output_value("digit1") & 0x7f
+	local d3 = output_value("digit2") & 0x7f
+	local d4 = output_value("digit3") & 0x7f
+	local d5 = output_value("digit4") & 0x7f
+	local d6 = output_value("digit5") & 0x7f
+	local d7 = output_value("digit6") & 0x7f
+	local d8 = output_value("digit7") & 0x7f
 	
 	interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
 	
 	send_input(":KEY.1", 0x01, 0.3) -- 1
 	emu.wait(0.2)
 	
-	d1 = p2 and (p2:get() & 0x7f) or 0
-	d2 = p3 and (p3:get() & 0x7f) or 0
-	d3 = p4 and (p4:get() & 0x7f) or 0
-	d4 = p5 and (p5:get() & 0x7f) or 0
-	d5 = p6 and (p6:get() & 0x7f) or 0
-	d6 = p7 and (p7:get() & 0x7f) or 0
+	d1 = output_value("digit2") & 0x7f
+	d2 = output_value("digit3") & 0x7f
+	d3 = output_value("digit4") & 0x7f
+	d4 = output_value("digit5") & 0x7f
+	d5 = output_value("digit6") & 0x7f
+	d6 = output_value("digit7") & 0x7f
 	
 	interface.depth = digit_ascii(d1) .. digit_ascii(d2):gsub(" ","")
 	interface.score = digit_ascii(d3) .. digit_ascii(d4) .. digit_ascii(d5) .. digit_ascii(d6):gsub(" ","")
 	
-	-- Post-gather intercept check to prevent a late CL clear from trampling a move found mid-cycle
-	for idx = 0, 63 do
-		local led_check = root:output("led" .. tostring(idx))
-		if led_check and led_check:get() ~= 0 then
-			machine.video.throttled = throttled_state
-			return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-		end
-	end
-
+	-- always back to the clocks: leaving the INFO screen up hides a move found meanwhile from is_selected
 	send_input(":KEY.0", 0x10, 0.2) -- CL
 	emu.wait(0.05)
 	
 	machine.video.throttled = throttled_state
 	return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 end
+]]
 
 function digit_ascii(digit)
 	if     digit == 0   then return " "

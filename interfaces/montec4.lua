@@ -3,9 +3,16 @@ interface = {}
 interface.invert = false
 interface.level = "a2"
 interface.cur_level = nil
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 interface.pv = ""
 interface.depth = "0"
 interface.score = "0.00"
+
+local function output_value(name)
+	local out = machine.devices[":"]:output(name)
+	return out ~= nil and out:get() or 0
+end
+
 
 function interface.get_module()
 	if machine.system.name == "montec4" then
@@ -71,15 +78,12 @@ function interface.set_pos(mode)
 				if p ~= 0 then
 					local target_type = math.abs(p)
 					local target_color = (p > 0) and 1 or -1
-					
 					-- Key mask layout map: Pawn=0x01, Knight=0x02, Bishop=0x04, Rook=0x08, Queen=0x10, King=0x20
 					local key_mask = 0x01 << (6 - target_type)
-					
 					if brush_type ~= target_type then
 						-- Switch brush type. The computer maintains the PREVIOUS brush color!
 						send_input(":KEY.1", key_mask, 0.5)
 						brush_type = target_type
-						
 						-- Check if the retained brush color matches our target color
 						if brush_color ~= target_color then
 							send_input(":KEY.1", key_mask, 0.5) -- Double tap to toggle color state
@@ -92,7 +96,6 @@ function interface.set_pos(mode)
 							brush_color = target_color
 						end
 					end
-					
 					-- Commit the verified piece onto the sensor board square grid
 					sb_press_square(":board:board", 0.5, x, 9 - y)
 				end
@@ -100,14 +103,11 @@ function interface.set_pos(mode)
 		end
 		
 		-- 3. VERIFY ACTIVE SIDE TO MOVE USING REALS OVER HARDWARE INDICATOR LEDS (3.3 vs 2.3)
-		local root = machine.devices[":"]
 		emu.wait(0.2) -- Let the hardware outputs settle from the final piece press
 		
 		local target_matched = false
-		local white_led = root:output("3.3")
-		local black_led = root:output("2.3")
-		local white_is_green = white_led and white_led:get() ~= 0 or false
-		local black_is_green = black_led and black_led:get() ~= 0 or false
+		local white_is_green = output_value("3.3") ~= 0
+		local black_is_green = output_value("2.3") ~= 0
 		
 		if mode == 1 and white_is_green then
 			target_matched = true
@@ -119,15 +119,12 @@ function interface.set_pos(mode)
 		if not target_matched then
 			send_input(":KEY.1", 0x01, 0.5) -- Taps Pawn (0x01) to cycle color register
 			emu.wait(0.3)
-			
-			white_is_green = white_led and white_led:get() ~= 0 or false
-			black_is_green = black_led and black_led:get() ~= 0 or false
-			
+			white_is_green = output_value("3.3") ~= 0
+			black_is_green = output_value("2.3") ~= 0
 			local check_match = false
 			if mode == 1 and white_is_green then check_match = true
 			elseif mode == -1 and black_is_green then check_match = true
 			end
-			
 			-- Tap a second time if the first cycle command didn't register a clean flip
 			if not check_match then
 				send_input(":KEY.1", 0x01, 0.5)
@@ -164,20 +161,14 @@ function interface.is_selected(x, y)
 		x = 9 - x
 		y = 9 - y
 	end
-	
-	local root = machine.devices[":"]
-	local p1 = root:output("digit1")
-	local p5 = root:output("digit5")
-	
-	local d1_val = p1 and p1:get() or 0
-	local d5_val = p5 and p5:get() or 0
+	local d1_val = output_value("digit1")
+	local d5_val = output_value("digit5")
 	
 	if (d1_val & 0x80 ~= 0 and d5_val & 0x80 ~= 0) then
 		return false
 	end
 	
-	local led_node = root:output("led" .. tostring((y - 1) * 8 + (x - 1)))
-	return led_node and led_node:get() ~= 0
+	return output_value("led" .. ((y - 1) * 8 + (x - 1))) ~= 0
 end
 
 function interface.select_piece(x, y, event)
@@ -203,30 +194,20 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	local root = machine.devices[":"]
-	local p0 = root:output("digit0")
-	local p1 = root:output("digit1")
-	local p4 = root:output("digit4")
-	local p5 = root:output("digit5")
-	
-	local d0 = p0 and (p0:get() & 0x7f) or 0
-	local d1 = p1 and (p1:get() & 0x7f) or 0
-	local d4 = p4 and (p4:get() & 0x7f) or 0
-	local d5 = p5 and (p5:get() & 0x7f) or 0
+	local d0 = output_value("digit0") & 0x7f
+	local d1 = output_value("digit1") & 0x7f
+	local d4 = output_value("digit4") & 0x7f
+	local d5 = output_value("digit5") & 0x7f
 	
 	local d2_val, d3_val = 0, 0
 	
 	-- Scan both potential data slots on Upper and Lower displays for 'Pr'
 	if (d0 == 0x73 and d1 == 0x50) then	-- upper display shows 'Pr'
-		local p2 = root:output("digit2")
-		local p3 = root:output("digit3")
-		d2_val = p2 and (p2:get() & 0x7f) or 0
-		d3_val = p3 and (p3:get() & 0x7f) or 0
+		d2_val = output_value("digit2") & 0x7f
+		d3_val = output_value("digit3") & 0x7f
 	elseif (d4 == 0x73 and d5 == 0x50) then	-- lower display shows 'Pr'
-		local p6 = root:output("digit6")
-		local p7 = root:output("digit7")
-		d2_val = p6 and (p6:get() & 0x7f) or 0
-		d3_val = p7 and (p7:get() & 0x7f) or 0
+		d2_val = output_value("digit6") & 0x7f
+		d3_val = output_value("digit7") & 0x7f
 	end
 	
 	-- We look for the active character drawn on the secondary digit positions
@@ -255,16 +236,22 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- show_info disabled: its INFO press can land a few ms after the machine shows its move (before the move LEDs light);
+-- the machine then drops the move display, takes the move as played and starts the player's clock -> the plugin never sees it.
+-- To be redone in the show_info revisit (only press keys while the machine's own display shows it is still searching).
+--[[
 function interface.show_info(on)
 	if on then
-		local root = machine.devices[":"]
 
 		-- DUAL-GATED ESCAPE SCANNER: Abort instantly if any chessboard LED is lit to protect moves
 		for idx = 0, 63 do
-			local led_check = root:output("led" .. tostring(idx))
-			if led_check and led_check:get() ~= 0 then
+			if output_value("led" .. idx) ~= 0 then
 				return nil
 			end
+		end
+		-- only while both displays show the clocks: a just-found move is on the display before its LEDs light up, and INFO would hide it
+		if (output_value("digit1") & 0x80 == 0 or output_value("digit5") & 0x80 == 0) then
+			return nil
 		end
 
 		local throttled_state = machine.video.throttled
@@ -272,46 +259,30 @@ function interface.show_info(on)
 		send_input(":KEY.0", 0x08, 0.2) -- INFO
 		emu.wait(0.1)
 		
-		local p0 = root:output("digit0")
-		local p1 = root:output("digit1")
-		local p2 = root:output("digit2")
-		local p3 = root:output("digit3")
-		local p4 = root:output("digit4")
-		local p5 = root:output("digit5")
-		local p6 = root:output("digit6")
-		local p7 = root:output("digit7")
-		
-		local d1 = p0 and (p0:get() & 0x7f) or 0
-		local d2 = p1 and (p1:get() & 0x7f) or 0
-		local d3 = p2 and (p2:get() & 0x7f) or 0
-		local d4 = p3 and (p3:get() & 0x7f) or 0
-		local d5 = p4 and (p4:get() & 0x7f) or 0
-		local d6 = p5 and (p5:get() & 0x7f) or 0
-		local d7 = p6 and (p6:get() & 0x7f) or 0
-		local d8 = p7 and (p7:get() & 0x7f) or 0
+		local d1 = output_value("digit0") & 0x7f
+		local d2 = output_value("digit1") & 0x7f
+		local d3 = output_value("digit2") & 0x7f
+		local d4 = output_value("digit3") & 0x7f
+		local d5 = output_value("digit4") & 0x7f
+		local d6 = output_value("digit5") & 0x7f
+		local d7 = output_value("digit6") & 0x7f
+		local d8 = output_value("digit7") & 0x7f
 		
 		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
 		send_input(":KEY.1", 0x01, 0.2) -- 1
 		emu.wait(0.1)
 		
-		d1 = p2 and (p2:get() & 0x7f) or 0
-		d2 = p3 and (p3:get() & 0x7f) or 0
-		d3 = p4 and (p4:get() & 0x7f) or 0
-		d4 = p5 and (p5:get() & 0x7f) or 0
-		d5 = p6 and (p6:get() & 0x7f) or 0
-		d6 = p7 and (p7:get() & 0x7f) or 0
+		d1 = output_value("digit2") & 0x7f
+		d2 = output_value("digit3") & 0x7f
+		d3 = output_value("digit4") & 0x7f
+		d4 = output_value("digit5") & 0x7f
+		d5 = output_value("digit6") & 0x7f
+		d6 = output_value("digit7") & 0x7f
 		
 		interface.depth = digit_ascii(d1) .. digit_ascii(d2):gsub(" ","")
 		interface.score = digit_ascii(d3) .. digit_ascii(d4) .. digit_ascii(d5) .. digit_ascii(d6):gsub(" ","")
 		
-		for idx = 0, 63 do
-			local led_check = root:output("led" .. tostring(idx))
-			if led_check and led_check:get() ~= 0 then
-				machine.video.throttled = throttled_state
-				return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-			end
-		end
-
+		-- always back to the clocks: leaving the INFO screen up hides a move found meanwhile from is_selected
 		send_input(":KEY.0", 0x10, 0.2) -- CL
 		emu.wait(0.05)
 
@@ -319,6 +290,7 @@ function interface.show_info(on)
 		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 	end
 end
+]]
 
 function digit_ascii(digit)
 	if     digit == 0   then return " "
