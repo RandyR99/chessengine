@@ -149,12 +149,14 @@ local function display_move()
 end
 
 function interface.is_selected(x, y)
-	-- the display keeps showing the previous move while the machine thinks: its from-square is empty now
+	-- the move must be on the display and on the row/column LEDs: the INFO display (show_info) lights no LEDs.
+	-- The display keeps showing the previous move while the machine thinks: its from-square is empty now
+	local led = output_value("1." .. (x - 1)) ~= 0 and output_value("2." .. (y - 1)) ~= 0
 	local fx, fy, tx, ty = display_move()
 	if fx and get_piece_id(fx, fy) ~= 0 then
-		return (x == fx and y == fy) or (x == tx and y == ty)
+		return ((x == fx and y == fy) or (x == tx and y == ty)) and led
 	end
-	return output_value("1." .. (x - 1)) ~= 0 and output_value("2." .. (y - 1)) ~= 0
+	return led
 end
 
 function interface.select_piece(x, y, event)
@@ -201,62 +203,63 @@ function interface.promote(x, y, piece)
 	end
 end
 
--- show_info disabled: it presses CLEAR/INFO/ENTER while the machine thinks; the INFO display (main line)
--- was then taken for the machine's move and the machine ignored the board presses (stalls, reversed moves).
--- To be redone in the show_info revisit.
---[[
-function interface.show_info(on)
-	if on then
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
-		send_input(":KEY", 0x80, 0.3) -- CLEAR
-		send_input(":KEY", 0x02, 0.3) -- INFO
-		local d1 = output_value("digit3") & 0x7f
-		local d2 = output_value("digit2") & 0x7f
-		local d3 = output_value("digit1") & 0x7f
-		local d4 = output_value("digit0") & 0x7f
-		interface.pv = digit_ascii(d1) .. digit_ascii(d2) ..digit_ascii(d3) .. digit_ascii(d4)
-		send_input(":KEY", 0x02, 0.3) -- INFO
-		d1 = output_value("digit3") & 0x7f
-		d2 = output_value("digit2") & 0x7f
-		d3 = output_value("digit1") & 0x7f
-		d4 = output_value("digit0") & 0x7f
-		interface.score = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4):gsub(" ","")
-		send_input(":KEY", 0x40, 0.3) -- ENTER
-		d2 = output_value("digit2") & 0x7f
-		d3 = output_value("digit1") & 0x7f
-		d4 = output_value("digit0") & 0x7f
-		interface.depth = digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4):gsub(" ","")
-		machine.video.throttled = throttled_state
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
+local function any_led()
+	for i = 0, 7 do
+		if output_value("1." .. i) ~= 0 or output_value("2." .. i) ~= 0 then
+			return true
+		end
 	end
+	return false
 end
 
-function digit_ascii(digit)
-	if     digit == 0   then return " "
-	elseif digit == 64  then return "-"
-	elseif digit == 8   then return "_"
-	elseif digit == 63  then return "0"
-	elseif digit == 6   then return "1"
-	elseif digit == 91  then return "2"
-	elseif digit == 79  then return "3"
-	elseif digit == 102 then return "4"
-	elseif digit == 109 then return "5"
-	elseif digit == 125 then return "6"
-	elseif digit == 7   then return "7"
-	elseif digit == 127 then return "8"
-	elseif digit == 111 then return "9"
-	elseif digit == 119 then return "a"
-	elseif digit == 124 then return "b"
-	elseif digit == 57  then return "c"
-	elseif digit == 94  then return "d"
-	elseif digit == 121 then return "e"
-	elseif digit == 113 then return "f"
-	elseif digit == 61  then return "g"
-	elseif digit == 118 then return "h"
-	end
-	return " "
+local function digit_ascii(digit)
+	local chars = { [0x00]=" ", [0x40]="-", [0x3f]="0", [0x06]="1", [0x5b]="2", [0x4f]="3", [0x66]="4", [0x6d]="5",
+		[0x7d]="6", [0x07]="7", [0x7f]="8", [0x6f]="9", [0x77]="a", [0x7c]="b", [0x39]="c", [0x5e]="d", [0x79]="e",
+		[0x71]="f", [0x3d]="g", [0x76]="h" }
+	return chars[digit & 0x7f] or "?"
 end
---]]
+
+local function display_text()
+	return digit_ascii(output_value("digit3")) .. digit_ascii(output_value("digit2")) .. digit_ascii(output_value("digit1")) .. digit_ascii(output_value("digit0"))
+end
+
+-- the INFO displays blink: read until something is shown
+local function read_display()
+	local text = display_text()
+	for i = 1, 10 do
+		if text:match("%S") then
+			break
+		end
+		emu.wait(0.1)
+		text = display_text()
+	end
+	return text
+end
+
+-- manual 6.1/6.2: INFO = main line (first move), INFO again = evaluation ('-1.50'), ENTER = depth ('d  6'), CLEAR = clock.
+-- Keys only while the machine thinks and no LED is lit (a lit LED = its move is shown or being executed on the board);
+-- 1 s presses: the 6502 scans the keys slowly
+function interface.show_info(on)
+	if not on or any_led() then
+		return nil
+	end
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	send_input(":KEY", 0x02, 1) -- INFO
+	local pv = read_display()
+	send_input(":KEY", 0x02, 1) -- INFO
+	local score = read_display():gsub(" ", "")
+	send_input(":KEY", 0x40, 1) -- ENTER
+	local depth = read_display()
+	send_input(":KEY", 0x80, 1) -- CLEAR
+	machine.video.throttled = throttled_state
+	if not pv:match("^[a-h][1-8][a-h][1-8]$") or not score:match("^%-?%d+$") or not depth:match("^d") then
+		return nil
+	end
+	interface.pv = pv
+	interface.score = tostring(tonumber(score))
+	interface.depth = tostring(tonumber((depth:sub(2):gsub("[^%d]", ""))) or 0)
+	return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
+end
 
 return interface
