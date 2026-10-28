@@ -109,10 +109,12 @@ function interface.is_selected(x, y)
 	local d6 = output_value("digit6") & 0x7f
 	local d5 = output_value("digit5") & 0x7f
 	local d4 = output_value("digit4") & 0x7f
+	-- the move must be on the display and on the square LED: the Show Move display (show_info) lights no LEDs
+	local led = output_value((x - 1) .. "." .. (y - 1)) ~= 0
 	if (d7 == 0x73) then -- promotion
-		return output_value((x - 1) .. "." .. (y - 1)) ~= 0
+		return led
 	else
-		return (xval[x] == d7 and yval[y] == d6) or (xval[x] == d5 and yval[y] == d4)
+		return ((xval[x] == d7 and yval[y] == d6) or (xval[x] == d5 and yval[y] == d4)) and led
 	end
 end
 
@@ -173,37 +175,47 @@ function interface.promote(x, y, piece)
 	end
 end
 
-function interface.show_info(on)
-	if on and Ticker == 1 then
-		local pv
-		local score
-		local depth
-		if output_value("digit7") ~= 0x73 then
-			send_input(":IN.0", 0x80, 0.2) -- Show Move
-			emu.wait(0.2)
-			local d3 = output_value("digit0")
-			local d2 = output_value("digit1")
-			local d1 = output_value("digit2")
-			local d0 = output_value("digit3")
-			local d7 = output_value("digit4")
-			local d6 = output_value("digit5")
-			local d5 = output_value("digit6")
-			local d4 = output_value("digit7")
-			Ticker = 0
-			pv = digit_ascii(d4) .. digit_ascii(d5) .. digit_ascii(d6) .. digit_ascii(d7)
-			score = digit_ascii(d0) .. digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3)
-			send_input(":IN.2", 0x04, 0.2) -- 3
-			emu.wait(0.2)
-			d3 = output_value("digit0")
-			d2 = output_value("digit1")
-			d1 = output_value("digit2")
-			d0 = output_value("digit3")
-			if output_value("digit7") ~= 0x73 then
-				send_input(":IN.0", 0x80, 0.2) -- Show Move
-				depth = digit_ascii(d2) .. digit_ascii(d3)
+local function any_led()
+	for x = 0, 7 do
+		for y = 0, 7 do
+			if output_value(x .. "." .. y) ~= 0 then
+				return true
 			end
-			return "info score cp " .. score .. " depth " .. depth .. " pv " .. pv
 		end
+	end
+	return false
+end
+
+local function display_text(first, last)
+	local text = ""
+	for i = first, last, -1 do
+		text = text .. digit_ascii(output_value("digit" .. i))
+	end
+	return text
+end
+
+-- manual 19: SHOW MOVE = best move (left display) + evaluation (right, '-1.50'), bishop key = depth ('SD 05'),
+-- SHOW MOVE again = clocks. Keys only while the machine thinks and no LED is lit (a lit LED = its move is shown
+-- or being executed on the board)
+function interface.show_info(on)
+	if on and Ticker == 1 and not any_led() then
+		Ticker = 0
+		local throttled_state = machine.video.throttled
+		machine.video.throttled = false
+		send_input(":IN.0", 0x80, 0.5) -- Show Move
+		local pv = display_text(7, 4)
+		local score = display_text(3, 0):gsub(" ", "")
+		send_input(":IN.2", 0x04, 0.5) -- Bishop: depth
+		local depth = display_text(3, 0)
+		send_input(":IN.0", 0x80, 0.5) -- Show Move
+		machine.video.throttled = throttled_state
+		if not pv:match("^[a-h][1-8][a-h][1-8]$") or not score:match("^%-?%d+$") or not depth:match("%d%d$") then
+			return nil
+		end
+		interface.pv = pv
+		interface.score = tostring(tonumber(score))
+		interface.depth = tostring(tonumber(depth:sub(3)))
+		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 	else
 		Ticker = 1
 	end
