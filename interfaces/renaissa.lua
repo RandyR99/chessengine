@@ -189,6 +189,15 @@ function interface.is_selected(x, y)
 	local d2 = getdigit(2)
 	local d3 = getdigit(3)
 	local d4 = getdigit(4)
+	-- the move must be on the display and on the square's 4 corner LEDs (CB-Emu 2026 update: the machine's
+	-- info displays light no LEDs). The LEDs follow the physical board, which start_play may have rotated
+	local px, py = x, y
+	if interface.invert then
+		px = 9 - x
+		py = 9 - y
+	end
+	local led = output_value((px - 1) .. "." .. py) ~= 0 and output_value((px - 1) .. "." .. (py - 1)) ~= 0
+		and output_value(px .. "." .. py) ~= 0 and output_value(px .. "." .. (py - 1)) ~= 0
 	if (d1 == 0x04 and interface.opt_clear_announcements) then
 		emu.wait(1.5)
 		send_input(":IN.6", 0x02, 1) -- Normal
@@ -210,7 +219,7 @@ function interface.is_selected(x, y)
 			d4 = 0x06
 		end
 	end
-	return (xval[x] == d1 and yval[y] == d2) or (xval[x] == d3 and yval[y] == d4)
+	return ((xval[x] == d1 and yval[y] == d2) or (xval[x] == d3 and yval[y] == d4)) and led
 end
 
 function interface.select_piece(x, y, event)
