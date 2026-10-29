@@ -204,6 +204,8 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
+	-- only called for the machine's moves
+	interface.machine_promotion = true
 	if     (output_value("8.5") ~= 0) or (output_value("9.5") ~= 0) then return 'q'
 	elseif (output_value("8.4") ~= 0) or (output_value("9.4") ~= 0) then return 'r'
 	elseif (output_value("8.6") ~= 0) or (output_value("9.6") ~= 0) then return 'b'
@@ -226,6 +228,15 @@ function interface.promote(x, y, piece)
 		y = 9 - y
 	end
 	sb_promote(":board", x, y, piece)
+	-- v1.0/v1.2 (leonardob/leonardoa) keep their own promotion open (Black/White light and piece light stay on):
+	-- lift the new piece, press Normal, put it back
+	if interface.machine_promotion and (machine.system.name == "leonardoa" or machine.system.name == "leonardob") then
+		emu.wait(0.5)
+		sb_select_piece(":board", 1, x, y, "get")
+		send_input(":IN.6", 0x02, 1) -- Normal
+		sb_select_piece(":board", 1, x, y, "put")
+	end
+	interface.machine_promotion = false
 end
 
 return interface
