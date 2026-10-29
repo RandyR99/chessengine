@@ -1,4 +1,5 @@
 local interface = {}
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 local module = machine.images[':cartslot'].filename
 interface.level = 1

@@ -1,4 +1,5 @@
 interface = {}
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 if ioport.ports[":IN.3"]:read() & 0x01 ~= 0 then -- Program switch: 2265
 	return load_interface("feagv4")
