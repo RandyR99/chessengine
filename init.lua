@@ -42,6 +42,9 @@ local piece_to = nil
 local prev_move = nil
 local moved_since_position = false -- the machine sent a bestmove after the last "position" command
 local game_over_sent = false -- "bestmove 0000" was sent for the machine's resignation or draw claim
+local pos_count = {}         -- occurrences of each position (board + side to move) in this game, for threefold repetition
+local turn_since = nil       -- emulated time when the machine's current turn began
+local max_think = 0          -- the machine's longest move in this game (emulated seconds)
 local scr = [[
   while true do
     _G.status = io.stdin:read("*line")
@@ -86,6 +89,8 @@ local function board_reset()
   piece_from = nil
   piece_to = nil
   prev_move = nil
+  pos_count = {}
+  max_think = 0
   manager.machine.video.frameskip = frskip
 
   board = {{ 3, 5, 4, 2, 1, 4, 5, 3 },
@@ -117,6 +122,8 @@ local function board_clear()
   piece_from = nil
   piece_to = nil
   prev_move = nil
+  pos_count = {}
+  max_think = 0
 
   board = {{ 0, 0, 0, 0, 0, 0, 0, 0 },
     {  0, 0, 0, 0, 0, 0, 0, 0 },
@@ -347,6 +354,9 @@ local function send_cmd(cmd)
 end
 
 local function send_move(move)
+  if turn_since then
+    max_think = math.max(max_think, manager.machine.time:as_double() - turn_since)
+  end
   prev_move = move
   moved_since_position = true
   if (protocol == "xboard") then
@@ -363,7 +373,58 @@ local function send_move(move)
   end
 end
 
+local function position_key()
+  local k = ply
+  for y = 1, 8 do
+    for x = 1, 8 do
+      k = k .. "," .. board[y][x]
+    end
+  end
+  return k
+end
+
+-- a position seen twice with the other side to move is one move of the machine away: the machine may claim
+-- the threefold repetition before making that move (the two boards differ on exactly a from and a to square)
+local function repetition_by_move()
+  local cur = {}
+  for y = 1, 8 do
+    for x = 1, 8 do
+      cur[#cur + 1] = board[y][x]
+    end
+  end
+  for k, c in pairs(pos_count) do
+    if c >= 2 and k:sub(1, 1) ~= ply then
+      local other, diff = {}, {}
+      for v in k:gmatch(",(-?%d+)") do
+        other[#other + 1] = tonumber(v)
+      end
+      for i = 1, 64 do
+        if cur[i] ~= other[i] then
+          diff[#diff + 1] = i
+          if #diff > 2 then break end
+        end
+      end
+      if #diff == 2 then
+        local a, b = diff[1], diff[2]
+        if (cur[a] ~= 0 and other[a] == 0 and cur[b] == 0 and other[b] == cur[a]) or
+           (cur[b] ~= 0 and other[b] == 0 and cur[a] == 0 and other[a] == cur[b]) then
+          return true
+        end
+      end
+    end
+  end
+  return false
+end
+
+local function count_position()
+  local k = position_key()
+  pos_count[k] = (pos_count[k] or 0) + 1
+end
+
 local function make_move(move, reason, promotion)
+  if reason ~= "_castling" and next(pos_count) == nil then
+    count_position() -- the start position of this game
+  end
   local from = move_to_pos(move:sub(1, 2))
   local to = move_to_pos(move:sub(3, 4))
 
@@ -420,6 +481,10 @@ local function make_move(move, reason, promotion)
   -- promotion
   if (move:len() >= 5) then
     promote_pawn(to, move:sub(move:len()), promotion)
+  end
+
+  if reason ~= "_castling" then
+    count_position()
   end
 end
 
@@ -910,6 +975,9 @@ local function update()
 
   -- search for a new move
   if ply == my_color then
+    if not turn_since then
+      turn_since = manager.machine.time:as_double()
+    end
     search_selected_piece()
     -- the machine resigned or claimed a draw (interface.game_over() reads its display or LEDs):
     -- "bestmove 0000" lets the GUI end the game
@@ -919,6 +987,16 @@ local function update()
         send_cmd("bestmove 0000")
       end
     end
+    -- threefold repetition: many machines claim it silently and stop; once the machine has been quiet for
+    -- twice its longest move of the game (at least 30 s), "bestmove 0000" lets the GUI end the game as a draw
+    local seen = game_started and not game_over_sent and ticker % 100 == 0 and pos_count[position_key()] or 0
+    if (seen >= 3 or (seen == 2 and repetition_by_move())) and
+       manager.machine.time:as_double() - turn_since > math.max(30, 2 * max_think) then
+      game_over_sent = true
+      send_cmd("bestmove 0000")
+    end
+  else
+    turn_since = nil
   end
   
   -- Info display (evaluation, best move) updated periodically

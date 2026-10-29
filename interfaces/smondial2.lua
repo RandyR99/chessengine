@@ -136,9 +136,13 @@ function interface.promote(x, y, piece)
 end
 
 function interface.game_over()
-	-- the machine resigns a lost position: "rESG" on the lower display
-	return output_value("digit4") & 0x7f == 0x50 and output_value("digit5") & 0x7f == 0x79 and
-	       output_value("digit6") & 0x7f == 0x6d and output_value("digit7") & 0x7f == 0x3d
+	-- lower display: "rESG" = the machine resigns a lost position, "rE 3" = threefold repetition
+	if output_value("digit4") & 0x7f ~= 0x50 or output_value("digit5") & 0x7f ~= 0x79 then
+		return false
+	end
+	local d6 = output_value("digit6") & 0x7f
+	local d7 = output_value("digit7") & 0x7f
+	return (d6 == 0x6d and d7 == 0x3d) or (d6 == 0x00 and d7 == 0x4f)
 end
 
 return interface
