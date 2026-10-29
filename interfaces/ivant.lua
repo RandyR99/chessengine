@@ -91,10 +91,26 @@ function interface.setup_machine()
 	promcode = 0
 --	send_input(":IN.0", 0x10, 0.5) -- New Game
     emu.wait(10)
+	-- the rest unthrottled: Ivan announces every key press
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
     send_input(":IN.1", 0x10, 0.5) -- Clear
+
+	-- Coach off (it would ask Yes/No before a losing player move); Option cycles 7 pages back to the clock
+	for i = 1, 7 do
+		send_input(":IN.0", 0x08, 0.5) -- Option
+		emu.wait(1)
+		if getdigit(1) == 0x39 and getdigit(2) == 0x3f and getdigit(3) == 0x39 and getdigit(4) == 0x76 then -- COCH
+			send_input(":IN.0", 0x01, 0.5) -- No: feature off (the Off key switches Ivan off)
+			emu.wait(0.5)
+			send_input(":IN.0", 0x08, 0.5) -- Option: back to the clock
+			break
+		end
+	end
 
 	interface.cur_level = 6
 	interface.setlevel()
+	machine.video.throttled = throttled_state
 end
 
 function setpiece(n)
@@ -133,6 +149,9 @@ function interface.set_pos(mode)
 		if mode<0 then
 			send_input(":IN.0", 0x20, 1) -- Black/White
 		end
+		send_input(":IN.1", 0x10, 1) -- Clear
+		-- after a set up Ivan ignores a pawn move to the last rank as the first move until Verify, Clear
+		send_input(":IN.0", 0x04, 1) -- Verify
 		send_input(":IN.1", 0x10, 1) -- Clear
 	end
 end
