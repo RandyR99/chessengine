@@ -119,6 +119,30 @@ function interface.start_play()
 	send_input(":IN.2", 0x02, 0.5) -- Play
 end
 
+-- game end (mate, stalemate, threefold, 50 moves, insufficient material): the info line shows move number,
+-- symbol and move instead of the clocks, so the LCD stops changing; while it thinks its clock runs
+local lcd_last, lcd_since
+function interface.game_over()
+	for i = 0, 7 do
+		if output_value("1." .. i) ~= 0 or output_value("0." .. i) ~= 0 then
+			lcd_last = nil
+			return false
+		end
+	end
+	local lcd = "" -- (no 'table' library in the interface environment)
+	for r = 0, 15 do
+		for c = 9, 28 do
+			lcd = lcd .. output_value("s" .. r .. "." .. c)
+		end
+	end
+	local t = machine.time:as_double()
+	if lcd ~= lcd_last then
+		lcd_last, lcd_since = lcd, t
+		return false
+	end
+	return t - lcd_since >= 3
+end
+
 function interface.is_selected(x, y)
 	local xval = output_value("1." .. (x - 1)) ~= 0
 	local yval = output_value("0." .. (y - 1)) ~= 0

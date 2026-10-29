@@ -32,6 +32,14 @@ function interface.start_play(init)
 	send_input(":IN.2", 0x08, 1) -- Z (Enter)
 end
 
+function interface.game_over()
+	-- the machine resigns a lost position: "I LOSE", the move digits flash 0x09
+	for i = 3, 6 do
+		if output_value("digit" .. i) ~= 0x09 then return false end
+	end
+	return true
+end
+
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f }

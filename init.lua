@@ -41,6 +41,7 @@ local piece_from = nil
 local piece_to = nil
 local prev_move = nil
 local moved_since_position = false -- the machine sent a bestmove after the last "position" command
+local game_over_sent = false -- "bestmove 0000" was sent for the machine's resignation or draw claim
 local scr = [[
   while true do
     _G.status = io.stdin:read("*line")
@@ -638,6 +639,7 @@ local function execute_uci_command(cmd)
 
   if cmd:match("^position ") ~= nil then
     moved_since_position = false
+    game_over_sent = false
   end
 
   if cmd:match("^position fen ") ~= nil then
@@ -909,6 +911,14 @@ local function update()
   -- search for a new move
   if ply == my_color then
     search_selected_piece()
+    -- the machine resigned or claimed a draw (interface.game_over() reads its display or LEDs):
+    -- "bestmove 0000" lets the GUI end the game
+    if interface.game_over and game_started and not game_over_sent and ticker % 100 == 0 then
+      if interface.game_over() then
+        game_over_sent = true
+        send_cmd("bestmove 0000")
+      end
+    end
   end
   
   -- Info display (evaluation, best move) updated periodically

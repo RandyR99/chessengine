@@ -162,4 +162,22 @@ function setpiece(n)
     end
 end
 
+-- game end: the rank LEDs double as status lights - rank 1 (0.7) = Mate, rank 2 (0.6) = Stale (draw), rank 3 = Check
+-- (the same row LEDs show the machine's moves, so no column LED may be lit, and the state must hold for two checks)
+local end_seen = 0
+function interface.game_over()
+    for i = 0, 7 do
+        if output_value("1." .. i) ~= 0 then
+            end_seen = 0
+            return false
+        end
+    end
+    if output_value("0.7") ~= 0 or output_value("0.6") ~= 0 then
+        end_seen = end_seen + 1
+    else
+        end_seen = 0
+    end
+    return end_seen >= 2
+end
+
 return interface

@@ -135,4 +135,10 @@ function interface.promote(x, y, piece)
 	end
 end
 
+function interface.game_over()
+	-- the machine resigns a lost position: "rESG" on the lower display
+	return output_value("digit4") & 0x7f == 0x50 and output_value("digit5") & 0x7f == 0x79 and
+	       output_value("digit6") & 0x7f == 0x6d and output_value("digit7") & 0x7f == 0x3d
+end
+
 return interface

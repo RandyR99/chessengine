@@ -117,6 +117,11 @@ end
 function interface.stop_play()
 end
 
+function interface.game_over()
+	-- the machine resigns a lost position: "LOSE"
+	return output_value("digit0") == 0x38 and output_value("digit1") == 0x3f and output_value("digit2") == 0x6d and output_value("digit3") == 0x79
+end
+
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 } -- A to H
 	local yval = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f } -- 1 to 8

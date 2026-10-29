@@ -278,4 +278,13 @@ function interface.show_info(on)
 	end
 end
 
+-- game end texts on the LCD (both lines joined, spaces removed): the machine resigned or the game is over
+local game_end_texts = { checkmate = true, resign = true, stalemate = true, ["3rdrepeat"] = true, insufmat = true, ["50moves"] = true }
+
+function interface.game_over()
+	local ddram = emu.item(machine.devices[':hd44780'].items['0/m_ddram']):read_block(0x00, 0x80)
+	local text = (ddram:sub(1, 16) .. ddram:sub(65, 80)):gsub("[%s%c]", "")
+	return game_end_texts[text] == true
+end
+
 return interface
