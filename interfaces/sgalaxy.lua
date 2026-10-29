@@ -163,6 +163,10 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- show_info disabled: on the default level the machine finishes its move right when INFO is pressed (every ~10 s);
+-- it then takes its move as played without lighting the LEDs -> the plugin never sees it (sgalaxyb fen_wl/fen_start ~2/3).
+-- To be redone in the show_info revisit (read score, depth and best move from RAM).
+--[[
 function interface.show_info(on, color)
 	if on then
 		local dot1 = output_value("s0.16")
@@ -190,6 +194,7 @@ function interface.show_info(on, color)
 		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 	end
 end
+--]]
 
 function digit_ascii(digit)
 	if     digit == nil then return("0")
