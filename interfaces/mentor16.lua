@@ -1,4 +1,5 @@
 interface = {}
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 local function output_value(name)
     local out = machine.devices[":"]:output(name)

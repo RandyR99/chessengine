@@ -1,4 +1,5 @@
 interface = {}
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 local module = 0
 interface.opt_clear_announcements = true

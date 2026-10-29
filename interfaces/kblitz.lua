@@ -1,4 +1,5 @@
 interface = {}
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 -- Based on the MessNew (CB-Emu) kblitzx interface. In MAME 0.289 the cursor keys
 -- became two dials. They can only be turned from Lua in MAME 0.290 or later (0.289's

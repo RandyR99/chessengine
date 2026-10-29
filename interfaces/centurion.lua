@@ -1,4 +1,5 @@
 interface = {}
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 interface.invert = false
 interface.level = "a4"

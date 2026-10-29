@@ -1,4 +1,5 @@
 interface = {}
+interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 -- read len bytes of a memory share (battery RAM) as a string
 local function ram_block(tag, offset, len)
