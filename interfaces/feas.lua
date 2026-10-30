@@ -1,5 +1,6 @@
 interface = {}
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
+interface.info_every = 1 -- show_info only reads the display
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
@@ -9,8 +10,6 @@ end
 interface.opt_clear_announcements = true
 interface.level = "a1"
 interface.cur_level = nil
-interface.score = "0.00"
-interface.depth = "0"
 
 function interface.get_module()
 	if machine.system.name == "feas" then
@@ -288,21 +287,40 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- options E1 and E3 (set in setup_machine): while the machine thinks the player's display shows the score in
+-- centipawns for the machine (a dot after the second digit = negative, above 9990 = mate), the search depth in hex
+-- next to the number of lines searched, and the move time (dot after the first digit)
+local segment_hex = { [0x3f] = 0, [0x06] = 1, [0x5b] = 2, [0x4f] = 3, [0x66] = 4, [0x6d] = 5, [0x7d] = 6, [0x07] = 7,
+	[0x7f] = 8, [0x67] = 9, [0x6f] = 9, [0x77] = 10, [0x7c] = 11, [0x39] = 12, [0x5e] = 13, [0x79] = 14, [0x71] = 15 }
+local segment_dec = { [0x3f] = 0, [0x06] = 1, [0x5b] = 2, [0x4f] = 3, [0x66] = 4, [0x6d] = 5, [0x7d] = 6, [0x7c] = 6,
+	[0x07] = 7, [0x7f] = 8, [0x67] = 9, [0x6f] = 9 }
+
 function interface.show_info(on)
-	if on then
-		local dot  = output_value("1.7")
-		local dot1 = output_value("0.7")
-		local d1   = output_value("digit1")
-		local d2   = output_value("digit0")
-		local d3   = output_value("digit2")
-		local d4   = output_value("digit3")
-		if dot1 == 0 and d1 ~= 0 and d3 ~= 0 then
-			interface.score = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4):gsub(" ","")
-		elseif dot == 0 and dot1 == 0 and (d1 == 0 or d3 == 0) then
-			interface.depth = digit_ascii(d3) .. digit_ascii(d4):gsub(" ","")
-		end
-		return "info score cp " .. interface.score .. " depth " .. interface.depth
+	if not on then
+		interface.score = nil
+		interface.depth = nil
+		return nil
 	end
+	if output_value("0.7") ~= 0 then
+		return { score = interface.score, depth = interface.depth } -- option E3: the move time page
+	end
+	local d = {}
+	local h = {}
+	for i, name in ipairs({ "digit1", "digit0", "digit2", "digit3" }) do
+		local v = output_value(name) & 0x7f
+		d[i] = segment_dec[v]
+		h[i] = segment_hex[v]
+	end
+	if d[1] and d[2] and d[3] and d[4] then
+		local score = d[1] * 1000 + d[2] * 100 + d[3] * 10 + d[4]
+		if output_value("1.7") ~= 0 then
+			score = -score
+		end
+		interface.score = score
+	elseif not h[3] and h[4] then
+		interface.depth = h[4] -- depth 16 and up (two hex digits) would look like the clock, which starts right after the move
+	end
+	return { score = interface.score, depth = interface.depth }
 end
 
 function digit_ascii(digit)
