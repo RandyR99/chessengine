@@ -30,15 +30,30 @@ end
 function interface.start_play(init)
 	interface.turn = false
 	send_input(":IN.2", 0x08, 1) -- Z (Enter)
+	interface.last_active = machine.time:as_double()
 end
 
 function interface.game_over()
 	-- the machine resigns a lost position: "I LOSE", the move digits flash 0x09
+	local resign = true
 	for i = 3, 6 do
-		if output_value("digit" .. i) ~= 0x09 then return false end
+		if output_value("digit" .. i) ~= 0x09 then resign = false end
 	end
-	return true
+	if resign then
+		return true
+	end
+	-- facing mate on the next move it may also give up without a move: the busy LED goes off and the
+	-- display stays blank, shows only the input cursor (it reset its board) or flashes the player's move
+	return interface.last_active ~= nil and machine.time:as_double() - interface.last_active > 10
 end
+
+-- game_over() is polled too rarely to see the busy LED, so the last thinking is recorded every frame;
+-- a normal move appears within about a second after the LED goes off
+emu.register_periodic(function()
+	if output_value("busy_led") ~= 0 then
+		interface.last_active = machine.time:as_double()
+	end
+end)
 
 function interface.is_selected(x, y)
 	local xval = { 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x3d, 0x76 }
@@ -72,6 +87,7 @@ function interface.select_piece(x, y, event)
 		if (event == "put") then
 			if (interface.turn) then
 				send_input(":IN.2", 0x08, 1)
+				interface.last_active = machine.time:as_double()
 			end
 			interface.turn = not interface.turn
 		end
