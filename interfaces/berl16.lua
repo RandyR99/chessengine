@@ -1,4 +1,5 @@
 interface = load_interface("berlinp")
+interface.info_every = 1 -- show_info only reads the display
 
 function interface.get_module()
 	if machine.system.name == "berl16" then
@@ -26,9 +27,12 @@ function interface.show_pv_after_move_player()
     send_input(":KEY", 0x08, 0.6) -- DOWN
 end
 
-function interface.show_info()
+function interface.show_info(on)
+    if not on then
+        return nil
+    end
     local info = nil
-    if interface.ticker == 1 then
+    do -- (was: only when interface.ticker == 1, a field nothing sets)
         local ddram = emu.item(
                           machine.devices[':display:hd44780'].items['0/m_ddram']):read_block(
                           0x00, 0x80)

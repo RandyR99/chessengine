@@ -305,6 +305,9 @@ function interface.show_info(on)
         return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
     end
 end
+-- off: this called digit_ascii, which renaissa.lua doesn't define - a Lua error on every call that aborted the
+-- plugin's update loop; and while it thinks the Renaissance shows its clock unless a display mode is set (to do)
+interface.show_info = nil
 
 
 return interface

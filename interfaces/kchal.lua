@@ -1,4 +1,5 @@
 interface = {}
+interface.info_every = 1 -- show_info only reads the display
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 local function output_value(name)
@@ -9,12 +10,6 @@ end
 interface.level = 6
 interface.cur_level = nil
 interface.prom = false
-local pv1 = ""
-local pv2 = ""
-local pv3 = ""
-local l_pv = ""
-local score = ""
-local counter = 0
 
 -- the machine switches itself off after a few idle minutes: the LCD is then blank
 -- and the CPU is in standby (PC stands still); the LCD alone also blanks in play
@@ -59,58 +54,40 @@ function getdigit(n, ascii)
     return digit
 end
 
+-- while the machine thinks the LCD rotates: the clock (colon), the score in centipawns for the machine (dot, a minus
+-- sign in the first character: "-09.05") and the moves of the main line; the machine shows no search depth
 function interface.show_info(on)
-    local colon = output_value("s0.6")
-    if on == true then
-        local d1 = getdigit(1, 1)
-        local d2 = getdigit(2, 1)
-        local d3 = getdigit(3, 1)
-        local d4 = getdigit(4, 1)
-        local d5 = getdigit(5, 1)
-        local dot = output_value("s0.7")
-        if d2:sub(1, 1) == "?" or d2:sub(1, 1) == "?" or d2:sub(1, 1) == "?" or
-            d2:sub(1, 1) == "?" then
-            emu.wait(0.1)
-            d2 = getdigit(2, 1)
-            d3 = getdigit(3, 1)
-            d4 = getdigit(4, 1)
-            d5 = getdigit(5, 1)
-        end
-        if colon == 1 then
-            counter = 1
-            l_pv = ""
-        elseif dot == 1 then
-            score = d2 .. d3 .. d4 .. d5
-            counter = 1
-            l_pv = ""
-        elseif d5 == " " then
-        else
-            if counter == 1 and l_pv ~= d2 .. d3 .. d4 .. d5 then
-                pv1 = d2 .. d3 .. d4 .. d5
-                l_pv = pv1
-                counter = 2
-
-            elseif counter == 2 and l_pv ~= d2 .. d3 .. d4 .. d5 then
-                pv2 = d2 .. d3 .. d4 .. d5
-                l_pv = pv2
-                counter = 3
-                if pv2 == "____" then pv3 = "" end
-            elseif counter == 3 and l_pv ~= d2 .. d3 .. d4 .. d5 then
-                pv3 = d2 .. d3 .. d4 .. d5
-                l_pv = pv3
-
-            end
-        end
-        return
-            "info score cp " .. score .. " depth 1 pv " .. pv1 .. " " .. pv2 ..
-                " " .. pv3
-    else
-        pv1 = ""
-        pv2 = ""
-        pv3 = ""
-        l_pv = ""
-        counter = 1
+    if on ~= true then
+        interface.score = nil -- each search starts without the values of the last one
+        interface.pv = nil
+        interface.pv_cycle = {}
+        return nil
     end
+    interface.pv_cycle = interface.pv_cycle or {}
+    local d = {}
+    for i = 1, 5 do
+        d[i] = getdigit(i, 1)
+    end
+    if d[2]:sub(1, 1) == "?" then -- caught while the LCD changes
+        emu.wait(0.1)
+        for i = 1, 5 do
+            d[i] = getdigit(i, 1)
+        end
+    end
+    local text = d[2] .. d[3] .. d[4] .. d[5]
+    if output_value("s0.6") == 1 or output_value("s0.7") == 1 then
+        -- clock or score: a new round of the rotation, the moves seen so far are the main line
+        if #interface.pv_cycle > 0 then
+            interface.pv = interface.pv_cycle
+        end
+        interface.pv_cycle = {}
+        if output_value("s0.7") == 1 and tonumber(text) then
+            interface.score = (d[1] == "-" and -1 or 1) * tonumber(text)
+        end
+    elseif text:match("^%l%d%l%d$") and interface.pv_cycle[#interface.pv_cycle] ~= text and #interface.pv_cycle < 3 then
+        interface.pv_cycle[#interface.pv_cycle + 1] = text
+    end
+    return { score = interface.score, pv = interface.pv or interface.pv_cycle }
 end
 
 function interface.setlevel()

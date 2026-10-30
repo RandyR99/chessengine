@@ -1,4 +1,5 @@
 interface = {}
+interface.info_every = 1 -- show_info only reads the display
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 interface.opt_clear_announcements = true
@@ -301,29 +302,19 @@ function interface.befor_move_from_engine()
   end
 end
    
-function interface.show_info(ply)
-  if ply==true then
-    local d0 = output_value("digit0")
-    local d1 = output_value("digit1")
-    local d2 = output_value("digit2")
-    local d3 = output_value("digit3")
-    local dotO = output_value("2.7") -- punkt oben
-    emu.wait(0.1)
-    if d1 == 0 then interface.depth =  tonumber(interface.digit_string(d0),16)
-    elseif d3 ~=0 and d2 ~=0 and d1 ~=0 and d0 ~=0 and dotO== 0 then
-      interface.hex=interface.digit_string(d3) .. interface.digit_string(d2) .. interface.digit_string(d1) ..  interface.digit_string(d0)
-      interface.score = tonumber(interface.digit_string(d3) .. interface.digit_string(d2) .. interface.digit_string(d1) ..  interface.digit_string(d0),16)/256
-      interface.score =tostring(round( interface.score )*10)
-      interface.score =interface.score:gsub("%.","")
-      local dotU = output_value("3.7") -- punkt unten
-      if dotU==1 then
-        interface.score="-" .. interface.score:gsub("%.","")
-        interface.hex="-" .. interface.hex
-      end
-    end
-    if interface.depth==0 then  interface.score="book" end
+-- while it thinks the display shows the search depth (hex, last digit; the first digit counts the moves searched);
+-- the hex score page the old code expected never appeared (12 minutes of thinking in a queen-down position)
+function interface.show_info(on)
+  if on ~= true then
+    return nil
   end
-  return ("info score cp " ..  (interface.score) .. " depth " .. tostring(interface.depth) .. " hex " .. tostring(interface.hex))
+  if output_value("digit1") == 0 then
+    local depth = tonumber(interface.digit_string(output_value("digit0")), 16)
+    if depth and depth > 0 then
+      return { depth = depth }
+    end
+  end
+  return nil
 end
 
 function round(num)
