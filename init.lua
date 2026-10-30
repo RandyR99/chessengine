@@ -1207,17 +1207,15 @@ local function update()
       end
     end
     
-    if interface.show_info and not interface.info_every then
-      send_info()
-    end
   else
     ticker = ticker + 1
   end
 
-  -- interfaces that read the info without pressing keys can set interface.info_every (emulated seconds)
-  if interface.show_info and interface.info_every then
+  -- every 10 s of emulated time (the ticks come at very different rates per driver); interfaces that read
+  -- the info without pressing keys can set a shorter interface.info_every
+  if interface.show_info then
     local now = manager.machine.time:as_double()
-    if now - info_since >= interface.info_every then
+    if now - info_since >= (interface.info_every or 10) then
       info_since = now
       send_info()
     end

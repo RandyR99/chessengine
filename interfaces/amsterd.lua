@@ -3,9 +3,6 @@ interface.ignore_late_go = true -- replies on its own once the player's move is 
 
 interface.level = "2"
 interface.cur_level = nil
-interface.score = "0.00"
-interface.depth = "0"
-interface.pv = ""
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
@@ -202,39 +199,41 @@ function interface.show_info(on)
 			return digit_ascii(digit_val) or " "
 		end
 
+		-- manual H.1-H.6: INFO = main line, then A1 = evaluation in pawns for Mephisto ("-1,50"), C3 = depth ("M 02")
+		local info = {}
 		send_input(":KEY.0", 0x01, 0.15) -- Info: principal variation
 		emu.wait(0.2)
 		local d1, d2, d3, d4 = get_lit_digits()
-		local current_pv = safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)
-		if string.match(current_pv, "^[a-h][1-8][a-h][1-8]$") then
-			interface.pv = current_pv
+		local move = safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)
+		if move:match("^[a-h][1-8][a-h][1-8]$") then
+			info.pv = { move }
 		end
-		
+
 		send_input(":KEY.1", 0x01, 0.15) -- 1: score
 		emu.wait(0.2)
-		
 		d1, d2, d3, d4 = get_lit_digits()
-		local current_score = (safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)):gsub(" ","")
-		if string.match(current_score, "[0-9%-]+") and not string.match(current_score, "^[a-h][1-8]") then
-			interface.score = current_score
+		local score = (safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)):gsub(" ","")
+		if score:match("^%-?%d+$") then
+			info.score = score -- two decimals without the comma: centipawns
 		end
-		
+
 		send_input(":KEY.1", 0x04, 0.15) -- 3: depth
 		emu.wait(0.2)
-		
 		d1, d2, d3, d4 = get_lit_digits()
-		local full_str = safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)
-		local clean_depth = full_str:gsub("n", ""):gsub("=", ""):gsub(" ", "")
-		if clean_depth ~= "" and tonumber(clean_depth) then
-			interface.depth = string.format("%02d", tonumber(clean_depth))
+		local depth = (safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)):gsub("n", ""):gsub("=", ""):gsub(" ", "")
+		if depth:match("^%d+$") then
+			info.depth = depth
 		end
-		
+
 		send_input(":KEY.0", 0x10, 0.15) -- CL
 		emu.wait(0.1)
 		machine.video.throttled = throttled_state
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
+		return info
 	end
 end
+-- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
+-- (as on montec/mm4); to come back once the info can be read from RAM without key presses
+interface.show_info = nil
 
 function digit_ascii(digit)
 	if     digit == 0   then return " "

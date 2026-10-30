@@ -221,6 +221,9 @@ function interface.show_info(on)
 		Ticker = 1
 	end
 end
+-- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
+-- (as on montec/mm4); to come back once the info can be read from RAM without key presses
+interface.show_info = nil
 
 function digit_ascii(digit)
 	if     (digit == nil) then digit = -1

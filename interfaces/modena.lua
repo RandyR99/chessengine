@@ -262,5 +262,8 @@ function interface.show_info(on)
 	interface.depth = tostring(tonumber((depth:sub(2):gsub("[^%d]", ""))) or 0)
 	return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 end
+-- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
+-- (as on montec/mm4); to come back once the info can be read from RAM without key presses
+interface.show_info = nil
 
 return interface
