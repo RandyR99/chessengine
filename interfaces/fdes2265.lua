@@ -1,12 +1,10 @@
 interface = {}
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
+interface.info_every = 1 -- show_info only reads the display
 
 interface.opt_clear_announcements = true
 interface.level = "a1"
 interface.cur_level = nil
-interface.score = "0.00"
-interface.depth = "0"
-interface.pv = ""
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
@@ -286,49 +284,40 @@ function interface.promote(x, y, piece)
 	end
 end
 
-interface.last_thinking_state = false
+
+-- rotating display (set in setup_machine: B2 depth, C2 score, E2 first move of the main line, A2 time off; Mach IV
+-- manual 3.8-3.16) changes every second while the machine thinks: the move ("d7d5"), the score in centipawns for
+-- the machine (dot after the second character, output 3.7; "-9.99" is its limit) and the moves examined followed by
+-- the ply depth ("12 6")
+local segment_digit = { [0x3f] = 0, [0x06] = 1, [0x5b] = 2, [0x4f] = 3, [0x66] = 4, [0x6d] = 5, [0x7d] = 6, [0x07] = 7,
+	[0x7f] = 8, [0x67] = 9, [0x6f] = 9 }
+local segment_file = { [0x77] = "a", [0x7c] = "b", [0x39] = "c", [0x5e] = "d", [0x79] = "e", [0x71] = "f", [0x3d] = "g", [0x76] = "h" }
 
 function interface.show_info(on)
-	if on and not interface.last_thinking_state then
-		interface.score = "0.00"
-		interface.depth = "0"
-		interface.pv = ""
+	if not on then
+		interface.score = nil
+		interface.depth = nil
+		interface.pv = nil
+		return nil
 	end
-	interface.last_thinking_state = on
-
- 	if on then
-
-		local dot = output_value("3.7")
-		local d1  = output_value("digit2")
-		local d2  = output_value("digit3")
-		local d3  = output_value("digit4")
-		local d4  = output_value("digit5")
-
-		local raw_d1 = digit_ascii(d1)
-		local raw_d2 = digit_ascii(d2)
-		local raw_d3 = digit_ascii(d3)
-		local raw_d4 = digit_ascii(d4)
-
-		if dot == 0 then
-			if raw_d1 == "a" or raw_d1 == "b" or raw_d1 == "c" or raw_d1 == "d" or raw_d1 == "e" or raw_d1 == "f" or raw_d1 == "g" or raw_d1 == "h" then
-				interface.pv = raw_d1 .. raw_d2 .. raw_d3 .. raw_d4
-			else
-				local clean_depth = (raw_d3 .. raw_d4):gsub(" ","")
-				if clean_depth:match("^%d+$") then
-					interface.depth = clean_depth
-				end
-			end
-		else
-			local clean_score = (raw_d1 .. raw_d2 .. raw_d3 .. raw_d4):gsub(" ","")
-			if clean_score:match("^%-?%d+$") and clean_score:len() <= 4 then
-				interface.score = clean_score
-			end
+	local v = {}
+	for i = 1, 4 do
+		v[i] = output_value("digit" .. (i + 1)) & 0x7f
+	end
+	local d = { segment_digit[v[1]], segment_digit[v[2]], segment_digit[v[3]], segment_digit[v[4]] }
+	if output_value("3.7") ~= 0 then
+		if d[2] and d[3] and d[4] and (v[1] == 0 or v[1] == 0x40 or d[1]) then
+			local score = (d[1] or 0) * 1000 + d[2] * 100 + d[3] * 10 + d[4]
+			interface.score = v[1] == 0x40 and -score or score
 		end
-		
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " ..  interface.pv
-	else
-		return ""
+	elseif segment_file[v[1]] and d[2] and segment_file[v[3]] and d[4] then
+		interface.pv = { segment_file[v[1]] .. d[2] .. segment_file[v[3]] .. d[4] }
+	elseif v[3] == 0 and d[4] and d[4] > 0 then -- ply 0 shows before the first iteration
+		interface.depth = d[4]
+	elseif d[3] and d[4] then
+		interface.depth = d[3] * 10 + d[4]
 	end
+	return { score = interface.score, depth = interface.depth, pv = interface.pv }
 end
 
 function digit_ascii(digit)

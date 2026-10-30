@@ -273,6 +273,10 @@ function interface.show_info(on)
 	end
 	return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
 end
+-- off: without display options the Excel 68000 shows only the move time while it thinks, and its options (squares
+-- B1 depth, C1 score, E1 main line) can only be switched on WHILE it thinks (manual p. 15-16) - a square press then,
+-- whose rank 1 LEDs the move detection takes for the machine's move; to come back with a safe way to read the info
+interface.show_info = nil
 
 function digit_ascii(digit)
 	if     digit == nil then return " "
