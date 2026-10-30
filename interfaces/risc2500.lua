@@ -1,5 +1,6 @@
 interface = {}
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
+interface.info_every = 1 -- show_info only reads RAM
 
 interface.level = "010 sec/move"
 interface.cur_level = nil
@@ -351,16 +352,14 @@ end
 
 function interface.show_info(on)
     if on == true then
-        local pv = read_pv()
+        -- best line [b 03-06 -35] (manual 6.2): depth 3, selective depth 6, score in centipawns for the side to move
         local info = read_depth()
         if info:sub(1,1) == "p" or info:sub(1,1) == "b" then
-            local depth = info:sub(3,4)
-            local seldepth = info:sub(6,7)
-            local score = info:sub(8,12)
-            score = score:gsub(" ", "")
-            pv = pv:gsub("-", "")
-            pv = pv:gsub("x", "")
-            return "info score cp " .. score .. " depth " .. depth .. " seldepth " .. seldepth .. " pv " .. pv
+            local pv = {}
+            for move in read_pv():gmatch("%S+") do
+                pv[#pv + 1] = move:gsub("[%-x%.%+#]", "") -- e2-e4, e4xd5, O-O, a line cut off with '.'
+            end
+            return { depth = info:sub(3,4), seldepth = info:sub(6,7), score = info:sub(8,12), pv = pv }
         end
     end
 end

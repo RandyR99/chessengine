@@ -386,6 +386,181 @@ local function position_key()
   return k
 end
 
+-- info lines from interface.show_info(): one format for all machines, as python-chess parses it in picochess:
+-- "info depth <plies> score cp <centipawns, side to move> pv <legal UCI moves>"; unknown fields are left out
+-- (an empty field logs an error and drops the value) and the pv stops at its first move that isn't legal
+
+-- square attacked by the side whose pieces have the sign 'side' (1 White, -1 Black) on board b
+local function attacked(b, x, y, side)
+  local function at(px, py, ids)
+    if px < 1 or px > 8 or py < 1 or py > 8 then return false end
+    local p = b[py][px] * side
+    for _, id in ipairs(ids) do
+      if p == id then return true end
+    end
+    return false
+  end
+  if at(x - 1, y - side, { 6 }) or at(x + 1, y - side, { 6 }) then return true end
+  for _, d in ipairs({ {1,2}, {2,1}, {2,-1}, {1,-2}, {-1,-2}, {-2,-1}, {-2,1}, {-1,2} }) do
+    if at(x + d[1], y + d[2], { 5 }) then return true end
+  end
+  for dx = -1, 1 do
+    for dy = -1, 1 do
+      if (dx ~= 0 or dy ~= 0) and at(x + dx, y + dy, { 1 }) then return true end
+    end
+  end
+  for _, d in ipairs({ {1,0,3}, {-1,0,3}, {0,1,3}, {0,-1,3}, {1,1,4}, {1,-1,4}, {-1,1,4}, {-1,-1,4} }) do
+    local px, py = x + d[1], y + d[2]
+    while px >= 1 and px <= 8 and py >= 1 and py <= 8 do
+      local p = b[py][px] * side
+      if p == d[3] or p == 2 then return true end
+      if b[py][px] ~= 0 then break end
+      px, py = px + d[1], py + d[2]
+    end
+  end
+  return false
+end
+
+-- plays 'move' (UCI) for 'side' on board b and returns it when it is legal there (a promotion without the
+-- piece letter becomes a queen promotion), else nil; 'last' = the previous move (for e.p.)
+local function try_move(b, move, side, last)
+  local fx, fy, tx, ty, promo = move:match("^([a-h])([1-8])([a-h])([1-8])([qrbn]?)$")
+  if not fx then return nil end
+  fx, fy, tx, ty = fx:byte() - 96, tonumber(fy), tx:byte() - 96, tonumber(ty)
+  local p = b[fy][fx] * side
+  local q = b[ty][tx] * side
+  if p <= 0 or q > 0 or (fx == tx and fy == ty) then return nil end
+  local dx, dy = tx - fx, ty - fy
+  local ep = false
+  if p == 6 then
+    local start, last_rank = side == 1 and 2 or 7, side == 1 and 8 or 1
+    if ty == last_rank and promo == "" then
+      promo = "q"
+      move = move .. promo
+    elseif ty ~= last_rank and promo ~= "" then
+      return nil
+    end
+    if dx == 0 and dy == side and q == 0 then
+    elseif dx == 0 and dy == 2 * side and fy == start and q == 0 and b[fy + side][fx] == 0 then
+    elseif math.abs(dx) == 1 and dy == side and q < 0 then
+    elseif math.abs(dx) == 1 and dy == side and q == 0 and b[fy][tx] == -6 * side and
+           (last == nil or last == string.char(tx + 96) .. (fy + 2 * side) .. string.char(tx + 96) .. fy) then
+      ep = true
+    else
+      return nil
+    end
+  elseif promo ~= "" then
+    return nil
+  elseif p == 5 then
+    if not ((math.abs(dx) == 1 and math.abs(dy) == 2) or (math.abs(dx) == 2 and math.abs(dy) == 1)) then return nil end
+  elseif p == 1 and math.abs(dx) == 2 and dy == 0 and fx == 5 and fy == (side == 1 and 1 or 8) then
+    local rx = dx > 0 and 8 or 1
+    if b[fy][rx] * side ~= 3 then return nil end
+    for x = math.min(fx, rx) + 1, math.max(fx, rx) - 1 do
+      if b[fy][x] ~= 0 then return nil end
+    end
+    for x = fx, tx, dx > 0 and 1 or -1 do
+      if attacked(b, x, fy, -side) then return nil end
+    end
+    b[fy][(fx + tx) // 2], b[fy][rx] = b[fy][rx], 0
+  elseif p == 1 then
+    if math.abs(dx) > 1 or math.abs(dy) > 1 then return nil end
+  else
+    local straight, diagonal = dx == 0 or dy == 0, math.abs(dx) == math.abs(dy)
+    if (p == 3 and not straight) or (p == 4 and not diagonal) or (p == 2 and not straight and not diagonal) then return nil end
+    local sx, sy = dx == 0 and 0 or dx // math.abs(dx), dy == 0 and 0 or dy // math.abs(dy)
+    local x, y = fx + sx, fy + sy
+    while x ~= tx or y ~= ty do
+      if b[y][x] ~= 0 then return nil end
+      x, y = x + sx, y + sy
+    end
+  end
+  local captured = b[ty][tx]
+  b[ty][tx], b[fy][fx] = b[fy][fx], 0
+  if ep then b[fy][tx] = 0 end
+  if promo ~= "" then b[ty][tx] = side * (({ q = 2, r = 3, b = 4, n = 5 })[promo]) end
+  for y = 1, 8 do
+    for x = 1, 8 do
+      if b[y][x] == side and attacked(b, x, y, -side) then return nil end
+    end
+  end
+  return move
+end
+
+local function format_info(info)
+  if type(info) == "string" then
+    -- older interfaces return the line itself: take its values apart
+    local t = {}
+    local words = {}
+    for w in info:gmatch("%S+") do words[#words + 1] = w end
+    local i = 1
+    while i <= #words do
+      local w = words[i]
+      if w == "string" then
+        return "info " .. table.concat(words, " ", i)
+      elseif w == "score" and (words[i + 1] == "cp" or words[i + 1] == "mate") then
+        if tonumber(words[i + 2]) then
+          t[words[i + 1] == "cp" and "score" or "mate"] = words[i + 2]
+          i = i + 1
+        end
+        i = i + 1
+      elseif w == "depth" or w == "seldepth" then
+        if tonumber(words[i + 1]) then
+          t[w] = words[i + 1]
+          i = i + 1
+        end
+      elseif w == "pv" then
+        t.pv = {}
+        while words[i + 1] and (words[i + 1]:match("^%l%d%l%d%l?$") or words[i + 1]:match("^[Oo0]%-?[Oo0]%-?[Oo0]?$")) do
+          t.pv[#t.pv + 1] = words[i + 1]
+          i = i + 1
+        end
+      end
+      i = i + 1
+    end
+    info = t
+  end
+  local parts = {}
+  local depth, seldepth = tonumber(info.depth), tonumber(info.seldepth)
+  if depth then parts[#parts + 1] = "depth " .. math.floor(depth) end
+  if seldepth then parts[#parts + 1] = "seldepth " .. math.floor(seldepth) end
+  if tonumber(info.mate) then
+    parts[#parts + 1] = "score mate " .. math.floor(tonumber(info.mate))
+  elseif tonumber(info.score) then
+    parts[#parts + 1] = "score cp " .. math.floor(tonumber(info.score))
+  end
+  local pv = info.pv
+  if type(pv) == "string" then
+    local list = {}
+    for w in pv:gmatch("%S+") do list[#list + 1] = w end
+    pv = list
+  end
+  if type(pv) == "table" and board ~= nil then
+    local b = {}
+    for y = 1, 8 do
+      b[y] = {}
+      for x = 1, 8 do b[y][x] = board[y][x] end
+    end
+    local side, last = ply == "W" and 1 or -1, nil
+    local moves = {}
+    for _, m in ipairs(pv) do
+      m = m:lower()
+      local castle = m:gsub("%-", ""):gsub("0", "o")
+      if castle == "oo" or castle == "ooo" then
+        local r = side == 1 and "1" or "8"
+        m = "e" .. r .. (castle == "oo" and "g" or "c") .. r
+      end
+      m = try_move(b, m, side, last)
+      if not m then break end
+      moves[#moves + 1] = m
+      side, last = -side, m
+    end
+    if #moves > 0 then parts[#parts + 1] = "pv " .. table.concat(moves, " ") end
+  end
+  if #parts == 0 then return nil end
+  return "info " .. table.concat(parts, " ")
+end
+
 -- a position seen twice with the other side to move is one move of the machine away: the machine may claim
 -- the threefold repetition before making that move (the two boards differ on exactly a from and a to square)
 local function repetition_by_move()
@@ -914,6 +1089,18 @@ local function execute_xboard_command(cmd)
   local dummy = 1
 end
 
+local info_since = 0 -- emulated time of the last interface.show_info() call with interface.info_every
+
+local function send_info()
+  local info = interface.show_info(ply == my_color, ply)
+  if info ~= nil then
+    info = format_info(info)
+    if info then
+      send_cmd(info)
+    end
+  end
+end
+
 local function update()
   repeat
     local command = recv_cmd()
@@ -1020,21 +1207,20 @@ local function update()
       end
     end
     
-    if interface.show_info then
-      local info_str
-      if ply == my_color then
-        info_str = interface.show_info(true, ply)
-      else
-        info_str = interface.show_info(false, ply)
-      end
-      -- Ensure the string is neither nil nor just empty spaces
-      if info_str ~= nil and tostring(info_str):match("%S") then
-        -- Forward the string and ensure a clean terminal newline sequence
-        send_cmd(tostring(info_str))
-      end
+    if interface.show_info and not interface.info_every then
+      send_info()
     end
   else
     ticker = ticker + 1
+  end
+
+  -- interfaces that read the info without pressing keys can set interface.info_every (emulated seconds)
+  if interface.show_info and interface.info_every then
+    local now = manager.machine.time:as_double()
+    if now - info_since >= interface.info_every then
+      info_since = now
+      send_info()
+    end
   end
 end
 
