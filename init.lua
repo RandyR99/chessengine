@@ -42,6 +42,7 @@ local piece_to = nil
 local prev_move = nil
 local moved_since_position = false -- the machine sent a bestmove after the last "position" command
 local game_over_sent = false -- "bestmove 0000" was sent for the machine's resignation or draw claim
+local resigned = false       -- the machine resigned together with its move (interface.resigned()); answered on its next turn
 local pos_count = {}         -- occurrences of each position (board + side to move) in this game, for threefold repetition
 local turn_since = nil       -- emulated time when the machine's current turn began
 local max_think = 0          -- the machine's longest move in this game (emulated seconds)
@@ -82,6 +83,7 @@ local function board_reset()
     manager.machine.video.throttled = false
   end
   game_started = false
+  resigned = false
   piece_get = false
   sel_started = false
   my_color = "B"
@@ -115,6 +117,7 @@ end
 
 local function board_clear()
   game_started = false
+  resigned = false
   piece_get = false
   sel_started = false
   my_color = "B"
@@ -981,8 +984,9 @@ local function update()
     search_selected_piece()
     -- the machine resigned or claimed a draw (interface.game_over() reads its display or LEDs):
     -- "bestmove 0000" lets the GUI end the game
-    if interface.game_over and game_started and not game_over_sent and ticker % 100 == 0 then
-      if interface.game_over() then
+    if (interface.game_over or resigned) and game_started and not game_over_sent and ticker % 100 == 0 then
+      if resigned or interface.game_over() then
+        resigned = false
         game_over_sent = true
         send_cmd("bestmove 0000")
       end
@@ -997,6 +1001,10 @@ local function update()
     end
   else
     turn_since = nil
+    -- some machines play their move and resign at the same time; the sign may be gone by their next turn
+    if interface.resigned and game_started and ticker % 100 == 0 and interface.resigned() then
+      resigned = true
+    end
   end
   
   -- Info display (evaluation, best move) updated periodically
