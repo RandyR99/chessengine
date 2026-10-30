@@ -1,4 +1,5 @@
 interface = {}
+interface.info_every = 1 -- show_info only reads the display
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 interface.turn = true
@@ -8,8 +9,6 @@ interface.cur_level = nil
 interface.levelnum = 1
 local lastx = 0
 local lasty = 0
-interface.score = "0.00"
-interface.pv = ""
 interface.edit = false
 
 local function output_value(name)
@@ -324,21 +323,24 @@ function interface.show_pv_after_move_player()
 end
 
 function interface.show_info(on)
-   if on then
-		local ddram = ram_block(0x3e6F, 0x10)
-		if (ddram:sub(2,3)) ~= "NO" and (ddram:sub(2,3)) ~= "EI" and (ddram:sub(2,3)) ~= "AS" then
-			if (output_value("0.7.11") ~= 0x00) then
-				interface.score = ddram:sub(10,14):gsub(":", " ") .. "0"
-				interface.pv = ddram:sub(1,10):gsub(":", " ")
-				emu.wait(0.2)
-				if output_value("0.7.11") ~= 0x00 then
-					return "info score cp " .. interface.score .. " depth 1" .. " pv " .. string.lower(interface.pv)
-				end
-			else
-				return
-			end
-		end
+	if not on then
+		return nil
 	end
+	-- the LCD shows the move being searched and the score in tenths of a pawn for the machine; no search depth
+	local ddram = ram_block(0x3e6F, 0x10)
+	if ddram:sub(2,3) == "NO" or ddram:sub(2,3) == "EI" or ddram:sub(2,3) == "AS" or output_value("0.7.11") == 0x00 then
+		return nil
+	end
+	local pv = {}
+	for move in string.lower(ddram:sub(1,10):gsub(":", " ")):gmatch("%S+") do
+		pv[#pv + 1] = move
+	end
+	local score = tonumber((ddram:sub(10,14):gsub(":", " "):gsub(" ", "")))
+	emu.wait(0.2)
+	if output_value("0.7.11") == 0x00 or #pv == 0 or not pv[1]:match("^%l%d%l%d") then
+		return nil
+	end
+	return { score = score and score * 10, pv = pv }
 end
 
 return interface

@@ -18,17 +18,21 @@ function interface.get_author()
 end
 
 function interface.show_info(on)
-	if on then
-		local ddram = ram_block(":maincpu:internal_ram", 0x80, 0x05)
-		if (digit_ascii(ddram:byte(1)) .. digit_ascii(ddram:byte(2))) == "d " then
-			interface.depth = digit_ascii(ddram:byte(3)) .. digit_ascii(ddram:byte(4))
-		elseif digit_ascii(ddram:byte(1)) == " " or digit_ascii(ddram:byte(1)) == "-" then
-			interface.score = (digit_ascii(ddram:byte(1)) .. digit_ascii(ddram:byte(2)) .. digit_ascii(ddram:byte(3)) .. digit_ascii(ddram:byte(4))):gsub(" ","")
-		elseif digit_ascii(ddram:byte(1)) == "a" or digit_ascii(ddram:byte(1)) == "b" or digit_ascii(ddram:byte(1)) == "c" or digit_ascii(ddram:byte(1)) == "d" or digit_ascii(ddram:byte(1)) == "e" or digit_ascii(ddram:byte(1)) == "f" or digit_ascii(ddram:byte(1)) == "g" or digit_ascii(ddram:byte(1)) == "h" then
-			interface.pv = digit_ascii(ddram:byte(1)) .. digit_ascii(ddram:byte(2)) .. digit_ascii(ddram:byte(3)) .. digit_ascii(ddram:byte(4))
-		end
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
+	if not on then
+		interface.score = nil -- each search starts without the values of the last one
+		interface.depth = nil
+		interface.pv = nil
+		return nil
 	end
+	local ddram = ram_block(":maincpu:internal_ram", 0x80, 0x05)
+	if (digit_ascii(ddram:byte(1)) .. digit_ascii(ddram:byte(2))) == "d " then
+		interface.depth = digit_ascii(ddram:byte(3)) .. digit_ascii(ddram:byte(4))
+	elseif digit_ascii(ddram:byte(1)) == " " or digit_ascii(ddram:byte(1)) == "-" then
+		interface.score = (digit_ascii(ddram:byte(1)) .. digit_ascii(ddram:byte(2)) .. digit_ascii(ddram:byte(3)) .. digit_ascii(ddram:byte(4))):gsub(" ","")
+	elseif digit_ascii(ddram:byte(1)) == "a" or digit_ascii(ddram:byte(1)) == "b" or digit_ascii(ddram:byte(1)) == "c" or digit_ascii(ddram:byte(1)) == "d" or digit_ascii(ddram:byte(1)) == "e" or digit_ascii(ddram:byte(1)) == "f" or digit_ascii(ddram:byte(1)) == "g" or digit_ascii(ddram:byte(1)) == "h" then
+		interface.pv = digit_ascii(ddram:byte(1)) .. digit_ascii(ddram:byte(2)) .. digit_ascii(ddram:byte(3)) .. digit_ascii(ddram:byte(4))
+	end
+	return { score = interface.score, depth = interface.depth, pv = interface.pv }
 end
 
 function digit_ascii(digit)

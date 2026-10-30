@@ -1,10 +1,8 @@
 interface = load_interface("supercon")
+interface.info_every = 1 -- show_info only reads the display
 
 interface.level = "a1"
 interface.cur_level = nil
-interface.pv = ""
-interface.depth = "0"
-interface.score = "0.00"
 
 function interface.get_module()
 	if machine.system.name == "cfortea" then
@@ -217,15 +215,19 @@ function interface.show_pv_after_move_emu()
 end
 
 function interface.show_info(on)
-	if on then
-		if digit_ascii(lcd_char(0)) == "d" and lcd_char(2) < 10 then
-			interface.depth = digit_ascii(lcd_char(1)) .. digit_ascii(lcd_char(2)):gsub(" ", "")
-		elseif digit_ascii(lcd_char(5)) == " " or digit_ascii(lcd_char(5)) == "-" then
-			interface.pv = digit_ascii(lcd_char(0)) .. digit_ascii(lcd_char(1)) .. digit_ascii(lcd_char(2)) .. digit_ascii(lcd_char(3))
-			interface.score = digit_ascii(lcd_char(5)) .. digit_ascii(lcd_char(6)) .. digit_ascii(lcd_char(7)) .. digit_ascii(lcd_char(8)) .. digit_ascii(lcd_char(9)):gsub(" ", "")
-		end
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
+	if not on then
+		interface.score = nil -- each search starts without the values of the last one
+		interface.depth = nil
+		interface.pv = nil
+		return nil
 	end
+	if digit_ascii(lcd_char(0)) == "d" and lcd_char(2) < 10 then
+		interface.depth = digit_ascii(lcd_char(1)) .. digit_ascii(lcd_char(2)):gsub(" ", "")
+	elseif digit_ascii(lcd_char(5)) == " " or digit_ascii(lcd_char(5)) == "-" then
+		interface.pv = digit_ascii(lcd_char(0)) .. digit_ascii(lcd_char(1)) .. digit_ascii(lcd_char(2)) .. digit_ascii(lcd_char(3))
+		interface.score = digit_ascii(lcd_char(5)) .. digit_ascii(lcd_char(6)) .. digit_ascii(lcd_char(7)) .. digit_ascii(lcd_char(8)) .. digit_ascii(lcd_char(9)):gsub(" ", "")
+	end
+	return { score = interface.score, depth = interface.depth, pv = interface.pv }
 end
 
 function digit_ascii(digit)

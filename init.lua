@@ -522,7 +522,7 @@ local function format_info(info)
   end
   local parts = {}
   local depth, seldepth = tonumber(info.depth), tonumber(info.seldepth)
-  if depth then parts[#parts + 1] = "depth " .. math.floor(depth) end
+  if depth and depth >= 1 then parts[#parts + 1] = "depth " .. math.floor(depth) end -- depth 0: before the first iteration
   if seldepth then parts[#parts + 1] = "seldepth " .. math.floor(seldepth) end
   if tonumber(info.mate) then
     parts[#parts + 1] = "score mate " .. math.floor(tonumber(info.mate))

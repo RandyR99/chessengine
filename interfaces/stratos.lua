@@ -1,4 +1,5 @@
 interface = {}
+interface.info_every = 1 -- show_info only reads the display
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 -- read len bytes of a memory share (battery RAM) as a string
@@ -22,8 +23,6 @@ interface.level = "a1"
 interface.cur_level = nil
 interface.pv_depth = 0
 interface.pv = ""
-interface.score = "0"
-interface.depth = "1"
 interface.last_pv = ""
 
 function interface.get_module()
@@ -308,7 +307,15 @@ function interface.select_info_display()
 end
 
 function interface.show_info(on, color)
-	if on == true then
+	if on ~= true then
+		interface.score = nil -- each search starts without the values of the last one
+		interface.depth = nil
+		interface.pv = ""
+		interface.last_pv = ""
+		interface.pv_depth = 0
+		return nil
+	end
+	do
 		local info = interface.read_digit(1)
 		if (info:sub(2,2)) ~= "P" then
 			if (info:sub(2,3)) == "nf" then
@@ -332,7 +339,7 @@ function interface.show_info(on, color)
 			if string.match(interface.last_pv, "^" .. interface.pv) == nil then
 				interface.last_pv = interface.pv
 			end
-			return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.last_pv
+			return { score = interface.score, depth = interface.depth, pv = interface.last_pv }
 		end
 	end
 end
