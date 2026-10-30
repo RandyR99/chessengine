@@ -1,4 +1,5 @@
 interface = {}
+interface.info_every = 1 -- show_info only reads the display
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 local function led_on(name)
@@ -564,13 +565,45 @@ function interface.promote(x, y, piece)
 	end
 end
 
-function interface.show_info(on)
-	if on then
-		local depth = " depth " .. digit_char(0) .. digit_char(1)
-		local score = " score cp " .. digit_char(7) .. digit_char(8) .. digit_char(10) .. digit_char(11)
-		local pv = " pv " .. (digit_char(48) .. digit_char(49) .. digit_char(51) .. digit_char(52)):gsub(" ", "")
-		return "info" .. score .. depth .. pv
+-- the LCD shows the search as text (display memory, 16 characters a row): BEST move at 0x20 ("pB8-C6", a piece
+-- symbol first), EVAL at 0x48 ("-9.85", pawns for the machine) and DEPTH at 0x70 ("02/06" = depth/selective depth)
+local lcd_chars = { [0x0b] = "+", [0x0d] = "-", [0x0e] = ".", [0x0f] = "/", [0x1a] = ":" }
+
+local function lcd_text(from, to)
+	local display = machine.devices[':lcd:lcdc'].spaces['display']
+	local text = ""
+	for a = from, to do
+		local b = display:read_u8(a)
+		if b >= 0x10 and b <= 0x19 then
+			text = text .. string.char(0x30 + b - 0x10)
+		elseif lcd_chars[b] then
+			text = text .. lcd_chars[b]
+		elseif b >= 0x20 and b < 0x7f then
+			text = text .. string.char(b)
+		else
+			text = text .. " "
+		end
 	end
+	return text
+end
+
+function interface.show_info(on)
+	if not on then
+		return nil
+	end
+	local info = {}
+	local from, to = lcd_text(0x20, 0x2f):match("([A-H][1-8])[-x]([A-H][1-8])")
+	if from then
+		info.pv = { (from .. to):lower() }
+	end
+	local eval = tonumber(lcd_text(0x48, 0x4f):match("[+-]?%d+%.%d+"))
+	if eval then
+		info.score = math.floor(eval * 100 + (eval < 0 and -0.5 or 0.5))
+	end
+	local depth, seldepth = lcd_text(0x70, 0x7f):match("(%d+)/(%d+)")
+	info.depth = tonumber(depth)
+	info.seldepth = tonumber(seldepth)
+	return info
 end
 
 function digit_char(n)

@@ -1,4 +1,5 @@
 interface = {}
+interface.info_every = 1 -- show_info only reads the display
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 interface.turn = true
@@ -172,7 +173,10 @@ function interface.promote(x, y, piece)
 	-- TODO
 end
 
-function interface.show_info()
+function interface.show_info(on)
+  if not on then
+    return nil
+  end
   local info=nil
   local d0 = output_value("digit3")
     local d1 = output_value("digit2")
