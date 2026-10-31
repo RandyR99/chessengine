@@ -86,5 +86,8 @@ end
 -- (as on montec/mm4); to come back once the info can be read from RAM without key presses
 interface.show_info = nil
 
+-- the RISC program runs on the ARM coprocessor: polgar's RAM reader doesn't apply
+interface.show_info = nil
+
 return interface
 

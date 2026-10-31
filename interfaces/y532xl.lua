@@ -3,7 +3,6 @@ interface.ignore_late_go = true -- replies on its own once the player's move is 
 
 interface.level = "TI 1"
 interface.cur_level = nil
-local Ticker = 1
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
@@ -195,35 +194,31 @@ local function display_text(first, last)
 	return text
 end
 
--- manual 19: SHOW MOVE = best move (left display) + evaluation (right, '-1.50'), bishop key = depth ('SD 05'),
--- SHOW MOVE again = clocks. Keys only while the machine thinks and no LED is lit (a lit LED = its move is shown
--- or being executed on the board)
+-- the best move so far is kept in RAM at 0x0f56/0x0f57 (square = (rank - 1) * 8 + file, file 0 = a; found by RAM
+-- dumps during the search; at the start of a search it still holds the player's move, which the plugin's legality
+-- check drops). Read without key presses (SHOW MOVE could land just as the move appears and hide it); the evaluation
+-- and depth weren't found in RAM
+local stale = nil -- RAM as the previous search left it
+local first = true
+
 function interface.show_info(on)
-	if on and Ticker == 1 and not any_led() then
-		Ticker = 0
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
-		send_input(":IN.0", 0x80, 0.5) -- Show Move
-		local pv = display_text(7, 4)
-		local score = display_text(3, 0):gsub(" ", "")
-		send_input(":IN.2", 0x04, 0.5) -- Bishop: depth
-		local depth = display_text(3, 0)
-		send_input(":IN.0", 0x80, 0.5) -- Show Move
-		machine.video.throttled = throttled_state
-		if not pv:match("^[a-h][1-8][a-h][1-8]$") or not score:match("^%-?%d+$") or not depth:match("%d%d$") then
-			return nil
-		end
-		interface.pv = pv
-		interface.score = tostring(tonumber(score))
-		interface.depth = tostring(tonumber(depth:sub(3)))
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-	else
-		Ticker = 1
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	local from, to = sp:read_u8(0x0f56), sp:read_u8(0x0f57)
+	if not on or first then
+		first = false -- battery RAM still holds the last search before this session's first player turn
+		stale = from * 256 + to
+		return nil
 	end
+	if from * 256 + to == stale or from > 63 or to > 63 or from == to then
+		return nil
+	end
+	stale = nil
+	local function square(v)
+		return string.char(0x61 + v % 8) .. (v // 8 + 1)
+	end
+	return { pv = { square(from) .. square(to) } }
 end
--- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
--- (as on montec/mm4); to come back once the info can be read from RAM without key presses
-interface.show_info = nil
+interface.info_every = 1 -- show_info only reads RAM
 
 function digit_ascii(digit)
 	if     (digit == nil) then digit = -1

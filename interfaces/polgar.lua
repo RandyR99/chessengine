@@ -267,60 +267,11 @@ function interface.promote(x, y, piece)
 	end
 end
 
--- show_info may press keys only while the machine searches: no move in the upper row ('E4-D3') and no board LED lit;
--- CL/INFO while the machine shows its move or while the plugin executes it on the board can make the machine miss the move
-function interface.searching_display()
-	if read_lcd_range(0x00, 0x0f):match("^.[A-H][1-8][-x:][A-H][1-8]") then
-		return false
-	end
-	for i = 0, 63 do
-		if output_value("led" .. i) ~= 0 then
-			return false
-		end
-	end
-	return true
-end
-
-function interface.show_info(on)
-	if on and interface.searching_display() then
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
-		send_input(":KEY", 0x80, 0.2) -- CL
-		send_input(":KEY", 0x02, 0.2) -- INFO
-		send_input(":KEY", 0x02, 0.2) -- INFO
-		
-		local ddram = read_lcd_range(0x00, 0x7F)
-		local raw_score = ""
-		local raw_depth = ""
-		local raw_pv = ""
-
-		if ddram:sub(1,4) == "-PB-" then
-			raw_score = ddram:sub(65,66) .. ddram:sub(68,69):gsub(" ", "")
-			raw_depth = ddram:sub(71,72):gsub(" ", "")
-			raw_pv = string.lower(ddram:sub(7,20))
-		elseif ddram:sub(2,3) ~= "nr" then
-			raw_score = ddram:sub(1,2) .. ddram:sub(4,5):gsub(" ", "")
-			raw_depth = ddram:sub(7,8):gsub(" ", "")
-			raw_pv = string.lower(ddram:sub(77,112))
-		end
-
-		-- Fallback Sanitization: Filter out incomplete text or intermediate states like "G-F"
-		if raw_score:match("^%s*$") or raw_score:match("[A-Za-z]") then
-			machine.video.throttled = throttled_state
-			return nil
-		end
-
-		interface.score = raw_score
-		interface.depth = raw_depth
-		interface.pv = raw_pv
-
-		machine.video.throttled = throttled_state
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-	end
-end
--- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
--- (as on montec/mm4); to come back once the info can be read from RAM without key presses
-interface.show_info = nil
+-- the main line in RAM like on mega4 (same list of square pairs, at 0x013e), read without key presses
+local mega4 = load_interface("mega4")
+mega4.pv_ram = 0x013e
+interface.show_info = mega4.show_info
+interface.info_every = 1 -- show_info only reads RAM
 
 return interface
 

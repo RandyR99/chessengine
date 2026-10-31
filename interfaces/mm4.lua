@@ -216,6 +216,7 @@ end
 local segment_char = { [0x00] = "", [0x40] = "-", [0x3f] = "0", [0x06] = "1", [0x5b] = "2", [0x4f] = "3", [0x66] = "4",
 	[0x6d] = "5", [0x7d] = "6", [0x07] = "7", [0x7f] = "8", [0x6f] = "9" }
 local stale = nil -- RAM as the previous search (or game) left it
+local first = true
 interface.info_ram = 0x013e
 
 function interface.show_info(on)
@@ -225,7 +226,8 @@ function interface.show_info(on)
 	for a = base, base + 0x0d do
 		raw = raw .. string.char(sp:read_u8(a))
 	end
-	if not on then
+	if not on or first then
+		first = false -- battery RAM still holds the last search before this session's first player turn
 		stale = raw
 		return nil
 	end

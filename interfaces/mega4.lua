@@ -171,18 +171,22 @@ function interface.promote(x, y, piece)
 	end
 end
 
--- the search keeps its main line in RAM at 0x018a (found by RAM dumps during the search): pairs of squares
+-- the search keeps its main line in RAM at interface.pv_ram (0x018a; polgar 0x013e; found by RAM dumps during the
+-- search): pairs of squares
 -- (file * 10 + rank, file 0 = a), ended by an invalid pair. Read without key presses (an INFO press could land just
 -- after the machine shows its move and hide it); the evaluation and depth weren't found in RAM
 local stale = nil -- RAM as the previous search (or game) left it
+local first = true
+interface.pv_ram = 0x018a
 
 function interface.show_info(on)
 	local sp = machine.devices[":maincpu"].spaces["program"]
 	local raw = ""
-	for a = 0x018a, 0x0199 do
+	for a = interface.pv_ram, interface.pv_ram + 0x0f do
 		raw = raw .. string.char(sp:read_u8(a))
 	end
-	if not on then
+	if not on or first then
+		first = false -- battery RAM still holds the last search before this session's first player turn
 		stale = raw
 		return nil
 	end
