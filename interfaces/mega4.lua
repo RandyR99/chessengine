@@ -174,7 +174,8 @@ end
 -- the search keeps its main line in RAM at interface.pv_ram (0x018a; polgar 0x013e; found by RAM dumps during the
 -- search): pairs of squares (file * 10 + rank, file 0 = a), ended by an invalid pair. With the debugger (the display
 -- code of the INFO pages): interface.score_ram (0x0114) holds the evaluation for the machine as it is shown, 4 LCD
--- bytes: sign (0x08 '-', 0x00 '+'), then 3 digits through the ROM table at 0xe77f (bit 0 of the first = point);
+-- bytes: sign (0x08 '-', 0x00 '+'), then 3 digits through the ROM table at interface.digit_table (0xe77f; montec4
+-- 0xe953; bit 0 of the first = point);
 -- interface.depth_ram (0x000b) the search depth. Read without key presses (an INFO press could land just after the
 -- machine shows its move and hide it)
 local stale = nil -- RAM as the previous search (or game) left it
@@ -182,6 +183,7 @@ local first = true
 interface.pv_ram = 0x018a
 interface.score_ram = 0x0114
 interface.depth_ram = 0x000b
+interface.digit_table = 0xe77f
 
 function interface.show_info(on)
 	local sp = machine.devices[":maincpu"].spaces["program"]
@@ -224,7 +226,7 @@ function interface.show_info(on)
 	if interface.score_ram then
 		local digit = {}
 		for n = 0, 9 do
-			digit[sp:read_u8(0xe77f + n)] = n
+			digit[sp:read_u8(interface.digit_table + n)] = n
 		end
 		local sign, d1, d2, d3 = raw:byte(17, 20)
 		local p1, p2, p3 = digit[d1 & 0xfe], digit[d2], digit[d3]

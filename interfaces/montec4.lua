@@ -236,8 +236,10 @@ function interface.promote(x, y, piece)
 	end
 end
 
--- the main line in RAM, read like on mega4 (same program family, same address)
-interface.show_info = load_interface("mega4").show_info
+-- the main line, evaluation and depth in RAM, read like on mega4 (same program family, same addresses)
+local mega4 = load_interface("mega4")
+mega4.digit_table = 0xe953 -- the evaluation's digit table (same RAM layout as mega4)
+interface.show_info = mega4.show_info
 interface.info_every = 1 -- show_info only reads RAM
 
 function digit_ascii(digit)
