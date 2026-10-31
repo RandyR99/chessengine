@@ -281,25 +281,30 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- the best move so far is kept in RAM at 0x11fc10/0x11fc11 (0x88 squares: (rank - 1) * 16 + file, file 0 = a; found by
+-- RAM dumps during the search). Read without key presses (Analysis could land just as the move appears and hide it);
+-- the evaluation and depth weren't identified
+local stale = nil -- RAM as the previous search left it
+local first = true
+
 function interface.show_info(on)
-	if on then
-		send_input(":IN.2", 0x08, 1) -- Analysis
-		local d1 = output_value("digit0")
-		local d2 = output_value("digit1")
-		local d3 = output_value("digit2")
-		local d4 = output_value("digit3")
-		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-		local d5 = output_value("digit4")
-		local d6 = output_value("digit5")
-		local d7 = output_value("digit6")
-		local d8 = output_value("digit7")
-		interface.score = (digit_ascii(d5) .. digit_ascii(d6) .. digit_ascii(d7) .. digit_ascii(d8)):gsub(" ", "") .. "0"
-		return "info score cp " .. interface.score .. " depth 1 pv " .. interface.pv
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	local from, to = sp:read_u8(0x11fc10), sp:read_u8(0x11fc11)
+	if not on or first then
+		first = false -- RAM can still hold the last search before this session's first player turn
+		stale = from * 256 + to
+		return nil
 	end
+	if from * 256 + to == stale or from & 0x88 ~= 0 or to & 0x88 ~= 0 or from == to then
+		return nil
+	end
+	stale = nil
+	local function square(v)
+		return string.char(0x61 + (v & 0x07)) .. ((v >> 4) + 1)
+	end
+	return { pv = { square(from) .. square(to) } }
 end
--- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
--- (as on montec/mm4); to come back once the info can be read from RAM without key presses
-interface.show_info = nil
+interface.info_every = 1 -- show_info only reads RAM
 
 function digit_ascii(digit)
 	if     digit == nil then return ("0")
