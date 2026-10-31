@@ -4,9 +4,6 @@ interface.invert = false
 interface.level = "c2"
 interface.cur_level = nil
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
-interface.pv = ""
-interface.depth = "0"
-interface.score = "0.00"
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
@@ -198,87 +195,63 @@ function interface.promote(x, y, piece)
 	end
 end
 
--- show_info disabled: its INFO press can land a few ms after the machine shows its move (before the move LEDs light);
--- the machine then drops the move display, takes the move as played and starts the player's clock -> the plugin never sees it.
--- To be redone in the show_info revisit (only press keys while the machine's own display shows it is still searching).
---[[
-function interface.show_info(on)
-	if not on then return nil end
+-- show_info reads the search result from RAM, without key presses (an INFO press could land just as the move appears
+-- and hide it). Found in the code of the INFO pages: the search stores its result block (0xbe29 in the montec ROM)
+-- with the main line as from-squares at base and to-squares at base + 6 (up to 6 moves, 0 ends it; 10x12 board,
+-- a1 = 21), the depth at base + 0x2a (the INFO page shows it + 1) and the evaluation for the machine as a 16-bit value
+-- at base + 0x30/0x31 (0x8000 = 0.00, high byte pawns, low byte 1/256 pawn). The Super Mondial program (smondial.lua
+-- borrows this reader) keeps the same block 0x14 bytes higher.
+local info_ram = { montec = 0x06c8, monteca = 0x06c8, smondial = 0x06dc, smondialab = 0x06dc, smondialb = 0x06dc }
+local base = info_ram[machine.system.name]
+local stale = nil
+local first = true
 
-	-- ESCAPE GATE: Scan the 64-square LED grid. If any LED is lit, abort immediately!
-	for idx = 0, 63 do
-		if output_value("led" .. idx) ~= 0 then
-			return nil -- Abort to protect the promotion sequence
-		end
+function interface.show_info(on)
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	local raw = ""
+	for a = base, base + 0x0b do
+		raw = raw .. string.char(sp:read_u8(a))
 	end
-	-- only while both displays show the clocks: a just-found move is on the display before its LEDs light up, and INFO would hide it
-	if (output_value("digit1") & 0x80 == 0 or output_value("digit5") & 0x80 == 0) then
+	for _, a in ipairs({ base + 0x2a, base + 0x30, base + 0x31 }) do
+		raw = raw .. string.char(sp:read_u8(a))
+	end
+	if not on or first then
+		first = false -- battery RAM still holds the last search before this session's first player turn
+		stale = raw
 		return nil
 	end
-
-	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
-	send_input(":KEY.0", 0x08, 0.3) -- INFO
-	emu.wait(0.2)
-	
-	local d1 = output_value("digit0") & 0x7f
-	local d2 = output_value("digit1") & 0x7f
-	local d3 = output_value("digit2") & 0x7f
-	local d4 = output_value("digit3") & 0x7f
-	local d5 = output_value("digit4") & 0x7f
-	local d6 = output_value("digit5") & 0x7f
-	local d7 = output_value("digit6") & 0x7f
-	local d8 = output_value("digit7") & 0x7f
-	
-	interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-	
-	send_input(":KEY.1", 0x01, 0.3) -- 1
-	emu.wait(0.2)
-	
-	d1 = output_value("digit2") & 0x7f
-	d2 = output_value("digit3") & 0x7f
-	d3 = output_value("digit4") & 0x7f
-	d4 = output_value("digit5") & 0x7f
-	d5 = output_value("digit6") & 0x7f
-	d6 = output_value("digit7") & 0x7f
-	
-	interface.depth = digit_ascii(d1) .. digit_ascii(d2):gsub(" ","")
-	interface.score = digit_ascii(d3) .. digit_ascii(d4) .. digit_ascii(d5) .. digit_ascii(d6):gsub(" ","")
-	
-	-- always back to the clocks: leaving the INFO screen up hides a move found meanwhile from is_selected
-	send_input(":KEY.0", 0x10, 0.2) -- CL
-	emu.wait(0.05)
-	
-	machine.video.throttled = throttled_state
-	return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-end
-]]
-
-function digit_ascii(digit)
-	if     digit == 0   then return " "
-	elseif digit == 64  then return "-"
-	elseif digit == 8   then return "_"
-	elseif digit == 63  then return "0"
-	elseif digit == 6   then return "1"
-	elseif digit == 91  then return "2"
-	elseif digit == 79  then return "3"
-	elseif digit == 102 then return "4"
-	elseif digit == 109 then return "5"
-	elseif digit == 125 then return "6"
-	elseif digit == 7   then return "7"
-	elseif digit == 127 then return "8"
-	elseif digit == 111 then return "9"
-	elseif digit == 119 then return "a"
-	elseif digit == 124 then return "b"
-	elseif digit == 57  then return "c"
-	elseif digit == 94  then return "d"
-	elseif digit == 121 then return "e"
-	elseif digit == 113 then return "f"
-	elseif digit == 61  then return "g"
-	elseif digit == 118 then return "h"
+	if raw == stale then
+		return nil -- nothing from this search yet
 	end
-	return " "
+	stale = nil
+	local info = {}
+	local function square(v)
+		local file, rank = (v - 21) % 10, (v - 21) // 10
+		if v >= 21 and v <= 98 and file <= 7 then
+			return string.char(0x61 + file) .. (rank + 1)
+		end
+	end
+	local pv = {}
+	for k = 1, 6 do
+		local from, to = square(raw:byte(k)), square(raw:byte(k + 6))
+		if not from or not to or from == to then
+			break
+		end
+		pv[#pv + 1] = from .. to
+	end
+	if #pv > 0 then
+		info.pv = pv
+	end
+	local depth, lo, hi = raw:byte(13, 15)
+	info.depth = depth + 1
+	info.score = ((hi << 8 | lo) - 0x8000) * 100 // 256
+	return info
 end
+
+if base == nil then
+	interface.show_info = nil -- result block not checked for this program
+end
+interface.info_every = 1 -- show_info only reads RAM
 
 return interface
 

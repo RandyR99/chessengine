@@ -150,4 +150,11 @@ function interface.resigned()
 	return lower_display(0x6d, 0x3d)
 end
 
+-- the main line, evaluation and depth in RAM, read like on mega4 (the Super Mondial II program keeps the same RAM
+-- layout; its digit table is at 0xe9d1)
+local mega4 = load_interface("mega4")
+mega4.digit_table = 0xe9d1
+interface.show_info = mega4.show_info
+interface.info_every = 1 -- show_info only reads RAM
+
 return interface

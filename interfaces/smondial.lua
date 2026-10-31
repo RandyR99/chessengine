@@ -4,9 +4,6 @@ interface.invert = false
 interface.level = "c2"
 interface.cur_level = nil
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
-interface.score = "0.00"
-interface.depth = "0"
-interface.pv = ""
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
@@ -201,65 +198,9 @@ function interface.promote(x, y, piece)
 	end
 end
 
--- show_info disabled (as on montec, same display code): its INFO press can land just after the machine shows its move
--- (before the move LEDs light) and hide it. To be redone in the show_info revisit.
---[[
-function interface.show_info(on)
-	if on then
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
-		send_input(":KEY.3", 0x04, 0.2) -- INFO
-		emu.wait(0.3)
-		local d1 = output_value("digit0")
-		local d2 = output_value("digit1")
-		local d3 = output_value("digit2")
-		local d4 = output_value("digit3")
-		local d5 = output_value("digit4")
-		local d6 = output_value("digit5")
-		local d7 = output_value("digit6")
-		local d8 = output_value("digit7")
-		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-		send_input(":KEY.0", 0x01, 0.2) -- 1
-		emu.wait(0.3)
-		d1 = output_value("digit2")
-		d2 = output_value("digit3")
-		d3 = output_value("digit4")
-		d4 = output_value("digit5")
-		d5 = output_value("digit6")
-		d6 = output_value("digit7")
-		interface.depth = digit_ascii(d1) .. digit_ascii(d2)
-		interface.score = digit_ascii(d3) .. digit_ascii(d4) .. digit_ascii(d5) .. digit_ascii(d6)
-		send_input(":KEY.0", 0x08, 0.2) -- CLEAR
-		emu.wait(0.3)
-		machine.video.throttled = throttled_state
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-	end
-end
-]]
-
-function digit_ascii(digit)
-	if     digit == 0   then return " "
-	elseif digit == 64  then return "-"
-	elseif digit == 8   then return "_"
-	elseif digit == 63  then return "0"
-	elseif digit == 6   then return "1"
-	elseif digit == 91  then return "2"
-	elseif digit == 79  then return "3"
-	elseif digit == 102 then return "4"
-	elseif digit == 109 then return "5"
-	elseif digit == 125 then return "6"
-	elseif digit == 7   then return "7"
-	elseif digit == 127 then return "8"
-	elseif digit == 111 then return "9"
-	elseif digit == 119 then return "a"
-	elseif digit == 124 then return "b"
-	elseif digit == 57  then return "c"
-	elseif digit == 94  then return "d"
-	elseif digit == 121 then return "e"
-	elseif digit == 113 then return "f"
-	elseif digit == 61  then return "g"
-	elseif digit == 118 then return "h"
-	end
-end
+-- show_info: the Super Mondial program keeps the same search result block as the Monte Carlo (montec.lua reads it
+-- from RAM without key presses; an INFO press could land just as the move appears and hide it)
+interface.show_info = load_interface("montec").show_info
+interface.info_every = 1
 
 return interface
