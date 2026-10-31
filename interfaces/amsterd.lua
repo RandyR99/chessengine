@@ -177,19 +177,23 @@ end
 -- the search information the INFO key shows is kept as text in RAM (found by the " SUM" in it): the main line
 -- 0x3c bytes before it ("E7E5E2E4D7D6" up to 8 moves, "_" after the last), the evaluation in pawns for Mephisto
 -- 0x1c before (" 0" "28": the point is bit 6 of the units digit; dallas/roma show at most "-9.99"), then after it the depth "M 03" (+0x0c), the move
--- searched "A 01" "E7E5" and the selective depth "S 12" (+0x18); manual H.1-H.6. Read without key presses
-local ram_ranges = { { 0xffc000, 0xffffff }, { 0x010000, 0x01ffff } } -- amsterd/dallas16/roma16, dallas32/roma32
+-- searched "A 01" "E7E5" and the selective depth "S 12" (+0x18; amsterdg has no move there: +0x14); manual H.1-H.6
+local ram_ranges = { amsterd = { 0xffc000, 0xffffff }, dallas16 = { 0xffc000, 0xffffff }, roma16 = { 0xffc000, 0xffffff },
+	dallas32 = { 0x010000, 0x01ffff }, roma32 = { 0x010000, 0x01ffff },
+	amsterdg = { 0x01c000, 0x01ffff }, dallas16g = { 0x01c000, 0x01ffff }, roma16g = { 0x01c000, 0x01ffff } } -- Glasgow hardware
 local info_text = nil -- address of " SUM"
 local stale = nil     -- the texts as the previous search left them
 
 local function find_info_text()
 	local sp = machine.devices[":maincpu"].spaces["program"]
-	for _, r in ipairs(ram_ranges) do
-		for a = r[1], r[2] - 0x20 do
-			if sp:read_u8(a) == 0x20 and sp:read_u8(a + 1) == 0x53 and sp:read_u8(a + 2) == 0x55 and sp:read_u8(a + 3) == 0x4d
-				and sp:read_u8(a + 0x0c) == 0x4d and sp:read_u8(a + 0x18) == 0x53 then
-				return a
-			end
+	local r = ram_ranges[machine.system.name]
+	if r == nil then
+		return nil
+	end
+	for a = r[1], r[2] - 0x20 do
+		if sp:read_u8(a) == 0x20 and sp:read_u8(a + 1) == 0x53 and sp:read_u8(a + 2) == 0x55 and sp:read_u8(a + 3) == 0x4d
+			and sp:read_u8(a + 0x0c) == 0x4d then
+			return a
 		end
 	end
 	return nil
@@ -253,7 +257,7 @@ function interface.show_info(on)
 		end
 	end
 	info.depth = tonumber(ram_text(0x0c, 4):match("^M ?(%d+)$"))
-	info.seldepth = tonumber(ram_text(0x18, 4):match("^S ?(%d+)$"))
+	info.seldepth = tonumber(ram_text(0x14, 8):match("^S ?(%d+)") or ram_text(0x14, 8):match("^....S ?(%d+)"))
 	return info
 end
 interface.info_every = 1 -- show_info only reads RAM
