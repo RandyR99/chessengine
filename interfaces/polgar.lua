@@ -267,11 +267,13 @@ function interface.promote(x, y, piece)
 	end
 end
 
--- the main line in RAM like on mega4 (same list of square pairs, at 0x013e), read without key presses
+-- the main line in RAM like on mega4 (same list of square pairs, at 0x013e) and the evaluation as text after it,
+-- read without key presses
 local mega4 = load_interface("mega4")
 mega4.pv_ram = 0x013e
-mega4.score_ram = nil -- not looked up for this program yet
-mega4.depth_ram = nil
+mega4.score_ram = nil
+mega4.score_text_ram = 0x0148 -- the evaluation for the machine as text ("-8.95")
+mega4.depth_ram = nil -- not found
 interface.show_info = mega4.show_info
 interface.info_every = 1 -- show_info only reads RAM
 

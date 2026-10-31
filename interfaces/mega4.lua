@@ -176,7 +176,8 @@ end
 -- code of the INFO pages): interface.score_ram (0x0114) holds the evaluation for the machine as it is shown, 4 LCD
 -- bytes: sign (0x08 '-', 0x00 '+'), then 3 digits through the ROM table at interface.digit_table (0xe77f; montec4
 -- 0xe953; bit 0 of the first = point);
--- interface.depth_ram (0x000b) the search depth. Read without key presses (an INFO press could land just after the
+-- interface.depth_ram (0x000b) the search depth; polgar has the evaluation as text instead (interface.score_text_ram,
+-- 0x0148: "-8.95"). Read without key presses (an INFO press could land just after the
 -- machine shows its move and hide it)
 local stale = nil -- RAM as the previous search (or game) left it
 local first = true
@@ -184,6 +185,7 @@ interface.pv_ram = 0x018a
 interface.score_ram = 0x0114
 interface.depth_ram = 0x000b
 interface.digit_table = 0xe77f
+interface.score_text_ram = nil
 
 function interface.show_info(on)
 	local sp = machine.devices[":maincpu"].spaces["program"]
@@ -193,6 +195,11 @@ function interface.show_info(on)
 	end
 	if interface.score_ram then
 		for a = interface.score_ram, interface.score_ram + 3 do
+			raw = raw .. string.char(sp:read_u8(a))
+		end
+	end
+	if interface.score_text_ram then
+		for a = interface.score_text_ram, interface.score_text_ram + 4 do
 			raw = raw .. string.char(sp:read_u8(a))
 		end
 	end
@@ -233,6 +240,14 @@ function interface.show_info(on)
 		if (sign == 0x00 or sign == 0x08) and p1 and p2 and p3 then
 			local cp = p1 * 100 + p2 * 10 + p3
 			info.score = sign == 0x08 and -cp or cp
+		end
+	end
+	if interface.score_text_ram then
+		local text = raw:sub(-5)
+		local sign, pawns, hundredths = text:match("^([ %-])(%d)%.(%d%d)$")
+		if pawns then
+			local cp = tonumber(pawns) * 100 + tonumber(hundredths)
+			info.score = sign == "-" and -cp or cp
 		end
 	end
 	if interface.depth_ram then
