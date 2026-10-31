@@ -169,4 +169,7 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- mm4's RAM addresses for the info (score, first move) don't apply to this older program
+interface.show_info = nil
+
 return interface

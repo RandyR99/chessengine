@@ -3,9 +3,6 @@ interface.ignore_late_go = true -- replies on its own once the player's move is 
 
 interface.level = "le 1"
 interface.cur_level = nil
---interface.score = "0.00"
---interface.depth = "0"
---interface.pv = ""
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
@@ -212,64 +209,55 @@ function interface.promote(x, y, piece)
 	machine.video.throttled = throttled_state
 end
 
---[[
-function interface.show_info(on)
-	if on then
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
-		send_input(":KEY.0", 0x08, 0.2) -- INFO
-		emu.wait(0.1)
-		local d1 = output_value("digit3") & 0x7f
-		local d2 = output_value("digit2") & 0x7f
-		local d3 = output_value("digit1") & 0x7f
-		local d4 = output_value("digit0") & 0x7f
-		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-		send_input(":KEY.1", 0x08, 0.2) -- 1
-		emu.wait(0.1)
-		d1 = output_value("digit3") & 0x7f
-		d2 = output_value("digit2") & 0x7f
-		d3 = output_value("digit1") & 0x7f
-		d4 = output_value("digit0") & 0x7f
-		if (digit_ascii(d1) == " " or digit_ascii(d1) == "-") and d2 ~= 0 then
-			interface.score = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4):gsub(" ","")
-		end
-		send_input(":KEY.1", 0x40, 0.2) -- 3
-		emu.wait(0.1)
-		d1 = output_value("digit3") & 0x7f
-		d2 = output_value("digit2") & 0x7f
-		if (d2 - 128) >= 1 and (d1 - 128) <= 0 then
-			interface.depth = digit_ascii(d1) .. digit_ascii(d2)
-		end
-		send_input(":KEY.0", 0x01, 0.2) -- CL
-		machine.video.throttled = throttled_state
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-	end
-end
+-- the search keeps what the INFO pages show in RAM (found with read taps on the info keys): 0x0148-0x014b the
+-- evaluation in pawns for Mephisto as display digits ("-8.91": 0x40 0xff 0x6f 0x06, bit 7 = point), 0x013e/0x013f
+-- the first move of the main line (file * 10 + rank, file 0 = a). Read without key presses (a press could land just
+-- as the move appears and hide it); no search depth found
+local segment_char = { [0x00] = "", [0x40] = "-", [0x3f] = "0", [0x06] = "1", [0x5b] = "2", [0x4f] = "3", [0x66] = "4",
+	[0x6d] = "5", [0x7d] = "6", [0x07] = "7", [0x7f] = "8", [0x6f] = "9" }
+local stale = nil -- RAM as the previous search (or game) left it
 
-function digit_ascii(digit)
-	if     digit == 0   then return " "
-	elseif digit == 64  then return "-"
-	elseif digit == 8   then return "_"
-	elseif digit == 63  then return "0"
-	elseif digit == 6   then return "1"
-	elseif digit == 91  then return "2"
-	elseif digit == 79  then return "3"
-	elseif digit == 102 then return "4"
-	elseif digit == 109 then return "5"
-	elseif digit == 125 then return "6"
-	elseif digit == 7   then return "7"
-	elseif digit == 127 then return "8"
-	elseif digit == 111 then return "9"
-	elseif digit == 119 then return "a"
-	elseif digit == 124 then return "b"
-	elseif digit == 57  then return "c"
-	elseif digit == 94  then return "d"
-	elseif digit == 121 then return "e"
-	elseif digit == 113 then return "f"
-	elseif digit == 61  then return "g"
-	elseif digit == 118 then return "h"
+function interface.show_info(on)
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	local raw = ""
+	for a = 0x013e, 0x014b do
+		raw = raw .. string.char(sp:read_u8(a))
 	end
+	if not on then
+		stale = raw
+		return nil
+	end
+	if raw == stale then
+		return nil -- nothing from this search yet
+	end
+	stale = nil
+	local info = {}
+	local text = ""
+	for a = 0x0148, 0x014b do
+		local b = sp:read_u8(a)
+		local c = segment_char[b & 0x7f]
+		if c == nil then
+			text = nil
+			break
+		end
+		text = text .. c .. ((b & 0x80 ~= 0) and "." or "")
+	end
+	local pawns = text and tonumber(text:match("^%-?%d+%.%d%d$"))
+	if pawns then
+		info.score = math.floor(pawns * 100 + (pawns < 0 and -0.5 or 0.5))
+	end
+	local function square(v)
+		local file, rank = v // 10, v % 10
+		if file <= 7 and rank >= 1 and rank <= 8 then
+			return string.char(0x61 + file) .. rank
+		end
+	end
+	local from, to = square(sp:read_u8(0x013e)), square(sp:read_u8(0x013f))
+	if from and to and from ~= to then
+		info.pv = { from .. to }
+	end
+	return info
 end
---]]
+interface.info_every = 1 -- show_info only reads RAM
 
 return interface

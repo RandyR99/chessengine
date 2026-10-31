@@ -104,4 +104,7 @@ function interface.set_option(name, value)
 	end
 end
 
+-- mm4's RAM addresses for the info (score, first move) don't apply to this older program
+interface.show_info = nil
+
 return interface
