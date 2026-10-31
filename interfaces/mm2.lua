@@ -169,7 +169,31 @@ function interface.promote(x, y, piece)
 	end
 end
 
--- mm4's RAM addresses for the info (score, first move) don't apply to this older program
-interface.show_info = nil
+-- show_info reads the evaluation from RAM, without key presses (an INFO press could land just as the move appears and
+-- hide it). Found in the code of the INFO pages: the search reports to the display program through a mailbox, whose
+-- score handler keeps the evaluation for the machine as pawns at 0x0f0f (shown up to 9.99), fraction at 0x0f0e
+-- (1/256 pawn) and a side bit at 0x0f0d (negative when it equals 0x0fec). The main line at 0x0f23/0x0f28 starts with
+-- the reply to the machine's move, which is not kept during the search, and no search depth is shown: score only.
+local stale = nil
+local first = true
+
+function interface.show_info(on)
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	local side, fraction, pawns = sp:read_u8(0x0f0d), sp:read_u8(0x0f0e), sp:read_u8(0x0f0f)
+	local raw = side .. " " .. fraction .. " " .. pawns
+	if not on or first then
+		first = false -- RAM still holds the last search before this session's first player turn
+		stale = raw
+		return nil
+	end
+	if raw == stale then
+		return nil -- nothing from this search yet
+	end
+	stale = nil
+	local cp = math.min(pawns, 9) * 100 + fraction * 100 // 256
+	return { score = side == sp:read_u8(0x0fec) and -cp or cp }
+end
+
+interface.info_every = 1 -- show_info only reads RAM
 
 return interface
