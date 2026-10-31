@@ -1,13 +1,5 @@
 interface = load_interface("port16")
--- the Lyon program has the programmable info display (lyon32.lua), here with the 16 bit module's keys
-local lyon = load_interface("lyon32")
-local setup_machine = interface.setup_machine
-function interface.setup_machine()
-	setup_machine()
-	lyon.info_display({ cl = { ":KEY3", 0x0200 }, right = { ":KEY2", 0x0100 }, down = { ":KEY3", 0x0100 }, ent = { ":KEY1", 0x0200 } })
-end
-interface.show_info = lyon.show_info
-interface.info_every = lyon.info_every
+interface.info_menu_item = 14 -- the info line table is in ANZEI (alm16 sets it up)
 
 interface.level = "NORML 01"
 

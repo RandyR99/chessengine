@@ -138,33 +138,41 @@ function interface.setup_machine()
 	interface.info_display()
 end
 
--- programmable info display (manual 2.16 ANZEI): while Mephisto computes, show info lines 3 (depth/selective depth,
--- move searched, its number) and 4 (evaluation for Mephisto, first two moves of the main line) only, instead of the
--- clock (lines 10 and 11); kept in the display module's memory, so a line is only toggled when it isn't set yet.
--- keys = { cl, right, down, ent } as { port, mask } (also used by gen32 and berl32t8p, whose keys differ)
+-- programmable info display (Lyon manual 2.16 ANZEI, Portorose manual 3.7.15): while Mephisto computes, show info
+-- lines 3 (depth/selective depth, move searched, its number) and 4 (evaluation for Mephisto, first two moves of the
+-- main line) only, instead of the clock (lines 10 and 11); kept in the display module's memory, so a line is only
+-- toggled when it isn't set yet. keys = { cl, right, down, ent } as { port, mask } (also used by gen32, berl32t8p,
+-- the 16 bit Lyons and alm16/alm32, whose keys differ); menu_item: the main menu item with the ZEILE01-13 table at
+-- its end: 14 ANZEI (Lyon and later), 10 FUNKT (Almeria, Portorose: after the other options)
 local lyon_keys = { cl = { ":KEY1", 0x8000 }, right = { ":KEY1", 0x4000 }, down = { ":KEY2", 0x4000 }, ent = { ":KEY3", 0x8000 } }
 
-function interface.info_display(keys)
+function interface.info_display(keys, menu_item)
 	keys = keys or lyon_keys
 	local function key(k, t)
 		send_input(keys[k][1], keys[k][2], t)
 	end
-	local ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram'])
+	local hd44780 = machine.devices[':display:hd44780']
+	local ddram = emu.item(hd44780.items['0/m_ddram'])
 	key("cl", 0.5)
 	key("cl", 0.5)
-	for i = 1, 13 do
-		key("right", 0.25) -- to ANZEI
+	for i = 2, menu_item or 14 do
+		key("right", 0.25)
 	end
 	key("ent", 0.5)
-	for line = 1, 13 do
-		key("down", 0.25) -- cursor on the line's computing-phase setting
-		local want = (line == 3 or line == 4) and "AN " or "AUS"
-		local name = string.format("ZEILE%02d", line)
-		local row = ddram:read_block(0x00, 0x07) == name and 0x00 or (ddram:read_block(0x40, 0x07) == name and 0x40)
-		if row and ddram:read_block(row + 0x09, 0x03) ~= want then
-			key("ent", 0.25)
-			key("down", 0.25) -- AN <-> AUS
-			key("ent", 0.25)
+	for step = 1, 40 do
+		key("down", 0.25)
+		local row = emu.item(hd44780.items['0/m_ac']):read(0) & 0x40 -- the row with the cursor
+		local line = tonumber(ddram:read_block(row, 0x07):match("^ZEILE(%d%d)$"))
+		if line then
+			local want = (line == 3 or line == 4) and "AN " or "AUS"
+			if ddram:read_block(row + 0x09, 0x03) ~= want then
+				key("ent", 0.25)
+				key("down", 0.25) -- AN <-> AUS
+				key("ent", 0.25)
+			end
+			if line == 13 then
+				break
+			end
 		end
 	end
 	key("cl", 0.5)
