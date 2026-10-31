@@ -199,16 +199,21 @@ end
 -- and hide it). Found in the code of the INFO pages: the search stores its result block (0xbe29 in the montec ROM)
 -- with the main line as from-squares at pv and to-squares at pv + 6 (up to 6 moves, 0 ends it; 10x12 board,
 -- a1 = 21), the depth (the INFO page shows it + 1) and the evaluation for the machine as a 16-bit value (0x8000 = 0.00,
--- high byte pawns, low byte 1/256 pawn). The Super Mondial (smondial.lua) and Modena (modena.lua) programs borrow this
--- reader with their own addresses; the Modena page halves the depth when 0xe2 >= 0x20.
+-- high byte pawns, low byte 1/256 pawn). The Super Mondial (smondial.lua), Modena (modena.lua), Dominator (sdtor.lua,
+-- scmder.lua) and Galaxy (sgalaxy.lua) programs borrow this reader with their own addresses. Their depth pages read
+-- 0xe2: at or above half_from (or equal to half_eq) they show the depth halved + 1, otherwise the depth + low_add.
 local info_ram = {
 	montec = { pv = 0x06c8, depth = 0x06f2, score = 0x06f8 },
 	smondial = { pv = 0x06dc, depth = 0x0706, score = 0x070c },
-	modena = { pv = 0x0823, depth = 0x085c, score = 0x0862, half = 0xe2 },
+	modena = { pv = 0x0823, depth = 0x085c, score = 0x0862, half_from = 0x20, low_add = 1 },
+	sdtor = { pv = 0x0a85, depth = 0x0abe, score = 0x0ac4, half_from = 0x30, low_add = 0 },
+	sgalaxyb = { pv = 0x0a69, depth = 0x0aa2, score = 0x0aa8, half_eq = 0x21, low_add = 0 },
 }
 info_ram.monteca = info_ram.montec
 info_ram.smondialab, info_ram.smondialb = info_ram.smondial, info_ram.smondial
 info_ram.modenaa, info_ram.modenab = info_ram.modena, info_ram.modena
+info_ram.sdtora, info_ram.scmder = info_ram.sdtor, info_ram.sdtor
+info_ram.sgalaxy, info_ram.sgalaxya = info_ram.sdtor, info_ram.sdtor
 local ram = info_ram[machine.system.name]
 local stale = nil
 local first = true
@@ -250,10 +255,12 @@ function interface.show_info(on)
 		info.pv = pv
 	end
 	local depth, lo, hi = raw:byte(13, 15)
-	if ram.half and sp:read_u8(ram.half) >= 0x20 then
-		depth = depth >> 1
+	local mode = sp:read_u8(0xe2)
+	if (ram.half_from and mode >= ram.half_from) or mode == ram.half_eq then
+		info.depth = (depth >> 1) + 1
+	else
+		info.depth = depth + (ram.low_add or 1)
 	end
-	info.depth = depth + 1
 	info.score = ((hi << 8 | lo) - 0x8000) * 100 // 256
 	return info
 end

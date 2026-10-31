@@ -8,10 +8,6 @@ end
 
 interface.level = "a2"
 interface.cur_level = nil
-interface.score = "0.00"
-interface.depth = "1"
-interface.pv = ""
-interface.LCTTicker = 0
 
 function interface.get_module()
 	return "CXG Sphinx Dominator"
@@ -148,91 +144,10 @@ function interface.promote(x, y, piece)
 	end
 end
 
-function interface.show_info(on, color)
-	if on then
-		local dot1 = output_value("s0.16")
-		local dot2 = output_value("s1.16")
-		if (dot1 == 1 and dot2 == 1) or interface.LCTTicker >= 1 then
-			if (dot1 == 1 and dot2 == 1) then
-				interface.LCTTicker = 1
-			end
-			send_input(":IN.1", 0x04, 0.5) -- Hint
-			emu.wait(0.25)
-			if interface.LCTTicker == 1 then
-				local d1 = output_value("digit0")
-				local d2 = output_value("digit1")
-				local d3 = output_value("digit2")
-				local d4 = output_value("digit3")
-				local d5 = output_value("digit4")
-				local d6 = output_value("digit5")
-				local d7 = output_value("digit6")
-				local d8 = output_value("digit7")
-				interface.score = digit_ascii(d5) .. digit_ascii(d6) .. digit_ascii(d7) .. digit_ascii(d8)
-				if color == "B" then
-				    if tonumber(interface.score) ~= nil then
-				        interface.score = tonumber(interface.score) * (-1)
-		    		end
-		    	end
-				if digit_ascii(d1) ~= "-" then
-					interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-				end
-				interface.LCTTicker = 2
-				return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-			elseif interface.LCTTicker == 2 then
-				interface.LCTTicker = 3
-				return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-			elseif interface.LCTTicker == 3 then
-				interface.LCTTicker = 4
-				return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-			elseif interface.LCTTicker == 4 then
-				interface.LCTTicker = 5
-		 		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-			elseif interface.LCTTicker == 5 then
-				d7 = output_value("digit6")
-				d8 = output_value("digit7")
-				interface.depth = digit_ascii(d7) .. digit_ascii(d8):gsub(" ","")
-				interface.LCTTicker = 0
-				return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-			end
-		else
-			send_input(":IN.1", 0x04, 0.5) -- Hint
-			emu.wait(0.25)
-		end
-		interface.LCTTicker = 0
-	end
-end
--- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
--- (as on montec/mm4); to come back once the info can be read from RAM without key presses
-interface.show_info = nil
-
-function digit_ascii(digit)
-	if     digit == nil then return("0")
-	elseif digit == 63  then return("0")
-	elseif digit == 6   then return("1")
-	elseif digit == 91  then return("2")
-	elseif digit == 79  then return("3")
-	elseif digit == 102 then return("4")
-	elseif digit == 109 then return("5")
-	elseif digit == 125 then return("6")
-	elseif digit == 7   then return("7")
-	elseif digit == 127 then return("8")
-	elseif digit == 111 then return("9")
-	elseif digit == 119 then return("a")
-	elseif digit == 124 then return("b")
-	elseif digit == 57  then return("c")
-	elseif digit == 94  then return("d")
-	elseif digit == 121 then return("e")
-	elseif digit == 113 then return("f")
-	elseif digit == 61  then return("g")
-	elseif digit == 118 then return("h")
-	elseif digit == 0   then return(" ")
-	elseif digit == 28  then return("Nr.")
-	elseif digit == 64  then return("-")
-	elseif digit == 115 then return("P")
-	elseif digit == 55  then return("N")
-	else
-		return (" hex" .. tostring(digit) .. " ")
-	end
-end
+-- show_info: the Dominator program keeps a search result block like the Monte Carlo and Modena (montec.lua reads it
+-- from RAM without key presses; the old reader pressed Hint while the machine thought, and a press could land just
+-- as the move appears and hide it)
+interface.show_info = load_interface("montec").show_info
+interface.info_every = 1
 
 return interface
