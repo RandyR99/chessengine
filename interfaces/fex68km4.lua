@@ -19,6 +19,7 @@ function interface.setup_machine()
 	send_input(":IN.0", 0x80, 1) -- CLEAR
 	emu.wait(1)
 	machine.video.throttled = throttled_state
+	interface.display_options()
 	interface.cur_level = "a1"
 	interface.setlevel()
 end

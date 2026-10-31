@@ -4,9 +4,7 @@ interface.ignore_late_go = true -- replies on its own once the player's move is 
 interface.opt_clear_announcements = true
 interface.level = "a1"
 interface.cur_level = nil
-interface.score = "000"
-interface.depth = "0"
-interface.pv = ""
+interface.info_every = 1 -- show_info only reads the display
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
@@ -61,13 +59,48 @@ function interface.setlevel()
 	machine.video.throttled = throttled_state
 end
 
+-- the display options (manual p. 15-16: B1 depth, C1 score, E1 first move of the main line, A1 move time off) can
+-- only be switched on while the machine thinks, and stay on until pressed again (also after NEW GAME): set them in a
+-- short search of a problem position without book moves (kings and a pawn), then start a new game
+function interface.display_options()
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	send_input(":IN.0", 0x04, 0.5) -- OPTIONS
+	sb_press_square(":board", 0.5, 7, 1) -- Clear board (g1)
+	send_input(":IN.0", 0x80, 0.5) -- CLEAR
+	emu.wait(0.5)
+	send_input(":IN.0", 0x80, 0.5) -- CLEAR
+	send_input(":IN.0", 0x04, 0.5) -- OPTIONS
+	send_input(":IN.0", 0x02, 0.5) -- VERIFY: problem mode
+	send_input(":IN.0", 0x02, 0.5) -- King
+	emu.wait(0.4)
+	sb_press_square(":board", 0.5, 5, 1) -- white e1
+	sb_press_square(":board", 0.5, 5, 8) -- black e8 (second press: black)
+	sb_press_square(":board", 0.5, 5, 8)
+	send_input(":IN.0", 0x40, 0.5) -- Pawn
+	emu.wait(0.4)
+	sb_press_square(":board", 0.5, 4, 2) -- white d2
+	emu.wait(0.5)
+	send_input(":IN.0", 0x80, 0.6) -- CLEAR: leave board setup
+	emu.wait(0.6)
+	send_input(":IN.0", 0x40, 0.5) -- MOVE
+	emu.wait(1.5)
+	sb_press_square(":board", 0.5, 2, 1) -- B1 depth
+	sb_press_square(":board", 0.5, 3, 1) -- C1 score
+	sb_press_square(":board", 0.5, 5, 1) -- E1 main line
+	sb_press_square(":board", 0.5, 1, 1) -- A1 move time off (only possible with another option on)
+	emu.wait(1)
+	send_input(":IN.0", 0x01, 1) -- NEW GAME
+	emu.wait(1)
+	send_input(":IN.0", 0x80, 1) -- CLEAR: fex68km4a starts its RAM test ("512") again with NEW GAME
+	emu.wait(1)
+	machine.video.throttled = throttled_state
+end
+
 function interface.setup_machine()
-	interface.score = "000"
-	interface.depth = "0"
-	interface.pv = ""
-	
 	sb_reset_board(":board")
 	emu.wait(1)
+	interface.display_options()
 	interface.cur_level = "a1"
 	interface.setlevel()
 end
@@ -246,63 +279,34 @@ function interface.promote(x, y, piece)
 	end
 end
 
-function interface.show_info(on)
-	-- read only: pressing squares to cycle the display while the machine thinks lights
-	-- first-rank LEDs that the move detection takes for the machine's move
-	if (not on) then
-		return ""
-	end
-	local d1 = output_value("digit6")
-	local d2 = output_value("digit4")
-	local d3 = output_value("digit2")
-	local d4 = output_value("digit0")
-	if (output_value("6.7") == 0) then
-		if (digit_ascii(d1):match("^[a-h]$")) then
-			interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-		else
-			local depth = (digit_ascii(d3) .. digit_ascii(d4)):gsub(" ", "")
-			if (depth:match("^%d+$")) then
-				interface.depth = depth
-			end
-		end
-	else
-		local score = (digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)):gsub(" ", "")
-		if (score:match("^%-?%d+$")) then
-			interface.score = score
-		end
-	end
-	return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-end
--- off: without display options the Excel 68000 shows only the move time while it thinks, and its options (squares
--- B1 depth, C1 score, E1 main line) can only be switched on WHILE it thinks (manual p. 15-16) - a square press then,
--- whose rank 1 LEDs the move detection takes for the machine's move; to come back with a safe way to read the info
-interface.show_info = nil
+-- with the display options set by display_options() the display (digit6 digit4 digit2 digit0) rotates every second
+-- while the machine thinks: the first move of the main line ("b8c6"), the score in centipawns for the machine (" 035"
+-- = 0.35, "-001"; its point lights dot 6.7) and the moves examined followed by the ply depth ("16 5")
+local segment_digit = { [0x3f] = 0, [0x06] = 1, [0x5b] = 2, [0x4f] = 3, [0x66] = 4, [0x6d] = 5, [0x7d] = 6, [0x07] = 7,
+	[0x7f] = 8, [0x67] = 9, [0x6f] = 9 }
+local segment_file = { [0x77] = "a", [0x7c] = "b", [0x39] = "c", [0x5e] = "d", [0x79] = "e", [0x71] = "f", [0x3d] = "g", [0x76] = "h" }
+local info = {}
 
-function digit_ascii(digit)
-	if     digit == nil then return " "
-	elseif digit ==   0 then return " "
-	elseif digit ==  63 then return "0"
-	elseif digit ==   6 then return "1"
-	elseif digit ==  91 then return "2"
-	elseif digit ==  79 then return "3"
-	elseif digit == 102 then return "4"
-	elseif digit == 109 then return "5"
-	elseif digit == 111 then return "5"
-	elseif digit == 125 then return "6"
-	elseif digit ==   7 then return "7"
-	elseif digit == 127 then return "8"
-	elseif digit == 103 then return "9"
-	elseif digit == 119 then return "a"
-	elseif digit == 124 then return "b"
-	elseif digit ==  57 then return "c"
-	elseif digit ==  94 then return "d"
-	elseif digit == 121 then return "e"
-	elseif digit == 113 then return "f"
-	elseif digit == 123 then return "f"
-	elseif digit ==  61 then return "g"
-	elseif digit == 118 then return "h"
+function interface.show_info(on)
+	if not on then
+		info = {}
+		return nil
 	end
-	return " "
+	local v = { output_value("digit6") & 0x7f, output_value("digit4") & 0x7f, output_value("digit2") & 0x7f, output_value("digit0") & 0x7f }
+	local d = { segment_digit[v[1]], segment_digit[v[2]], segment_digit[v[3]], segment_digit[v[4]] }
+	if output_value("4.7") ~= 0 then
+		-- the move time (colon: dots 4.7-7.7), shown although A1 was pressed
+	elseif segment_file[v[1]] and d[2] and segment_file[v[3]] and d[4] then
+		info.pv = { segment_file[v[1]] .. d[2] .. segment_file[v[3]] .. d[4] }
+	elseif v[3] == 0 and d[4] then
+		if d[4] > 0 then -- ply 0 shows before the first iteration
+			info.depth = d[4]
+		end
+	elseif output_value("6.7") ~= 0 and d[2] and d[3] and d[4] and (v[1] == 0 or v[1] == 0x40 or d[1]) then
+		local score = (d[1] or 0) * 1000 + d[2] * 100 + d[3] * 10 + d[4]
+		info.score = v[1] == 0x40 and -score or score
+	end
+	return { score = info.score, depth = info.depth, pv = info.pv }
 end
 
 return interface
