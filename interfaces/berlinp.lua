@@ -1,4 +1,5 @@
 interface = {}
+local lyon = load_interface("lyon32") -- info display set-up and reader
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 interface.level = "NORML 01"
@@ -172,6 +173,7 @@ function interface.setup_machine()
 	machine.video.throttled = throttled_state
 	interface.cur_level = ""
 	interface.setlevel()
+	lyon.info_display({ cl = { ":KEY", 0x02 }, right = { ":KEY", 0x20 }, down = { ":KEY", 0x08 }, ent = { ":KEY", 0x01 }, time = 0.6 }, 14)
 end
 
 function interface.set_pos(mode)
@@ -340,26 +342,8 @@ function interface.promote(x, y, piece)
 	machine.video.throttled = throttled_state
 end
 
-function interface.show_info(on)
-	if on then
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
-		local info = nil
-		send_input(":KEY", 0x08, 0.6) -- DOWN
-		send_input(":KEY", 0x08, 0.6) -- DOWN
-		local ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram']):read_block(0x00, 0x80)
-		info = "info score cp " .. ddram:sub(65,69):gsub("%.", "")
-		info = info .. " depth " .. ddram:sub(1,2)
-		info = info .. " pv " .. string.lower(ddram:sub(70,112))
-		if string.lower(ddram:sub(65,65)) ~= " " and string.lower(ddram:sub(65,65)) ~= "-" then
-			info = nil
-		end
-		machine.video.throttled = throttled_state
-		return info
-	end
-end
--- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
--- (as on montec/mm4); to come back once the info can be read from RAM without key presses
-interface.show_info = nil
+-- the programmable info display (ANZEI), read from the LCD (lyon32.lua)
+interface.show_info = lyon.show_info
+interface.info_every = lyon.info_every
 
 return interface

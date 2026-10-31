@@ -209,11 +209,6 @@ function interface.get_promotion(x, y)
 	return nil
 end
 
-function interface.show_pv_after_move_emu()
-	interface.pv = ""
-	interface.depth = 1
-end
-
 function interface.show_info(on)
 	if not on then
 		interface.score = nil -- each search starts without the values of the last one

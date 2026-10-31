@@ -141,15 +141,16 @@ end
 -- programmable info display (Lyon manual 2.16 ANZEI, Portorose manual 3.7.15): while Mephisto computes, show info
 -- lines 3 (depth/selective depth, move searched, its number) and 4 (evaluation for Mephisto, first two moves of the
 -- main line) only, instead of the clock (lines 10 and 11); kept in the display module's memory, so a line is only
--- toggled when it isn't set yet. keys = { cl, right, down, ent } as { port, mask } (also used by gen32, berl32t8p,
--- the 16 bit Lyons and alm16/alm32, whose keys differ); menu_item: the main menu item with the ZEILE01-13 table at
--- its end: 14 ANZEI (Lyon and later), 10 FUNKT (Almeria, Portorose: after the other options)
+-- toggled when it isn't set yet. keys = { cl, right, down, ent } as { port, mask }, time = optional press time (also
+-- used by gen32, berl32t8p, berlinp, the 16 bit Lyons and alm16/alm32, whose keys differ); menu_item: the main menu
+-- item with the ZEILE01-13 table at its end: 14 ANZEI (Lyon and later), 10 FUNKT (Almeria, Portorose: after the
+-- other options)
 local lyon_keys = { cl = { ":KEY1", 0x8000 }, right = { ":KEY1", 0x4000 }, down = { ":KEY2", 0x4000 }, ent = { ":KEY3", 0x8000 } }
 
 function interface.info_display(keys, menu_item)
 	keys = keys or lyon_keys
 	local function key(k, t)
-		send_input(keys[k][1], keys[k][2], t)
+		send_input(keys[k][1], keys[k][2], math.max(t, keys.time or 0)) -- keys.time: longer presses for slower modules
 	end
 	local hd44780 = machine.devices[':display:hd44780']
 	local ddram = emu.item(hd44780.items['0/m_ddram'])

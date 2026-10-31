@@ -5,9 +5,6 @@ interface.ignore_late_go = true -- replies on its own once the player's move is 
 interface.opt_clear_announcements = true
 interface.level = "a1"
 interface.cur_level = nil
-interface.score = 0
-interface.depth = 0
-interface.hex = ""
 local turn  = 0
 local check = 3
 
@@ -271,37 +268,11 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- LV while the machine thinks makes the display show the search depth that show_info reads
 function interface.show_pv_after_move_player()
   send_input(":IN.3", 0x100, 0.5)        -- LV
-  interface.score=0
-  interface.depth=0
 end
- 
-   
-function interface.befor_move_from_engine()
-  send_input(":IN.3", 0x100, 0.5)        -- LV
-  local d1 = output_value("digit1")
-  if d1 == 0 then interface.depth =  tonumber(interface.digit_string(d0),16) end
-  send_input(":IN.5", 0x100, 0.5)  -- RE
-  local d0 = output_value("digit0")
-  d1 = output_value("digit1")
-  local d2 = output_value("digit2")
-  local d3 = output_value("digit3")
-  local dotO = output_value("2.7")
-  local dotU = output_value("3.7")
-  if d3 ~=0 and d2 ~=0 and d1 ~=0 and d0 ~=0 and dotO== 0 then
-    interface.hex=interface.digit_string(d3) .. interface.digit_string(d2) .. interface.digit_string(d1) ..  interface.digit_string(d0)
-    interface.score = tonumber(interface.digit_string(d3) .. interface.digit_string(d2) .. interface.digit_string(d1) ..  interface.digit_string(d0),16)/256
-    interface.score =tostring(round( interface.score )*10)
-    interface.score =interface.score:gsub("%.","")
-    local dotU = output_value("3.7") -- punkt unten
-    if dotU==1 then
-      interface.score="-" .. interface.score:gsub("%.","")
-      interface.hex="-" .. interface.hex
-    end
-  end
-end
-   
+
 -- while it thinks the display shows the search depth (hex, last digit; the first digit counts the moves searched);
 -- the hex score page the old code expected never appeared (12 minutes of thinking in a queen-down position)
 function interface.show_info(on)
@@ -316,13 +287,6 @@ function interface.show_info(on)
   end
   return nil
 end
-
-function round(num)
-  local numDecimalPlaces=2
-  local mult = 10^(numDecimalPlaces or 0)
-  return math.floor(num * mult + 0.5) / mult
-end
-
 
 function interface.digit_string(d)
      if d==nil then
