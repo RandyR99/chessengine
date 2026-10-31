@@ -178,38 +178,50 @@ function interface.promote(x, y, piece)
 	emu.wait(0.5)
 end
 
-function interface.show_info(on)
-	if on then
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
-		send_input(":KEY.0", 0x02, 0.5) -- INFO
-		send_input(":KEY.0", 0x02, 0.5) -- INFO
-		emu.wait(0.1)
-		local d1 = output_value("digit3") & 0x7f
-		local d2 = output_value("digit2") & 0x7f
-		local d3 = output_value("digit1") & 0x7f
-		local d4 = output_value("digit0") & 0x7f
-		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-		send_input(":KEY.1", 0x20, 0.5) -- 1
-		emu.wait(0.1)
-		d1 = output_value("digit3") & 0x7f
-		d2 = output_value("digit2") & 0x7f
-		d3 = output_value("digit1") & 0x7f
-		d4 = output_value("digit0") & 0x7f
-		interface.score = (digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)):gsub(" ","")
-		send_input(":KEY.1", 0x04, 0.2) -- 3
-		emu.wait(0.1)
-		d1 = output_value("digit1") & 0x7f
-		d2 = output_value("digit0") & 0x7f
-		interface.depth = digit_ascii(d1) .. digit_ascii(d2)
-		send_input(":KEY.1", 0x02, 0.2) -- CL
-		machine.video.throttled = throttled_state
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
+-- the INFO pages are kept in RAM while the machine searches (found with the debugger: the INFO keys only point the
+-- display at them): rows of 20 characters from 0x1e100 in the program's character codes (segments through the ROM
+-- table at 0x0584): row 1 starts with the depth ("02"), row 2 the main line ("g8f6b1c3f8c5f1c4", up to 4 moves),
+-- row 3 the evaluation for the machine in hundredths of a pawn ("-952"; "_000" until the first one is found).
+-- Read without key presses (a press could land just as the move appears and hide it)
+local segment_char = { [0x3f] = "0", [0x06] = "1", [0x5b] = "2", [0x4f] = "3", [0x66] = "4", [0x6d] = "5", [0x7d] = "6",
+	[0x07] = "7", [0x7f] = "8", [0x6f] = "9", [0x77] = "a", [0x7c] = "b", [0x39] = "c", [0x58] = "c", [0x5e] = "d",
+	[0x79] = "e", [0x71] = "f", [0x3d] = "g", [0x76] = "h", [0x74] = "h", [0x40] = "-", [0x00] = " " }
+
+local function page_row(row)
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	local text = ""
+	for a = 0x1e100 + row * 20, 0x1e100 + row * 20 + 19 do
+		local segments = sp:read_u8(0x0584 + (sp:read_u8(a) & 0x7f))
+		text = text .. (segment_char[segments] or "?")
 	end
+	return text
 end
--- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
--- (as on montec/mm4); to come back once the info can be read from RAM without key presses
-interface.show_info = nil
+
+function interface.show_info(on)
+	if not on then
+		return nil
+	end
+	local info = {}
+	info.depth = tonumber(page_row(0):match("^(%d%d)"))
+	local pv = {}
+	local line = page_row(1)
+	for k = 1, 13, 4 do
+		local move = line:sub(k, k + 3)
+		if not move:match("^[a-h][1-8][a-h][1-8]$") then
+			break
+		end
+		pv[#pv + 1] = move
+	end
+	if #pv > 0 then
+		info.pv = pv
+	end
+	local sign, digits = page_row(2):match("^([ %-])(%d%d%d)")
+	if digits and not (sign == " " and digits == "000") then
+		info.score = sign == "-" and -tonumber(digits) or tonumber(digits)
+	end
+	return info
+end
+interface.info_every = 1 -- show_info only reads RAM
 
 function digit_ascii(digit)
 	if     digit == 0   then return " "
