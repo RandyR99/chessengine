@@ -174,91 +174,89 @@ function interface.promote(x, y, piece)
 	end
 end
 
-function interface.show_info(on)
-	if on then
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
+-- the search information the INFO key shows is kept as text in RAM (found by the " SUM" in it): the main line
+-- 0x3c bytes before it ("E7E5E2E4D7D6" up to 8 moves, "_" after the last), the evaluation in pawns for Mephisto
+-- 0x1c before (" 0" "28": the point is bit 6 of the units digit; dallas/roma show at most "-9.99"), then after it the depth "M 03" (+0x0c), the move
+-- searched "A 01" "E7E5" and the selective depth "S 12" (+0x18); manual H.1-H.6. Read without key presses
+local ram_ranges = { { 0xffc000, 0xffffff }, { 0x010000, 0x01ffff } } -- amsterd/dallas16/roma16, dallas32/roma32
+local info_text = nil -- address of " SUM"
+local stale = nil     -- the texts as the previous search left them
 
-		-- the display blinks: wait for a lit phase (about 1 s at most)
-		local function get_lit_digits()
-			local d1, d2, d3, d4
-			for retry = 1, 60 do
-				d1 = output_value("digit3") & 0x7f
-				d2 = output_value("digit2") & 0x7f
-				d3 = output_value("digit1") & 0x7f
-				d4 = output_value("digit0") & 0x7f
-				if d1 ~= 0 or d2 ~= 0 or d3 ~= 0 or d4 ~= 0 then
-					return d1, d2, d3, d4
-				end
-				emu.wait(0.016)
+local function find_info_text()
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	for _, r in ipairs(ram_ranges) do
+		for a = r[1], r[2] - 0x20 do
+			if sp:read_u8(a) == 0x20 and sp:read_u8(a + 1) == 0x53 and sp:read_u8(a + 2) == 0x55 and sp:read_u8(a + 3) == 0x4d
+				and sp:read_u8(a + 0x0c) == 0x4d and sp:read_u8(a + 0x18) == 0x53 then
+				return a
 			end
-			return d1, d2, d3, d4
 		end
-
-		local function safe_ascii(digit_val)
-			return digit_ascii(digit_val) or " "
-		end
-
-		-- manual H.1-H.6: INFO = main line, then A1 = evaluation in pawns for Mephisto ("-1,50"), C3 = depth ("M 02")
-		local info = {}
-		send_input(":KEY.0", 0x01, 0.15) -- Info: principal variation
-		emu.wait(0.2)
-		local d1, d2, d3, d4 = get_lit_digits()
-		local move = safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)
-		if move:match("^[a-h][1-8][a-h][1-8]$") then
-			info.pv = { move }
-		end
-
-		send_input(":KEY.1", 0x01, 0.15) -- 1: score
-		emu.wait(0.2)
-		d1, d2, d3, d4 = get_lit_digits()
-		local score = (safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)):gsub(" ","")
-		if score:match("^%-?%d+$") then
-			info.score = score -- two decimals without the comma: centipawns
-		end
-
-		send_input(":KEY.1", 0x04, 0.15) -- 3: depth
-		emu.wait(0.2)
-		d1, d2, d3, d4 = get_lit_digits()
-		local depth = (safe_ascii(d1) .. safe_ascii(d2) .. safe_ascii(d3) .. safe_ascii(d4)):gsub("n", ""):gsub("=", ""):gsub(" ", "")
-		if depth:match("^%d+$") then
-			info.depth = depth
-		end
-
-		send_input(":KEY.0", 0x10, 0.15) -- CL
-		emu.wait(0.1)
-		machine.video.throttled = throttled_state
-		return info
 	end
+	return nil
 end
--- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
--- (as on montec/mm4); to come back once the info can be read from RAM without key presses
-interface.show_info = nil
 
-function digit_ascii(digit)
-	if     digit == 0   then return " "
-	elseif digit == 64  then return "-"
-	elseif digit == 8   then return "_"
-	elseif digit == 63  then return "0"
-	elseif digit == 6   then return "1"
-	elseif digit == 91  then return "2"
-	elseif digit == 79  then return "3"
-	elseif digit == 102 then return "4"
-	elseif digit == 109 then return "5"
-	elseif digit == 125 then return "6"
-	elseif digit == 7   then return "7"
-	elseif digit == 127 then return "8"
-	elseif digit == 111 then return "9"
-	elseif digit == 119 then return "a"
-	elseif digit == 124 then return "b"
-	elseif digit == 57  then return "c"
-	elseif digit == 94  then return "d"
-	elseif digit == 121 then return "e"
-	elseif digit == 113 then return "f"
-	elseif digit == 61  then return "g"
-	elseif digit == 118 then return "h"
+local function ram_text(offset, len)
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	local t = ""
+	for a = info_text + offset, info_text + offset + len - 1 do
+		t = t .. string.char(sp:read_u8(a))
 	end
+	return t
 end
+
+function interface.show_info(on)
+	if info_text == nil then
+		info_text = find_info_text()
+		if info_text == nil then
+			return nil
+		end
+	end
+	local texts = ram_text(-0x3c, 0x24) .. ram_text(0x0c, 0x10)
+	if not on then
+		stale = texts
+		return nil
+	end
+	if texts == stale then
+		return nil -- nothing from this search yet
+	end
+	stale = nil
+	local info = {}
+	local pv = {}
+	local line = ram_text(-0x3c, 0x20)
+	for k = 1, 29, 4 do
+		local move = ""
+		for c = k, k + 3 do
+			-- dallas/roma add 0x40 to characters of the first move (display attribute: "G8F6" = 87 78 86 36)
+			local ch = line:byte(c)
+			local want = (c - k) % 2 == 0 and "[A-H]" or "[1-8]"
+			if not string.char(ch):match(want) and ch >= 0x40 then
+				ch = ch - 0x40
+			end
+			move = move .. string.char(ch)
+		end
+		move = move:lower()
+		if not move:match("^[a-h][1-8][a-h][1-8]$") then
+			break
+		end
+		pv[#pv + 1] = move
+	end
+	if #pv > 0 then
+		info.pv = pv
+	end
+	local score = ram_text(-0x1c, 4)
+	local sign, units, hundredths = score:sub(1, 1), score:byte(2), score:sub(3, 4)
+	if units and units & 0x40 ~= 0 and hundredths:match("^%d%d$") and (sign == " " or sign == "-" or sign:match("%d")) then
+		local pawns = (units & 0xbf) - 0x30
+		if pawns >= 0 and pawns <= 9 then
+			local cp = (tonumber(sign) or 0) * 1000 + pawns * 100 + tonumber(hundredths)
+			info.score = sign == "-" and -cp or cp
+		end
+	end
+	info.depth = tonumber(ram_text(0x0c, 4):match("^M ?(%d+)$"))
+	info.seldepth = tonumber(ram_text(0x18, 4):match("^S ?(%d+)$"))
+	return info
+end
+interface.info_every = 1 -- show_info only reads RAM
 
 return interface
 
