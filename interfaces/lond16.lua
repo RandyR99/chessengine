@@ -1,4 +1,4 @@
-interface = load_interface("port16")
+interface = load_interface("lyon16") -- Lyon program family: info display
 
 interface.level = "NORML 01"
 
