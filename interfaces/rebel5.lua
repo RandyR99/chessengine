@@ -104,7 +104,6 @@ function interface.set_option(name, value)
 	end
 end
 
--- mm4's RAM addresses for the info (score, first move) don't apply to this older program
-interface.show_info = nil
+interface.info_ram = 0x0174 -- the info (first move, score) is kept 0x36 bytes later than on mm4
 
 return interface

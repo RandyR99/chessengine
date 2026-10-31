@@ -209,18 +209,20 @@ function interface.promote(x, y, piece)
 	machine.video.throttled = throttled_state
 end
 
--- the search keeps what the INFO pages show in RAM (found with read taps on the info keys): 0x0148-0x014b the
--- evaluation in pawns for Mephisto as display digits ("-8.91": 0x40 0xff 0x6f 0x06, bit 7 = point), 0x013e/0x013f
--- the first move of the main line (file * 10 + rank, file 0 = a). Read without key presses (a press could land just
+-- the search keeps what the INFO pages show in RAM (found with read taps on the info keys): at interface.info_ram
+-- (0x013e; rebel5: 0x0174) the first move of the main line (file * 10 + rank, file 0 = a), 10 bytes after it the
+-- evaluation in pawns for Mephisto as display digits ("-8.91": 0x40 0xff 0x6f 0x06, bit 7 = point). Read without key presses (a press could land just
 -- as the move appears and hide it); no search depth found
 local segment_char = { [0x00] = "", [0x40] = "-", [0x3f] = "0", [0x06] = "1", [0x5b] = "2", [0x4f] = "3", [0x66] = "4",
 	[0x6d] = "5", [0x7d] = "6", [0x07] = "7", [0x7f] = "8", [0x6f] = "9" }
 local stale = nil -- RAM as the previous search (or game) left it
+interface.info_ram = 0x013e
 
 function interface.show_info(on)
 	local sp = machine.devices[":maincpu"].spaces["program"]
 	local raw = ""
-	for a = 0x013e, 0x014b do
+	local base = interface.info_ram
+	for a = base, base + 0x0d do
 		raw = raw .. string.char(sp:read_u8(a))
 	end
 	if not on then
@@ -233,7 +235,7 @@ function interface.show_info(on)
 	stale = nil
 	local info = {}
 	local text = ""
-	for a = 0x0148, 0x014b do
+	for a = base + 0x0a, base + 0x0d do
 		local b = sp:read_u8(a)
 		local c = segment_char[b & 0x7f]
 		if c == nil then
@@ -252,7 +254,7 @@ function interface.show_info(on)
 			return string.char(0x61 + file) .. rank
 		end
 	end
-	local from, to = square(sp:read_u8(0x013e)), square(sp:read_u8(0x013f))
+	local from, to = square(sp:read_u8(base)), square(sp:read_u8(base + 1))
 	if from and to and from ~= to then
 		info.pv = { from .. to }
 	end
