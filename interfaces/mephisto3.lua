@@ -3,9 +3,6 @@ interface.ignore_late_go = true -- replies on its own once the player's move is 
 
 interface.level = 3
 interface.cur_level = nil
-interface.score = "0.00"
-interface.depth = "0"
-interface.pv = ""
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
@@ -186,62 +183,81 @@ function interface.promote(x, y, piece)
 	end
 end
 
-function interface.show_info(on)
-	if on then
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
-		send_input(":IN.1", 0x01, 0.2) -- Info
-		emu.wait(0.1)
-		local d1 = output_value("digit3") & 0x7f
-		local d2 = output_value("digit2") & 0x7f
-		local d3 = output_value("digit1") & 0x7f
-		local d4 = output_value("digit0") & 0x7f
-		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-		send_input(":IN.0", 0x02, 0.2) -- 1
-		emu.wait(0.1)
-		d1 = output_value("digit3") & 0x7f
-		d2 = output_value("digit2") & 0x7f
-		d3 = output_value("digit1") & 0x7f
-		d4 = output_value("digit0") & 0x7f
-		interface.score = (digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)):gsub(" ","")
-		send_input(":IN.1", 0x02, 0.2) -- 3
-		emu.wait(0.1)
-		d1 = output_value("digit1") & 0x7f
-		d2 = output_value("digit0") & 0x7f
-		interface.depth = digit_ascii(d1) .. digit_ascii(d2)
-		send_input(":IN.0", 0x01, 0.2) -- CL
-		machine.video.throttled = throttled_state
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-	end
-end
--- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
--- (as on montec/mm4); to come back once the info can be read from RAM without key presses
-interface.show_info = nil
+-- show_info reads the search information from RAM, without key presses (an INFO press could land just as the move
+-- appears and hide it). The program keeps the INFO pages as character codes (0-9 digits, 0x0a-0x11 a-h, 0x24 '-',
+-- bit 7 = point; segments through the ROM table at 0x7f4b) and the search fills them as it goes: the main line at
+-- 0x8314 (4 moves of 4 characters), the evaluation for the machine at 0x8328 (sign, pawns with point, 2 digits), the
+-- depth at 0x837a and the selective depth at 0x837e (2 digits each). Found by read taps on the INFO keys.
+local stale = nil
+local first = true
 
-function digit_ascii(digit)
-	if     digit == 0   then return " "
-	elseif digit == 64  then return "-"
-	elseif digit == 8   then return "_"
-	elseif digit == 63  then return "0"
-	elseif digit == 6   then return "1"
-	elseif digit == 91  then return "2"
-	elseif digit == 79  then return "3"
-	elseif digit == 102 then return "4"
-	elseif digit == 109 then return "5"
-	elseif digit == 125 then return "6"
-	elseif digit == 7   then return "7"
-	elseif digit == 127 then return "8"
-	elseif digit == 111 then return "9"
-	elseif digit == 119 then return "a"
-	elseif digit == 124 then return "b"
-	elseif digit == 57  then return "c"
-	elseif digit == 94  then return "d"
-	elseif digit == 121 then return "e"
-	elseif digit == 113 then return "f"
-	elseif digit == 61  then return "g"
-	elseif digit == 118 then return "h"
+function interface.show_info(on)
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	local raw = {}
+	for a = 0x8314, 0x832b do
+		raw[#raw + 1] = sp:read_u8(a) & 0x7f
 	end
-	return " " -- unknown segment pattern (a nil here broke the info line and stopped the plugin)
+	for a = 0x837a, 0x837f do
+		raw[#raw + 1] = sp:read_u8(a) & 0x7f
+	end
+	local key = ""
+	for _, c in ipairs(raw) do
+		key = key .. string.char(c)
+	end
+	if not on or first then
+		first = false -- battery RAM still holds the last search before this session's first player turn
+		stale = key
+		return nil
+	end
+	if key == stale then
+		return nil -- nothing from this search yet
+	end
+	stale = nil
+	local function char(c)
+		if c <= 9 then
+			return tostring(c)
+		elseif c >= 0x0a and c <= 0x11 then
+			return string.char(0x61 + c - 0x0a)
+		end
+	end
+	local info = {}
+	local pv = {}
+	for k = 1, 13, 4 do
+		local m = (char(raw[k]) or "?") .. (char(raw[k + 1]) or "?") .. (char(raw[k + 2]) or "?") .. (char(raw[k + 3]) or "?")
+		if not m:match("^[a-h][1-8][a-h][1-8]$") then
+			break
+		end
+		pv[#pv + 1] = m
+	end
+	if #pv > 0 then
+		info.pv = pv
+	end
+	local function number(a, b)
+		if a <= 9 and b <= 9 then
+			return a * 10 + b
+		end
+	end
+	local depth, seldepth = number(raw[25], raw[26]), number(raw[29], raw[30])
+	local sign, pawns, d1, d2 = raw[21], raw[22], raw[23], raw[24]
+	if pawns <= 9 and d1 <= 9 and d2 <= 9 then
+		local cp = pawns * 100 + d1 * 10 + d2
+		-- each search starts with ' 0.00' until its first iteration has a value
+		if cp ~= 0 or (depth or 0) > 1 then
+			info.score = sign == 0x24 and -cp or cp
+		end
+	end
+	if depth and depth > 0 then
+		info.depth = depth
+		if seldepth and seldepth >= depth then
+			info.seldepth = seldepth
+		end
+	end
+	if not info.pv and not info.score then
+		return nil
+	end
+	return info
 end
+
+interface.info_every = 1 -- show_info only reads RAM
 
 return interface
