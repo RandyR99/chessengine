@@ -27,7 +27,27 @@ function interface.setup_machine()
     emu.wait(2)
     sb_reset_board(":board")
     interface.invert = false
+    interface.cur_level = "a1" -- as in stratos.lua: setlevel() does nothing while cur_level is nil (reads the real level from the LEDs)
     interface.setlevel()
+end
+
+-- ver. D (tking): Function + Info steps through the display modes in a cycle (clock, clock with points, info, ...) and
+-- Normal doesn't reset it, so stratos.lua's fixed key sequence lands on a different mode depending on the current one:
+-- step until the LCD shows the info page ('in fo' / 'inf' at 0x0a25 of the battery RAM), at most 6 times
+if machine.system.name == "tking" then
+	function interface.select_info_display()
+		local throttled_state = machine.video.throttled
+		machine.video.throttled = false
+		local share = machine.memory.shares[":nvram.u6"]
+		for i = 1, 6 do
+			if share:read_u8(0x0a25) == 0x10 and share:read_u8(0x0a26) == 0x54 then
+				break
+			end
+			send_input(":IN.5", 0x02, 0.75) -- Function
+			send_input(":IN.6", 0x02, 0.75) -- Info
+		end
+		machine.video.throttled = throttled_state
+	end
 end
 
 function interface.start_play(init)
@@ -36,6 +56,7 @@ function interface.start_play(init)
         sb_rotate_board(":board")
         interface.invert = true
     end
+    interface.select_info_display() -- as in stratos.lua: the LCD shows the search information while the machine thinks
     send_input(":IN.4", 0x01, 1) -- Play
 end
 
