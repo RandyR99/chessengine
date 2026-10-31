@@ -172,18 +172,27 @@ function interface.promote(x, y, piece)
 end
 
 -- the search keeps its main line in RAM at interface.pv_ram (0x018a; polgar 0x013e; found by RAM dumps during the
--- search): pairs of squares
--- (file * 10 + rank, file 0 = a), ended by an invalid pair. Read without key presses (an INFO press could land just
--- after the machine shows its move and hide it); the evaluation and depth weren't found in RAM
+-- search): pairs of squares (file * 10 + rank, file 0 = a), ended by an invalid pair. With the debugger (the display
+-- code of the INFO pages): interface.score_ram (0x0114) holds the evaluation for the machine as it is shown, 4 LCD
+-- bytes: sign (0x08 '-', 0x00 '+'), then 3 digits through the ROM table at 0xe77f (bit 0 of the first = point);
+-- interface.depth_ram (0x000b) the search depth. Read without key presses (an INFO press could land just after the
+-- machine shows its move and hide it)
 local stale = nil -- RAM as the previous search (or game) left it
 local first = true
 interface.pv_ram = 0x018a
+interface.score_ram = 0x0114
+interface.depth_ram = 0x000b
 
 function interface.show_info(on)
 	local sp = machine.devices[":maincpu"].spaces["program"]
 	local raw = ""
 	for a = interface.pv_ram, interface.pv_ram + 0x0f do
 		raw = raw .. string.char(sp:read_u8(a))
+	end
+	if interface.score_ram then
+		for a = interface.score_ram, interface.score_ram + 3 do
+			raw = raw .. string.char(sp:read_u8(a))
+		end
 	end
 	if not on or first then
 		first = false -- battery RAM still holds the last search before this session's first player turn
@@ -194,6 +203,7 @@ function interface.show_info(on)
 		return nil -- nothing from this search yet
 	end
 	stale = nil
+	local info = {}
 	local function square(v)
 		local file, rank = v // 10, v % 10
 		if file <= 7 and rank >= 1 and rank <= 8 then
@@ -201,17 +211,38 @@ function interface.show_info(on)
 		end
 	end
 	local pv = {}
-	for k = 1, #raw - 1, 2 do
+	for k = 1, 15, 2 do
 		local from, to = square(raw:byte(k)), square(raw:byte(k + 1))
 		if not from or not to or from == to then
 			break
 		end
 		pv[#pv + 1] = from .. to
 	end
-	if #pv == 0 then
+	if #pv > 0 then
+		info.pv = pv
+	end
+	if interface.score_ram then
+		local digit = {}
+		for n = 0, 9 do
+			digit[sp:read_u8(0xe77f + n)] = n
+		end
+		local sign, d1, d2, d3 = raw:byte(17, 20)
+		local p1, p2, p3 = digit[d1 & 0xfe], digit[d2], digit[d3]
+		if (sign == 0x00 or sign == 0x08) and p1 and p2 and p3 then
+			local cp = p1 * 100 + p2 * 10 + p3
+			info.score = sign == 0x08 and -cp or cp
+		end
+	end
+	if interface.depth_ram then
+		local depth = sp:read_u8(interface.depth_ram)
+		if depth >= 1 and depth <= 40 then
+			info.depth = depth
+		end
+	end
+	if not info.pv and not info.score then
 		return nil
 	end
-	return { pv = pv }
+	return info
 end
 interface.info_every = 1 -- show_info only reads RAM
 
