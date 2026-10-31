@@ -197,22 +197,29 @@ end
 
 -- show_info reads the search result from RAM, without key presses (an INFO press could land just as the move appears
 -- and hide it). Found in the code of the INFO pages: the search stores its result block (0xbe29 in the montec ROM)
--- with the main line as from-squares at base and to-squares at base + 6 (up to 6 moves, 0 ends it; 10x12 board,
--- a1 = 21), the depth at base + 0x2a (the INFO page shows it + 1) and the evaluation for the machine as a 16-bit value
--- at base + 0x30/0x31 (0x8000 = 0.00, high byte pawns, low byte 1/256 pawn). The Super Mondial program (smondial.lua
--- borrows this reader) keeps the same block 0x14 bytes higher.
-local info_ram = { montec = 0x06c8, monteca = 0x06c8, smondial = 0x06dc, smondialab = 0x06dc, smondialb = 0x06dc }
-local base = info_ram[machine.system.name]
+-- with the main line as from-squares at pv and to-squares at pv + 6 (up to 6 moves, 0 ends it; 10x12 board,
+-- a1 = 21), the depth (the INFO page shows it + 1) and the evaluation for the machine as a 16-bit value (0x8000 = 0.00,
+-- high byte pawns, low byte 1/256 pawn). The Super Mondial (smondial.lua) and Modena (modena.lua) programs borrow this
+-- reader with their own addresses; the Modena page halves the depth when 0xe2 >= 0x20.
+local info_ram = {
+	montec = { pv = 0x06c8, depth = 0x06f2, score = 0x06f8 },
+	smondial = { pv = 0x06dc, depth = 0x0706, score = 0x070c },
+	modena = { pv = 0x0823, depth = 0x085c, score = 0x0862, half = 0xe2 },
+}
+info_ram.monteca = info_ram.montec
+info_ram.smondialab, info_ram.smondialb = info_ram.smondial, info_ram.smondial
+info_ram.modenaa, info_ram.modenab = info_ram.modena, info_ram.modena
+local ram = info_ram[machine.system.name]
 local stale = nil
 local first = true
 
 function interface.show_info(on)
 	local sp = machine.devices[":maincpu"].spaces["program"]
 	local raw = ""
-	for a = base, base + 0x0b do
+	for a = ram.pv, ram.pv + 0x0b do
 		raw = raw .. string.char(sp:read_u8(a))
 	end
-	for _, a in ipairs({ base + 0x2a, base + 0x30, base + 0x31 }) do
+	for _, a in ipairs({ ram.depth, ram.score, ram.score + 1 }) do
 		raw = raw .. string.char(sp:read_u8(a))
 	end
 	if not on or first then
@@ -243,12 +250,15 @@ function interface.show_info(on)
 		info.pv = pv
 	end
 	local depth, lo, hi = raw:byte(13, 15)
+	if ram.half and sp:read_u8(ram.half) >= 0x20 then
+		depth = depth >> 1
+	end
 	info.depth = depth + 1
 	info.score = ((hi << 8 | lo) - 0x8000) * 100 // 256
 	return info
 end
 
-if base == nil then
+if ram == nil then
 	interface.show_info = nil -- result block not checked for this program
 end
 interface.info_every = 1 -- show_info only reads RAM

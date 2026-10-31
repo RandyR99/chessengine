@@ -3,9 +3,6 @@ interface.ignore_late_go = true -- replies on its own once the player's move is 
 
 interface.level = "a2"
 interface.cur_level = nil
-interface.depth = "0"
-interface.score = "0.00"
-interface.pv = ""
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
@@ -204,66 +201,10 @@ function interface.promote(x, y, piece)
 	end
 end
 
-local function any_led()
-	for i = 0, 7 do
-		if output_value("1." .. i) ~= 0 or output_value("2." .. i) ~= 0 then
-			return true
-		end
-	end
-	return false
-end
-
-local function digit_ascii(digit)
-	local chars = { [0x00]=" ", [0x40]="-", [0x3f]="0", [0x06]="1", [0x5b]="2", [0x4f]="3", [0x66]="4", [0x6d]="5",
-		[0x7d]="6", [0x07]="7", [0x7f]="8", [0x6f]="9", [0x77]="a", [0x7c]="b", [0x39]="c", [0x5e]="d", [0x79]="e",
-		[0x71]="f", [0x3d]="g", [0x76]="h" }
-	return chars[digit & 0x7f] or "?"
-end
-
-local function display_text()
-	return digit_ascii(output_value("digit3")) .. digit_ascii(output_value("digit2")) .. digit_ascii(output_value("digit1")) .. digit_ascii(output_value("digit0"))
-end
-
--- the INFO displays blink: read until something is shown
-local function read_display()
-	local text = display_text()
-	for i = 1, 10 do
-		if text:match("%S") then
-			break
-		end
-		emu.wait(0.1)
-		text = display_text()
-	end
-	return text
-end
-
--- manual 6.1/6.2: INFO = main line (first move), INFO again = evaluation ('-1.50'), ENTER = depth ('d  6'), CLEAR = clock.
--- Keys only while the machine thinks and no LED is lit (a lit LED = its move is shown or being executed on the board);
--- 1 s presses: the 6502 scans the keys slowly
-function interface.show_info(on)
-	if not on or any_led() then
-		return nil
-	end
-	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
-	send_input(":KEY", 0x02, 1) -- INFO
-	local pv = read_display()
-	send_input(":KEY", 0x02, 1) -- INFO
-	local score = read_display():gsub(" ", "")
-	send_input(":KEY", 0x40, 1) -- ENTER
-	local depth = read_display()
-	send_input(":KEY", 0x80, 1) -- CLEAR
-	machine.video.throttled = throttled_state
-	if not pv:match("^[a-h][1-8][a-h][1-8]$") or not score:match("^%-?%d+$") or not depth:match("^d") then
-		return nil
-	end
-	interface.pv = pv
-	interface.score = tostring(tonumber(score))
-	interface.depth = tostring(tonumber((depth:sub(2):gsub("[^%d]", ""))) or 0)
-	return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-end
--- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
--- (as on montec/mm4); to come back once the info can be read from RAM without key presses
-interface.show_info = nil
+-- show_info: the Modena program keeps a search result block like the Monte Carlo (montec.lua reads it from RAM
+-- without key presses; the old reader pressed INFO/ENTER/CLEAR while the machine thought, and a press could land
+-- just as the move appears and hide it)
+interface.show_info = load_interface("montec").show_info
+interface.info_every = 1
 
 return interface
