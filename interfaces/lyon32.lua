@@ -135,7 +135,73 @@ function interface.setup_machine()
 
 	interface.cur_level = ""
 	interface.setlevel()
+	interface.info_display()
 end
+
+-- programmable info display (manual 2.16 ANZEI): while Mephisto computes, show info lines 3 (depth/selective depth,
+-- move searched, its number) and 4 (evaluation for Mephisto, first two moves of the main line) only, instead of the
+-- clock (lines 10 and 11); kept in the display module's memory, so a line is only toggled when it isn't set yet.
+-- keys = { cl, right, down, ent } as { port, mask } (also used by gen32 and berl32t8p, whose keys differ)
+local lyon_keys = { cl = { ":KEY1", 0x8000 }, right = { ":KEY1", 0x4000 }, down = { ":KEY2", 0x4000 }, ent = { ":KEY3", 0x8000 } }
+
+function interface.info_display(keys)
+	keys = keys or lyon_keys
+	local function key(k, t)
+		send_input(keys[k][1], keys[k][2], t)
+	end
+	local ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram'])
+	key("cl", 0.5)
+	key("cl", 0.5)
+	for i = 1, 13 do
+		key("right", 0.25) -- to ANZEI
+	end
+	key("ent", 0.5)
+	for line = 1, 13 do
+		key("down", 0.25) -- cursor on the line's computing-phase setting
+		local want = (line == 3 or line == 4) and "AN " or "AUS"
+		local name = string.format("ZEILE%02d", line)
+		local row = ddram:read_block(0x00, 0x07) == name and 0x00 or (ddram:read_block(0x40, 0x07) == name and 0x40)
+		if row and ddram:read_block(row + 0x09, 0x03) ~= want then
+			key("ent", 0.25)
+			key("down", 0.25) -- AN <-> AUS
+			key("ent", 0.25)
+		end
+	end
+	key("cl", 0.5)
+	key("cl", 0.5)
+end
+
+-- with info_display(): "03/15 F8G7=01/21" in the first row, "-8.87 G8F6 D2D4" in the second (German: comma)
+function interface.show_info(on)
+	if not on then
+		return nil
+	end
+	local ddram = emu.item(machine.devices[':display:hd44780'].items['0/m_ddram'])
+	local row1, row2 = ddram:read_block(0x00, 0x10), ddram:read_block(0x40, 0x10)
+	local info = {}
+	local depth, seldepth = row1:match("^(%d%d)/(%d%d) ")
+	if depth and tonumber(depth) > 0 then
+		info.depth = tonumber(depth)
+		info.seldepth = tonumber(seldepth)
+	end
+	local sign, pawns, hundredths = row2:match("^%s*(%-?)(%d+)[,.](%d%d) ")
+	if pawns then
+		local score = tonumber(pawns) * 100 + tonumber(hundredths)
+		info.score = sign == "-" and -score or score
+		local pv = {}
+		for move in row2:sub(7):gmatch("%S+") do
+			if not move:match("^[A-H][1-8][A-H][1-8]$") then
+				break
+			end
+			pv[#pv + 1] = move:lower()
+		end
+		if #pv > 0 then
+			info.pv = pv
+		end
+	end
+	return info
+end
+interface.info_every = 1 -- show_info only reads the display
 
 function interface.set_pos(mode)
 	if mode == 0 then
