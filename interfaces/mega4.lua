@@ -171,40 +171,45 @@ function interface.promote(x, y, piece)
 	end
 end
 
--- show_info disabled (as on montec, same display code): its INFO press can land just after the machine shows its move
--- (before the move LEDs light) and hide it. To be redone in the show_info revisit.
---[[
+-- the search keeps its main line in RAM at 0x018a (found by RAM dumps during the search): pairs of squares
+-- (file * 10 + rank, file 0 = a), ended by an invalid pair. Read without key presses (an INFO press could land just
+-- after the machine shows its move and hide it); the evaluation and depth weren't found in RAM
+local stale = nil -- RAM as the previous search (or game) left it
+
 function interface.show_info(on)
-	if on then
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
-		send_input(":KEY.3", 0x04, 0.2) -- INFO
-		emu.wait(0.1)
-		local d1 = output_value("digit0") & 0x7f
-		local d2 = output_value("digit1") & 0x7f
-		local d3 = output_value("digit2") & 0x7f
-		local d4 = output_value("digit3") & 0x7f
-		local d5 = output_value("digit4") & 0x7f
-		local d6 = output_value("digit5") & 0x7f
-		local d7 = output_value("digit6") & 0x7f
-		local d8 = output_value("digit7") & 0x7f
-		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-		send_input(":KEY.0", 0x01, 0.2) -- 1
-		emu.wait(0.1)
-		d1 = output_value("digit2") & 0x7f
-		d2 = output_value("digit3") & 0x7f
-		d3 = output_value("digit4") & 0x7f
-		d4 = output_value("digit5") & 0x7f
-		d5 = output_value("digit6") & 0x7f
-		d6 = output_value("digit7") & 0x7f
-		interface.depth = digit_ascii(d1) .. digit_ascii(d2):gsub(" ","")
-		interface.score = digit_ascii(d3) .. digit_ascii(d4) .. digit_ascii(d5) .. digit_ascii(d6):gsub(" ","")
-		send_input(":KEY.0", 0x08, 0.2) -- CLEAR
-		machine.video.throttled = throttled_state
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	local raw = ""
+	for a = 0x018a, 0x0199 do
+		raw = raw .. string.char(sp:read_u8(a))
 	end
+	if not on then
+		stale = raw
+		return nil
+	end
+	if raw == stale then
+		return nil -- nothing from this search yet
+	end
+	stale = nil
+	local function square(v)
+		local file, rank = v // 10, v % 10
+		if file <= 7 and rank >= 1 and rank <= 8 then
+			return string.char(0x61 + file) .. rank
+		end
+	end
+	local pv = {}
+	for k = 1, #raw - 1, 2 do
+		local from, to = square(raw:byte(k)), square(raw:byte(k + 1))
+		if not from or not to or from == to then
+			break
+		end
+		pv[#pv + 1] = from .. to
+	end
+	if #pv == 0 then
+		return nil
+	end
+	return { pv = pv }
 end
-]]
+interface.info_every = 1 -- show_info only reads RAM
 
 function digit_ascii(digit)
 	if     digit == 0   then return " "

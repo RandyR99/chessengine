@@ -236,61 +236,9 @@ function interface.promote(x, y, piece)
 	end
 end
 
--- show_info disabled: its INFO press can land a few ms after the machine shows its move (before the move LEDs light);
--- the machine then drops the move display, takes the move as played and starts the player's clock -> the plugin never sees it.
--- To be redone in the show_info revisit (only press keys while the machine's own display shows it is still searching).
---[[
-function interface.show_info(on)
-	if on then
-
-		-- DUAL-GATED ESCAPE SCANNER: Abort instantly if any chessboard LED is lit to protect moves
-		for idx = 0, 63 do
-			if output_value("led" .. idx) ~= 0 then
-				return nil
-			end
-		end
-		-- only while both displays show the clocks: a just-found move is on the display before its LEDs light up, and INFO would hide it
-		if (output_value("digit1") & 0x80 == 0 or output_value("digit5") & 0x80 == 0) then
-			return nil
-		end
-
-		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
-		send_input(":KEY.0", 0x08, 0.2) -- INFO
-		emu.wait(0.1)
-		
-		local d1 = output_value("digit0") & 0x7f
-		local d2 = output_value("digit1") & 0x7f
-		local d3 = output_value("digit2") & 0x7f
-		local d4 = output_value("digit3") & 0x7f
-		local d5 = output_value("digit4") & 0x7f
-		local d6 = output_value("digit5") & 0x7f
-		local d7 = output_value("digit6") & 0x7f
-		local d8 = output_value("digit7") & 0x7f
-		
-		interface.pv = digit_ascii(d1) .. digit_ascii(d2) .. digit_ascii(d3) .. digit_ascii(d4)
-		send_input(":KEY.1", 0x01, 0.2) -- 1
-		emu.wait(0.1)
-		
-		d1 = output_value("digit2") & 0x7f
-		d2 = output_value("digit3") & 0x7f
-		d3 = output_value("digit4") & 0x7f
-		d4 = output_value("digit5") & 0x7f
-		d5 = output_value("digit6") & 0x7f
-		d6 = output_value("digit7") & 0x7f
-		
-		interface.depth = digit_ascii(d1) .. digit_ascii(d2):gsub(" ","")
-		interface.score = digit_ascii(d3) .. digit_ascii(d4) .. digit_ascii(d5) .. digit_ascii(d6):gsub(" ","")
-		
-		-- always back to the clocks: leaving the INFO screen up hides a move found meanwhile from is_selected
-		send_input(":KEY.0", 0x10, 0.2) -- CL
-		emu.wait(0.05)
-
-		machine.video.throttled = throttled_state
-		return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-	end
-end
-]]
+-- the main line in RAM, read like on mega4 (same program family, same address)
+interface.show_info = load_interface("mega4").show_info
+interface.info_every = 1 -- show_info only reads RAM
 
 function digit_ascii(digit)
 	if     digit == 0   then return " "
