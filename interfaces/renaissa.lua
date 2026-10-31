@@ -107,6 +107,9 @@ function interface.setup_machine()
 
 	interface.cur_level = "a3"
 	interface.setlevel()
+	for i = 1, 3 do
+		send_input(":IN.2", 0x01, 1) -- Scroll: Info 4 (depth, next move, evaluation), kept across NEW GAME
+	end
 end
 
 function setpiece(n)
@@ -294,20 +297,37 @@ function interface.promote(x, y, piece)
 	sb_promote(":board", x, y, piece)
 end
 
-function interface.show_info(on)
-    if on then
-        local ddram = ram_block(":nvram", 0x0b3f, 0x10)
-        if digit_ascii(ddram:byte(1)) ~= " " and digit_ascii(ddram:byte(1)) ~= "-" and digit_ascii(ddram:byte(1)) ~= "P" then
-            interface.score = digit_ascii(ddram:byte(11)) .. digit_ascii(ddram:byte(12)) .. digit_ascii(ddram:byte(14)) .. digit_ascii(ddram:byte(15)):gsub(" ", "")
-            interface.depth = digit_ascii(ddram:byte(0)) .. digit_ascii(ddram:byte(1)):gsub(" ", "")
-            interface.pv = digit_ascii(ddram:byte(3)) .. digit_ascii(ddram:byte(4)) .. digit_ascii(ddram:byte(6)) .. digit_ascii(ddram:byte(7))
-        end
-        return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
-    end
+-- the LCD info line (Info 4, set up in setup_machine) as 7-segment codes, 16 characters at 0x0b3f:
+-- "3. d7 d5    -0.14" = depth, first move of the main line, evaluation in pawns for White (manual 5.4.3-5.4.4)
+local segment_char = { [0x3f]="0", [0x06]="1", [0x5b]="2", [0x4f]="3", [0x66]="4", [0x6d]="5", [0x7d]="6",
+	[0x07]="7", [0x7f]="8", [0x6f]="9", [0x77]="a", [0x7c]="b", [0x58]="c", [0x5e]="d", [0x79]="e", [0x71]="f",
+	[0x3d]="g", [0x74]="h", [0x76]="h", [0x40]="-", [0x00]=" " }
+
+function interface.show_info(on, ply)
+	if not on then
+		return nil
+	end
+	local line = ""
+	for _, c in ipairs({ ram_block(":nvram", 0x0b3f, 16):byte(1, 16) }) do
+		line = line .. (segment_char[c] or "?")
+	end
+	local info = {}
+	info.depth = tonumber(line:sub(1, 1))
+	local from, to = line:sub(3, 4), line:sub(6, 7)
+	if from:match("^[a-h][1-8]$") and to:match("^[a-h][1-8]$") then
+		info.pv = { from .. to }
+	end
+	local pawns, hundredths = line:sub(10, 12):match("^ *(%-?%d+)$"), line:sub(14, 15):match("^%d%d$")
+	if pawns and hundredths then
+		local score = math.abs(tonumber(pawns)) * 100 + tonumber(hundredths)
+		if pawns:sub(1, 1) == "-" then
+			score = -score
+		end
+		info.score = ply == "B" and -score or score -- for the machine
+	end
+	return info
 end
--- off: this called digit_ascii, which renaissa.lua doesn't define - a Lua error on every call that aborted the
--- plugin's update loop; and while it thinks the Renaissance shows its clock unless a display mode is set (to do)
-interface.show_info = nil
+interface.info_every = 1 -- show_info only reads the display
 
 
 return interface
