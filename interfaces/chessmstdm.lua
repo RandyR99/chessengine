@@ -8,10 +8,6 @@ end
 
 interface.level = 0
 interface.cur_level = nil
-interface.count = 0
-interface.score = "0.00"
-interface.pv = ""
-interface.depth = "0"
 
 function interface.get_module()
 	return "VEB Chess-Master Diamond"
@@ -227,109 +223,72 @@ function interface.promote(x, y, piece)
 	machine.video.throttled = throttled_state
 end
 
+-- show_info without key presses (the old reader stepped through the main line with Move Fore while the machine
+-- thought; a press could land just as the move appears and hide it). setlevel/set_option leave the display on the
+-- evaluation (View + Selection), which it shows in tenths of a pawn for the machine while it searches ('- 9.0',
+-- '+ 0.3'); the
+-- best move so far is in RAM at 0x8074/0x8075 (10x12 board, a1 = 21; found by RAM dumps during the search). No depth
+-- or longer main line is kept.
+local seg = { [0x00ff] = 0, [0x400c] = 1, [0x0377] = 2, [0x023f] = 3, [0x038c] = 4, [0x03bb] = 5, [0x03fb] = 6,
+	[0x020f] = 7, [0x03ff] = 8, [0x03bf] = 9 }
+local stale = nil
+local first = true
+local valued = false -- each search starts with ' 0.0' until it has an evaluation
+
 function interface.show_info(on)
-	if on then
-		local d1 = output_value("digit3") + 1
-		local d2 = output_value("digit2") + 1
-		local d3 = output_value("digit1") + 1
-		local d4 = output_value("digit0") + 1
-		if interface.count == 0 then
-			if d1 ~= 1 then
-				interface.score = (digit(d1) .. digit(d2) .. digit(d3) .. digit(d4)):gsub(" ", ""):gsub("%.", "") .. "0"
-			else
-				return
-			end
-			send_input(":IN.0", 0x01, 0.3) -- Move Fore
-			interface.count = interface.count + 1
-			interface.pv = ""
-		elseif (digit(d1) .. digit(d2) .. digit(d3) .. digit(d4)) ~= "    " then
-			interface.pv = digit(d1) .. digit(d2) .. digit(d3) .. digit(d4)
-			send_input(":IN.0", 0x01, 0.3) -- Move Fore
-			interface.count = interface.count + 1
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	local from, to = sp:read_u8(0x8074), sp:read_u8(0x8075)
+	local text = ""
+	for i = 3, 0, -1 do
+		local v = output_value("digit" .. i)
+		local d = seg[v & 0xffff]
+		if v & 0xffff == 0 then
+			text = text .. " "
+		elseif v & 0xffff == 0x0300 then
+			text = text .. "-"
+		elseif v & 0xffff == 0x0f00 then
+			text = text .. "+"
+		elseif d then
+			text = text .. d .. ((v & 0x10000 ~= 0) and "." or "")
 		else
-			interface.depth = interface.count - 1
-			interface.pv = string.lower(interface.pv)
-			send_input(":IN.1", 0x02, 0.3) -- View
-			send_input(":IN.0", 0x20, 0.3) -- Selection/Dialogue
-			interface.count = 0
-			return "info score cp " .. interface.score .. " depth " .. interface.depth .. " pv " .. interface.pv
+			text = text .. "?"
 		end
 	end
+	local raw = from .. " " .. to .. " " .. text
+	if not on or first then
+		first = false -- RAM still holds the last search before this session's first player turn
+		stale = raw
+		valued = false
+		return nil
+	end
+	if raw == stale then
+		return nil -- nothing from this search yet
+	end
+	stale = nil
+	local info = {}
+	local function square(v)
+		v = v - 21
+		if v >= 0 and v < 80 and v % 10 < 8 then
+			return string.char(0x61 + v % 10) .. (v // 10 + 1)
+		end
+	end
+	if square(from) and square(to) then
+		info.pv = { square(from) .. square(to) }
+	end
+	local sign, pawns, tenths = text:match("^([%-+]?) *(%d+)%.(%d)$")
+	if pawns then
+		local cp = tonumber(pawns) * 100 + tonumber(tenths) * 10
+		valued = valued or cp ~= 0
+		if valued then
+			info.score = sign == "-" and -cp or cp
+		end
+	end
+	if not info.pv and not info.score then
+		return nil
+	end
+	return info
 end
--- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
--- (as on montec/mm4); to come back once the info can be read from RAM without key presses
-interface.show_info = nil
 
-function digit(value)
-	local digit_asc = {
-		[1] = " ",
-		[2568] = "?",
-		[3841] = "+",
-		[769] = "-",
-		[20577] = "<-",
-		[40985] = "->",
-		[49177] = "->",
-		[41090] = "<-",
-		[976] = "A",
-		[3648] = "B",
-		[244] = "C",
-		[3136] = "D",
-		[500] = "E",
-		[452] = "F",
-		[764] = "G",
-		[973] = "H",
-		[13] = "I",
-		[49601] = "K",
-		[241] = "L",
-		[24781] = "M",
-		[41165] = "N",
-		[968] = "P",
-		[33736] = "R",
-		[3076] = "T",
-		[20673] = "V",
-		[37069] = "W",
-		[26625] = "Y",
-		[976 + 65536] = "A.",
-		[3648 + 65536] = "B.",
-		[244 + 65536] = "C.",
-		[3136 + 65536] = "D.",
-		[500 + 65536] = "E.",
-		[452 + 65536] = "F.",
-		[764 + 65536] = "G.",
-		[973 + 65536] = "H.",
-		[13 + 65536] = "I.",
-		[49601 + 65536] = "K.",
-		[241 + 65536] = "L.",
-		[24781 + 65536] = "M.",
-		[41165 + 65536] = "N.",
-		[968 + 65536] = "P.",
-		[33736 + 65536] = "R.",
-		[3076 + 65536] = "T.",
-		[20673 + 65536] = "V.",
-		[37069 + 65536] = "W.",
-		[26625 + 65536] = "Y.",
-		[256] = "0",
-		[65792] = "0.",
-		[16397] = "1",
-		[888] = "2",
-		[576] = "3",
-		[909] = "4",
-		[956] = "5",
-		[1020] = "6",
-		[528] = "7",
-		[1024] = "8",
-		[960] = "9",
-		[16397 + 65536] = "1.",
-		[888 + 65536] = "2.",
-		[576 + 65536] = "3.",
-		[909 + 65536] = "4.",
-		[956 + 65536] = "5.",
-		[1020 + 65536] = "6.",
-		[528 + 65536] = "7.",
-		[1024 + 65536] = "8.",
-		[960 + 65536] = "9."
-	}
-	return (digit_asc[value])
-end
+interface.info_every = 1 -- show_info only reads RAM and the display
 
 return interface
