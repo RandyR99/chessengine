@@ -65,6 +65,7 @@ end
 
 local function board_reset()
   local throttle_state = manager.machine.video.throttled
+  -- talking machines stay throttled for smoother speech
   if manager.machine.system.name ~= 'ivant' and
        manager.machine.system.name ~= 'igor' and
        manager.machine.system.name ~= 'chessac' and
@@ -73,9 +74,6 @@ local function board_reset()
        manager.machine.system.name ~= 'vsc' and
        manager.machine.system.name ~= 'csc' and
        manager.machine.system.name ~= 'csce' and
-       manager.machine.system.name ~= 'ccmk2' and
-       manager.machine.system.name ~= 'ccmk2a' and
-       manager.machine.system.name ~= 'chmate' and
        manager.machine.system.name ~= 'gambitv' and
        manager.machine.system.name ~= 'kishon' and
        manager.machine.system.name ~= 'kishona' and
@@ -844,9 +842,6 @@ local function play_moves(old, new)
      manager.machine.system.name ~= 'vsc' and
      manager.machine.system.name ~= 'csc' and
      manager.machine.system.name ~= 'csce' and
-     manager.machine.system.name ~= 'ccmk2' and
-     manager.machine.system.name ~= 'ccmk2a' and
-     manager.machine.system.name ~= 'chmate' and
      manager.machine.system.name ~= 'gambitv' and
      manager.machine.system.name ~= 'kishon' and
      manager.machine.system.name ~= 'kishona' and
@@ -1132,9 +1127,6 @@ local function update()
            manager.machine.system.name ~= 'vsc' and
            manager.machine.system.name ~= 'csc' and
            manager.machine.system.name ~= 'csce' and
-           manager.machine.system.name ~= 'ccmk2' and
-           manager.machine.system.name ~= 'ccmk2a' and
-           manager.machine.system.name ~= 'chmate' and
            manager.machine.system.name ~= 'gambitv' and
            manager.machine.system.name ~= 'kishon' and
            manager.machine.system.name ~= 'kishona' and
