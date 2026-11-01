@@ -44,8 +44,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
-- [a0b69ca](https://github.com/RandyR99/mame_for_picochess/commit/a0b69ca) 2026-10-13 mame_for_picochess: Add ch3008 (CXG Chess 3008); tidy ch2001 levels
 - [b859c98](https://github.com/RandyR99/chessengine/commit/b859c98) 2026-10-13 chessengine: ch2001: port to MAME 0.289 output proxies
+- [a0b69ca](https://github.com/RandyR99/mame_for_picochess/commit/a0b69ca) 2026-10-13 mame_for_picochess: Add ch3008 (CXG Chess 3008); tidy ch2001 levels
 
 </details>
 
@@ -62,8 +62,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [1668b8a](https://github.com/RandyR99/mame_for_picochess/commit/1668b8a) 2026-10-13 mame_for_picochess: Move ch3008 from retro_additions.ini to retro.ini
-- [a0b69ca](https://github.com/RandyR99/mame_for_picochess/commit/a0b69ca) 2026-10-13 mame_for_picochess: Add ch3008 (CXG Chess 3008); tidy ch2001 levels
 - [7aa15ac](https://github.com/RandyR99/chessengine/commit/7aa15ac) 2026-10-13 chessengine: ch3008: new interface from CB-Emu MessNew, ported to MAME 0.289
+- [a0b69ca](https://github.com/RandyR99/mame_for_picochess/commit/a0b69ca) 2026-10-13 mame_for_picochess: Add ch3008 (CXG Chess 3008); tidy ch2001 levels
 
 </details>
 
@@ -83,8 +83,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
-- [e2edc7a](https://github.com/RandyR99/chessengine/commit/e2edc7a) 2026-10-13 chessengine: scpchess/scpchessa: port to MAME 0.289, swap to match 0.289 sets, enable set_pos
 - [6fdc56c](https://github.com/RandyR99/mame_for_picochess/commit/6fdc56c) 2026-10-13 mame_for_picochess: Move scpchess and scpchessa to retro.ini (scpchessa ROM bug noted in comments)
+- [e2edc7a](https://github.com/RandyR99/chessengine/commit/e2edc7a) 2026-10-13 chessengine: scpchess/scpchessa: port to MAME 0.289, swap to match 0.289 sets, enable set_pos
 - [4a1f3a8](https://github.com/RandyR99/mame_for_picochess/commit/4a1f3a8) 2026-10-13 mame_for_picochess: scpchess/scpchessa: .uci levels from measured think times; add to retro_additions
 
 </details>
@@ -110,8 +110,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [e2edc7a](https://github.com/RandyR99/chessengine/commit/e2edc7a) 2026-10-13 chessengine: scpchess/scpchessa: port to MAME 0.289, swap to match 0.289 sets, enable set_pos
 - [6fdc56c](https://github.com/RandyR99/mame_for_picochess/commit/6fdc56c) 2026-10-13 mame_for_picochess: Move scpchess and scpchessa to retro.ini (scpchessa ROM bug noted in comments)
+- [e2edc7a](https://github.com/RandyR99/chessengine/commit/e2edc7a) 2026-10-13 chessengine: scpchess/scpchessa: port to MAME 0.289, swap to match 0.289 sets, enable set_pos
 - [4a1f3a8](https://github.com/RandyR99/mame_for_picochess/commit/4a1f3a8) 2026-10-13 mame_for_picochess: scpchess/scpchessa: .uci levels from measured think times; add to retro_additions
 
 </details>
@@ -147,8 +147,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - [5fdf725](https://github.com/RandyR99/chessengine/commit/5fdf725) 2026-10-31 chessengine: show_info: sdtor (sdtora, scmder) and sgalaxy (sgalaxya, sgalaxyb) read the search information from RAM, without key presses.
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes
 - [4dc4a63](https://github.com/RandyR99/chessengine/commit/4dc4a63) 2026-10-13 chessengine: sdtor/sgalaxy/scmder: port to MAME 0.289, fix scmder move entry
+- [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes
 
 </details>
 
@@ -169,8 +169,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [4d53174](https://github.com/RandyR99/chessengine/commit/4d53174) 2026-10-13 chessengine: cpchess2: port to MAME 0.289 output proxies, stable level bar
 - [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes
+- [4d53174](https://github.com/RandyR99/chessengine/commit/4d53174) 2026-10-13 chessengine: cpchess2: port to MAME 0.289 output proxies, stable level bar
 
 </details>
 
@@ -192,8 +192,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [8b0248b](https://github.com/RandyR99/mame_for_picochess/commit/8b0248b) 2026-10-26 mame_for_picochess: modular_tm.cpp (TM / 68030 modules): port32t .uci = Portorose 10 levels (TURN 08 = 40 moves/2h, verified), other 7 = Berlin Pro 11 levels; retro: new lyon32t…
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
-- [98dd217](https://github.com/RandyR99/mame_for_picochess/commit/98dd217) 2026-10-15 mame_for_picochess: compan2, enterp: new engines; compan levels = 6
 - [ba03af4](https://github.com/RandyR99/chessengine/commit/ba03af4) 2026-10-15 chessengine: compan2, enterp: new interfaces from MessChess, ported to MAME 0.289
+- [98dd217](https://github.com/RandyR99/mame_for_picochess/commit/98dd217) 2026-10-15 mame_for_picochess: compan2, enterp: new engines; compan levels = 6
 
 </details>
 
@@ -269,8 +269,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes
 - [d2c9012](https://github.com/RandyR99/chessengine/commit/d2c9012) 2026-10-13 chessengine: sjunior: port to MAME 0.289 (output proxies, RAM via data space)
+- [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes
 
 </details>
 

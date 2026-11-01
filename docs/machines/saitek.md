@@ -4,7 +4,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 | System | Name | Year | Elo | Levels | FEN | History | Info | Ponder | Limits |
 |---|---|---:|---:|---:|:-:|:-:|:-:|:-:|---:|
-| `analystd2` | Saitek Analyst D (set 2) | 1989 | 1950 | 10 | ✓ | ✓ | – | – | 1 |
+| `analystd2` | Saitek Analyst D (set 2) | 1989 | 1950 | 9 | ✓ | ✓ | – | ✓ | 1 |
 | `centurion` | Saitek Centurion | 1998 | 2020 | 11 | ✓ | ✓ | – | – | 1 |
 | `chessac` | Saitek Kasparov Chess Academy | 1997 | 1960 | 10 | ✓ | ✓ | – | ✓ |  |
 | `conquist` | Saitek Kasparov Conquistador | 1988 | 1615 | 8 | ✓ | ✓ | – | ✓ |  |
@@ -25,9 +25,12 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `leonardo` | Saitek Kasparov Leonardo | 1986 | 1600 | 10 | ✓ | ✓ | – | ✓ | 1 |
 | `leonardoa` | Saitek Kasparov Leonardo v1.2 | 1986 | 1600 | 10 | ✓ | ✓ | – | ✓ | 1 |
 | `leonardob` | Saitek Kasparov Leonardo v1.0 | 1986 | 1600 | 10 | ✓ | ✓ | – | ✓ | 1 |
-| `maestrod2` | Saitek Maestro D (set 2) | 1989 | 1950 | 10 | ✓ | ✓ | – | – | 1 |
+| `maestrod2` | Saitek Maestro D (set 2) | 1989 | 1950 | 9 | ✓ | ✓ | – | ✓ | 1 |
+| `maestroa1` | Saitek Maestro A (set 1) | 1986 | 1800 | 9 | ✓ | ✓ | – | ✓ | 1 |
+| `maestroc1` | Saitek Maestro C (set 1) | 1988 | 1800 | 9 | ✓ | ✓ | – | ✓ | 1 |
+| `maestrod4` | Saitek Maestro D++ | 1990 | 2025 | 9 | ✓ | ✓ | – | ✓ | 1 |
 | `prisma` | Saitek Kasparov Prisma | 1990 | 1770 | 10 | ✓ | ✓ | – | ✓ |  |
-| `sparc1` | Saitek Sparc Module (rev. 518) | 1993 | 2200 | 12 | ✓ | ✓ | ✓ | – | 1 |
+| `sparc1` | Saitek Sparc Module (rev. 518) | 1993 | 2200 | 10 | ✓ | ✓ | ✓ | – | 1 |
 | `tmate` | Saitek Kasparov Team-Mate | 1988 | 1535 | 8 | ✓ | ✓ | – | ✓ |  |
 | `schachak` | Saitek Mephisto Sprechende Schachakademie | 1997 | 1960 | 10 | ✓ | ✓ | – | ✓ |  |
 | `prschess` | Saitek President Chess | 1982 | 1500 | 7 | ✓ | ✓ | – | – | 1 |
@@ -56,21 +59,22 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - Stops thinking in dead draws (K+minor vs K, bare kings); picochess ends these games itself.
 
 - MAME set `leonardo` (Kasparov Leonardo (v1.4)), driver `saitek/leonardo.cpp`
-- script runs `mess leonardo -exp analyst,bios=5 -rom egr2`
+- script runs `mess leonardo -exp analyst,bios=d2 -rom egr2`
 - interface `leonardo.lua`
-- retro.ini: elo 1950, levels 9, ponder/brain n
+- retro.ini: elo 1950, levels 9, ponder/brain y
 
-**Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 15m game; 30m game; 40 moves/2h
+**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game
 
 **Commits**
 
-- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
+- [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
+- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [467c230](https://github.com/RandyR99/mame_for_picochess/commit/467c230) 2026-10-19 mame_for_picochess: turbos24k: 10 levels (leonardo set), ponder/brain = y
-- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 - [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
+- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 
 </details>
 
@@ -192,8 +196,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [339a31b](https://github.com/RandyR99/mame_for_picochess/commit/339a31b) 2026-10-16 mame_for_picochess: coronaa, coronab: add to retro.ini (11 levels)
 - [e042332](https://github.com/RandyR99/mame_for_picochess/commit/e042332) 2026-10-16 mame_for_picochess: corona/coronaa/coronab: 11 levels in the standard set (per move, per game, classical, analysis); corona levels = 11
+- [339a31b](https://github.com/RandyR99/mame_for_picochess/commit/339a31b) 2026-10-16 mame_for_picochess: coronaa, coronab: add to retro.ini (11 levels)
 - [72f413e](https://github.com/RandyR99/chessengine/commit/72f413e) 2026-10-16 chessengine: corona, stratos: port to MAME 0.289 (output proxies, battery RAM via memory shares)
 
 </details>
@@ -218,8 +222,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [339a31b](https://github.com/RandyR99/mame_for_picochess/commit/339a31b) 2026-10-16 mame_for_picochess: coronaa, coronab: add to retro.ini (11 levels)
 - [e042332](https://github.com/RandyR99/mame_for_picochess/commit/e042332) 2026-10-16 mame_for_picochess: corona/coronaa/coronab: 11 levels in the standard set (per move, per game, classical, analysis); corona levels = 11
+- [339a31b](https://github.com/RandyR99/mame_for_picochess/commit/339a31b) 2026-10-16 mame_for_picochess: coronaa, coronab: add to retro.ini (11 levels)
 - [72f413e](https://github.com/RandyR99/chessengine/commit/72f413e) 2026-10-16 chessengine: corona, stratos: port to MAME 0.289 (output proxies, battery RAM via memory shares)
 
 </details>
@@ -441,14 +445,14 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [263ceda](https://github.com/RandyR99/mame_for_picochess/commit/263ceda) 2026-10-25 mame_for_picochess: mm2.cpp family: .uci levels from the manuals (bup 9, mm2 8, mm4/mm5 11, rebel5 8, new mm4rebel 8 with '8 sss' levels), clones share the parent's file; mm4/mm…
 - [5d91e04](https://github.com/RandyR99/chessengine/commit/5d91e04) 2026-10-24 chessengine: RAM access via memory shares / address spaces instead of save-state items: supremo, nsnova, renaissa (ram_block helper), sapphire, sapphire2 (:nvram), kblitz…
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
-- [3552af9](https://github.com/RandyR99/chessengine/commit/3552af9) 2026-10-16 chessengine: kblitz: the dial fix ships in MAME 0.290
 - [1be06ee](https://github.com/RandyR99/mame_for_picochess/commit/1be06ee) 2026-10-16 mame_for_picochess: exechess 7 levels; gk2000 family 11 levels, new gk2000a, gk2000 is the 1997 version; kblitz needs MAME 0.290
+- [3552af9](https://github.com/RandyR99/chessengine/commit/3552af9) 2026-10-16 chessengine: kblitz: the dial fix ships in MAME 0.290
+- [df2de11](https://github.com/RandyR99/chessengine/commit/df2de11) 2026-10-15 chessengine: kblitz: full interface (setup, edit_game, start search, underpromotion) via the dials
 - [d62dd0c](https://github.com/RandyR99/mame_for_picochess/commit/d62dd0c) 2026-10-15 mame_for_picochess: kblitz: note the MAME 0.289 Shuttle Dial limitation in retro.ini
 - [a93d543](https://github.com/RandyR99/mame_for_picochess/commit/a93d543) 2026-10-15 mame_for_picochess: kblitz: retro comment for the full interface (needs patched MAME) and set 1 bishop bug
-- [df2de11](https://github.com/RandyR99/chessengine/commit/df2de11) 2026-10-15 chessengine: kblitz: full interface (setup, edit_game, start search, underpromotion) via the dials
 - [025cbdd](https://github.com/RandyR99/chessengine/commit/025cbdd) 2026-10-15 chessengine: kblitz: port to MAME 0.289, report underpromotion instead of waiting forever
-- [cffddda](https://github.com/RandyR99/mame_for_picochess/commit/cffddda) 2026-10-13 mame_for_picochess: Convert CRLF line endings to LF
 - [625d02a](https://github.com/RandyR99/chessengine/commit/625d02a) 2026-10-13 chessengine: Convert CRLF line endings to LF
+- [cffddda](https://github.com/RandyR99/mame_for_picochess/commit/cffddda) 2026-10-13 mame_for_picochess: Convert CRLF line endings to LF
 
 </details>
 
@@ -497,12 +501,12 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
-- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
+- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 - [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
+- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 
 </details>
 
@@ -525,13 +529,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
-- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
+- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [467c230](https://github.com/RandyR99/mame_for_picochess/commit/467c230) 2026-10-19 mame_for_picochess: turbos24k: 10 levels (leonardo set), ponder/brain = y
-- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 - [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
+- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 
 </details>
 
@@ -555,12 +559,12 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
-- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
+- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 - [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
+- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 
 </details>
 
@@ -584,12 +588,12 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
-- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
+- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 - [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
+- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 
 </details>
 
@@ -600,24 +604,116 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - Stops thinking in dead draws (K+minor vs K, bare kings); picochess ends these games itself.
 
 - MAME set `galileo` (Kasparov Galileo (v1.4)), driver `saitek/leonardo.cpp`, clone of `leonardo`
-- script runs `mess galileo -exp maestro,bios=6 -rom egr2`
+- script runs `mess galileo -exp maestro,bios=d2 -rom egr2`
 - interface `leonardo.lua`
-- retro.ini: elo 1950, levels 9, ponder/brain n
+- retro.ini: elo 1950, levels 9, ponder/brain y
 
 **Test notes**
 
 - leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
 
-**Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 15m game; 30m game; 40 moves/2h
+**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game
 
 **Commits**
 
-- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
+- [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
+- [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
+- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 - [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
+- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
+
+</details>
+
+<details><summary><code>maestroa1</code> Saitek Maestro A (set 1)</summary>
+
+**Known limits**
+
+- Stops thinking in dead draws (K+minor vs K, bare kings); picochess ends these games itself.
+
+- MAME set `galileo` (Kasparov Galileo (v1.4)), driver `saitek/leonardo.cpp`, clone of `leonardo`
+- script runs `mess galileo -exp maestroa,bios=a1`
+- interface `leonardo.lua`
+- retro.ini: elo 1800, levels 9, ponder/brain y
+
+**Test notes**
+
+- leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
+
+**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game
+
+**Commits**
+
+- [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
+- [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
+- [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
+- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
+- [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
+- [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
+- [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
+- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
+
+</details>
+
+<details><summary><code>maestroc1</code> Saitek Maestro C (set 1)</summary>
+
+**Known limits**
+
+- Stops thinking in dead draws (K+minor vs K, bare kings); picochess ends these games itself.
+
+- MAME set `galileo` (Kasparov Galileo (v1.4)), driver `saitek/leonardo.cpp`, clone of `leonardo`
+- script runs `mess galileo -exp maestro,bios=c1 -rom egr2`
+- interface `leonardo.lua`
+- retro.ini: elo 1800, levels 9, ponder/brain y
+
+**Test notes**
+
+- leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
+
+**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game
+
+**Commits**
+
+- [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
+- [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
+- [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
+- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
+- [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
+- [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
+- [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
+- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
+
+</details>
+
+<details><summary><code>maestrod4</code> Saitek Maestro D++</summary>
+
+**Known limits**
+
+- Stops thinking in dead draws (K+minor vs K, bare kings); picochess ends these games itself.
+
+- MAME set `galileo` (Kasparov Galileo (v1.4)), driver `saitek/leonardo.cpp`, clone of `leonardo`
+- script runs `mess galileo -exp maestro,bios=dpp -rom egr2`
+- interface `leonardo.lua`
+- retro.ini: elo 2025, levels 9, ponder/brain y
+
+**Test notes**
+
+- leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
+
+**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game
+
+**Commits**
+
+- [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
+- [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
+- [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
+- [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
+- [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
+- [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
+- [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
+- [0ac6804](https://github.com/RandyR99/chessengine/commit/0ac6804) 2026-10-16 chessengine: leonardo: port to MAME 0.289 (output proxies); also serves leonardoa/b and galileo
 
 </details>
 
@@ -639,9 +735,9 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [6f4c493](https://github.com/RandyR99/chessengine/commit/6f4c493) 2026-10-29 chessengine: Game end: optional interface.game_over() - when it returns true on the machine's turn, init.lua sends 'bestmove 0000' once (reset by the next 'position'); pi…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [f781cce](https://github.com/RandyR99/chessengine/commit/f781cce) 2026-10-17 chessengine: prisma: port to MAME 0.289 (output proxies)
-- [a0ed3d7](https://github.com/RandyR99/mame_for_picochess/commit/a0ed3d7) 2026-10-17 mame_for_picochess: prisma: 11 levels from the manual (A1-A8 per move, C1-C7 game, B7 analysis); old file used novice D levels as timed games
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
+- [a0ed3d7](https://github.com/RandyR99/mame_for_picochess/commit/a0ed3d7) 2026-10-17 mame_for_picochess: prisma: 11 levels from the manual (A1-A8 per move, C1-C7 game, B7 analysis); old file used novice D levels as timed games
+- [f781cce](https://github.com/RandyR99/chessengine/commit/f781cce) 2026-10-17 chessengine: prisma: port to MAME 0.289 (output proxies)
 
 </details>
 
@@ -660,7 +756,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - renaissa/renaissaa/sparc1: FEN setup must enter SET UP before the board rebuild (else "start + 1 white move" reverses the board).
 
-**Levels:** 5s move; 15s move; 30s move; 60s move; 2m move; 5m game; 10m game; 15m game; 30m game; 60m game; 90m game; Analysis
+**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game; Analysis
 
 **Commits**
 
@@ -669,8 +765,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [b45e562](https://github.com/RandyR99/chessengine/commit/b45e562) 2026-10-28 chessengine: renaissa (all renaissance.cpp sets): machine move needs the display AND the square's 4 corner LEDs (CB-Emu update; info displays light no LEDs); the LEDs fol…
 - [5d91e04](https://github.com/RandyR99/chessengine/commit/5d91e04) 2026-10-24 chessengine: RAM access via memory shares / address spaces instead of save-state items: supremo, nsnova, renaissa (ram_block helper), sapphire, sapphire2 (:nvram), kblitz…
-- [988d189](https://github.com/RandyR99/chessengine/commit/988d189) 2026-10-17 chessengine: renaissa: port to MAME 0.289 (output proxies); enter Set Up before the board is rebuilt
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
+- [988d189](https://github.com/RandyR99/chessengine/commit/988d189) 2026-10-17 chessengine: renaissa: port to MAME 0.289 (output proxies); enter Set Up before the board is rebuilt
 - [46c6423](https://github.com/RandyR99/mame_for_picochess/commit/46c6423) 2026-10-17 mame_for_picochess: renaissance: analysis levels (renaissa B7 = 14 levels, renaissaa B7 = 10, sparc1 f8 = 10); renaissaa.uci new heading style; renaissaa in retro.ini
 
 </details>
@@ -736,9 +832,9 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [9156704](https://github.com/RandyR99/chessengine/commit/9156704) 2026-10-17 chessengine: prschess: port to MAME 0.289 (output proxies); slow down board input for the machine
 - [ff52861](https://github.com/RandyR99/mame_for_picochess/commit/ff52861) 2026-10-17 mame_for_picochess: prschess: add Level 7 Analysis (machine level 8), levels = 7
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
+- [9156704](https://github.com/RandyR99/chessengine/commit/9156704) 2026-10-17 chessengine: prschess: port to MAME 0.289 (output proxies); slow down board input for the machine
 
 </details>
 
@@ -768,8 +864,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [b45e562](https://github.com/RandyR99/chessengine/commit/b45e562) 2026-10-28 chessengine: renaissa (all renaissance.cpp sets): machine move needs the display AND the square's 4 corner LEDs (CB-Emu update; info displays light no LEDs); the LEDs fol…
 - [5d91e04](https://github.com/RandyR99/chessengine/commit/5d91e04) 2026-10-24 chessengine: RAM access via memory shares / address spaces instead of save-state items: supremo, nsnova, renaissa (ram_block helper), sapphire, sapphire2 (:nvram), kblitz…
-- [988d189](https://github.com/RandyR99/chessengine/commit/988d189) 2026-10-17 chessengine: renaissa: port to MAME 0.289 (output proxies); enter Set Up before the board is rebuilt
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
+- [988d189](https://github.com/RandyR99/chessengine/commit/988d189) 2026-10-17 chessengine: renaissa: port to MAME 0.289 (output proxies); enter Set Up before the board is rebuilt
 - [46c6423](https://github.com/RandyR99/mame_for_picochess/commit/46c6423) 2026-10-17 mame_for_picochess: renaissance: analysis levels (renaissa B7 = 14 levels, renaissaa B7 = 10, sparc1 f8 = 10); renaissaa.uci new heading style; renaissaa in retro.ini
 
 </details>
@@ -971,8 +1067,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [d4eed72](https://github.com/RandyR99/mame_for_picochess/commit/d4eed72) 2026-10-20 mame_for_picochess: uci: short tournament headings ('40/2h', '60/5m') as '40 moves/2h', units h/m
-- [5c1a82f](https://github.com/RandyR99/mame_for_picochess/commit/5c1a82f) 2026-10-18 mame_for_picochess: stratos family: 10 levels per manual, retro levels, add stratosa and tkingb
 - [e752241](https://github.com/RandyR99/chessengine/commit/e752241) 2026-10-18 chessengine: stratos, tking: cold boot at start, reliable FEN setup, English names
+- [5c1a82f](https://github.com/RandyR99/mame_for_picochess/commit/5c1a82f) 2026-10-18 mame_for_picochess: stratos family: 10 levels per manual, retro levels, add stratosa and tkingb
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [72f413e](https://github.com/RandyR99/chessengine/commit/72f413e) 2026-10-16 chessengine: corona, stratos: port to MAME 0.289 (output proxies, battery RAM via memory shares)
 
@@ -993,8 +1089,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [d4eed72](https://github.com/RandyR99/mame_for_picochess/commit/d4eed72) 2026-10-20 mame_for_picochess: uci: short tournament headings ('40/2h', '60/5m') as '40 moves/2h', units h/m
-- [5c1a82f](https://github.com/RandyR99/mame_for_picochess/commit/5c1a82f) 2026-10-18 mame_for_picochess: stratos family: 10 levels per manual, retro levels, add stratosa and tkingb
 - [e752241](https://github.com/RandyR99/chessengine/commit/e752241) 2026-10-18 chessengine: stratos, tking: cold boot at start, reliable FEN setup, English names
+- [5c1a82f](https://github.com/RandyR99/mame_for_picochess/commit/5c1a82f) 2026-10-18 mame_for_picochess: stratos family: 10 levels per manual, retro levels, add stratosa and tkingb
 - [72f413e](https://github.com/RandyR99/chessengine/commit/72f413e) 2026-10-16 chessengine: corona, stratos: port to MAME 0.289 (output proxies, battery RAM via memory shares)
 
 </details>
@@ -1070,10 +1166,10 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [d4eed72](https://github.com/RandyR99/mame_for_picochess/commit/d4eed72) 2026-10-20 mame_for_picochess: uci: short tournament headings ('40/2h', '60/5m') as '40 moves/2h', units h/m
-- [5c1a82f](https://github.com/RandyR99/mame_for_picochess/commit/5c1a82f) 2026-10-18 mame_for_picochess: stratos family: 10 levels per manual, retro levels, add stratosa and tkingb
 - [e752241](https://github.com/RandyR99/chessengine/commit/e752241) 2026-10-18 chessengine: stratos, tking: cold boot at start, reliable FEN setup, English names
-- [72f413e](https://github.com/RandyR99/chessengine/commit/72f413e) 2026-10-16 chessengine: corona, stratos: port to MAME 0.289 (output proxies, battery RAM via memory shares)
+- [5c1a82f](https://github.com/RandyR99/mame_for_picochess/commit/5c1a82f) 2026-10-18 mame_for_picochess: stratos family: 10 levels per manual, retro levels, add stratosa and tkingb
 - [07601a1](https://github.com/RandyR99/mame_for_picochess/commit/07601a1) 2026-10-16 mame_for_picochess: retro.ini: unique small/medium names (arb, feas, tascr30, cmpchess), fill cp2000 and tkinga names
+- [72f413e](https://github.com/RandyR99/chessengine/commit/72f413e) 2026-10-16 chessengine: corona, stratos: port to MAME 0.289 (output proxies, battery RAM via memory shares)
 
 </details>
 
@@ -1093,8 +1189,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [d4eed72](https://github.com/RandyR99/mame_for_picochess/commit/d4eed72) 2026-10-20 mame_for_picochess: uci: short tournament headings ('40/2h', '60/5m') as '40 moves/2h', units h/m
-- [5c1a82f](https://github.com/RandyR99/mame_for_picochess/commit/5c1a82f) 2026-10-18 mame_for_picochess: stratos family: 10 levels per manual, retro levels, add stratosa and tkingb
 - [e752241](https://github.com/RandyR99/chessengine/commit/e752241) 2026-10-18 chessengine: stratos, tking: cold boot at start, reliable FEN setup, English names
+- [5c1a82f](https://github.com/RandyR99/mame_for_picochess/commit/5c1a82f) 2026-10-18 mame_for_picochess: stratos family: 10 levels per manual, retro levels, add stratosa and tkingb
 - [72f413e](https://github.com/RandyR99/chessengine/commit/72f413e) 2026-10-16 chessengine: corona, stratos: port to MAME 0.289 (output proxies, battery RAM via memory shares)
 
 </details>
@@ -1117,8 +1213,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [9473ebb](https://github.com/RandyR99/chessengine/commit/9473ebb) 2026-10-31 chessengine: tking (tkinga, tkingb): Level option applied, info display selected in start_play, ver. D info display found by stepping
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [d4eed72](https://github.com/RandyR99/mame_for_picochess/commit/d4eed72) 2026-10-20 mame_for_picochess: uci: short tournament headings ('40/2h', '60/5m') as '40 moves/2h', units h/m
-- [5c1a82f](https://github.com/RandyR99/mame_for_picochess/commit/5c1a82f) 2026-10-18 mame_for_picochess: stratos family: 10 levels per manual, retro levels, add stratosa and tkingb
 - [e752241](https://github.com/RandyR99/chessengine/commit/e752241) 2026-10-18 chessengine: stratos, tking: cold boot at start, reliable FEN setup, English names
+- [5c1a82f](https://github.com/RandyR99/mame_for_picochess/commit/5c1a82f) 2026-10-18 mame_for_picochess: stratos family: 10 levels per manual, retro levels, add stratosa and tkingb
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 
 </details>

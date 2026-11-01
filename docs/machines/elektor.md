@@ -26,8 +26,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
-- [b063bc0](https://github.com/RandyR99/mame_for_picochess/commit/b063bc0) 2026-10-12 mame_for_picochess: avrmax: levels as in Levels.txt; add avrmaxg and cc2schach to retro_additions
 - [a274ff6](https://github.com/RandyR99/chessengine/commit/a274ff6) 2026-10-12 chessengine: avrmax: port to MAME 0.289
+- [b063bc0](https://github.com/RandyR99/mame_for_picochess/commit/b063bc0) 2026-10-12 mame_for_picochess: avrmax: levels as in Levels.txt; add avrmaxg and cc2schach to retro_additions
 
 </details>
 
@@ -76,9 +76,9 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [625d02a](https://github.com/RandyR99/chessengine/commit/625d02a) 2026-10-13 chessengine: Convert CRLF line endings to LF
-- [48615c9](https://github.com/RandyR99/mame_for_picochess/commit/48615c9) 2026-10-12 mame_for_picochess: Move vetted avrmaxg and ivanto into retro.ini
 - [b063bc0](https://github.com/RandyR99/mame_for_picochess/commit/b063bc0) 2026-10-12 mame_for_picochess: avrmax: levels as in Levels.txt; add avrmaxg and cc2schach to retro_additions
 - [a274ff6](https://github.com/RandyR99/chessengine/commit/a274ff6) 2026-10-12 chessengine: avrmax: port to MAME 0.289
+- [48615c9](https://github.com/RandyR99/mame_for_picochess/commit/48615c9) 2026-10-12 mame_for_picochess: Move vetted avrmaxg and ivanto into retro.ini
 
 </details>
 
@@ -99,8 +99,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
+- [a274ff6](https://github.com/RandyR99/chessengine/commit/a274ff6) 2026-10-12 chessengine: avrmax: port to MAME 0.289
 - [48615c9](https://github.com/RandyR99/mame_for_picochess/commit/48615c9) 2026-10-12 mame_for_picochess: Move vetted avrmaxg and ivanto into retro.ini
 - [b063bc0](https://github.com/RandyR99/mame_for_picochess/commit/b063bc0) 2026-10-12 mame_for_picochess: avrmax: levels as in Levels.txt; add avrmaxg and cc2schach to retro_additions
-- [a274ff6](https://github.com/RandyR99/chessengine/commit/a274ff6) 2026-10-12 chessengine: avrmax: port to MAME 0.289
 
 </details>

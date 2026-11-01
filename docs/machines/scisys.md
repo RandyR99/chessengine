@@ -50,8 +50,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [542b983](https://github.com/RandyR99/chessengine/commit/542b983) 2026-10-30 chessengine: show_info: Novag, stratos and ccmk5 send only values read in the current search. sexperta/sfortea, nsnova/supremo and cfortea already read the score with the…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [81b907a](https://github.com/RandyR99/mame_for_picochess/commit/81b907a) 2026-10-17 mame_for_picochess: ccmk5: note the ROM hang when only promotions are legal
 - [0179a1e](https://github.com/RandyR99/chessengine/commit/0179a1e) 2026-10-17 chessengine: ccmk5: port to MAME 0.289 (output proxies, program-space RAM); fix levels never applied after setup and digits 6-9 crash
+- [81b907a](https://github.com/RandyR99/mame_for_picochess/commit/81b907a) 2026-10-17 mame_for_picochess: ccmk5: note the ROM hang when only promotions are legal
 - [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
 
 </details>
@@ -91,8 +91,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [84f9fe9](https://github.com/RandyR99/mame_for_picochess/commit/84f9fe9) 2026-10-15 mame_for_picochess: compan: 6 levels from measured think times (machine levels are 1-8, the old file sent 0-6)
-- [98dd217](https://github.com/RandyR99/mame_for_picochess/commit/98dd217) 2026-10-15 mame_for_picochess: compan2, enterp: new engines; compan levels = 6
 - [9dc2f03](https://github.com/RandyR99/chessengine/commit/9dc2f03) 2026-10-15 chessengine: compan: port to MAME 0.289, re-enable set_pos (board RAM via program space)
+- [98dd217](https://github.com/RandyR99/mame_for_picochess/commit/98dd217) 2026-10-15 mame_for_picochess: compan2, enterp: new engines; compan levels = 6
 
 </details>
 
@@ -115,8 +115,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [6832820](https://github.com/RandyR99/mame_for_picochess/commit/6832820) 2026-10-29 mame_for_picochess: New engines expchess (SciSys Explorer Chess), fex68km4a (Excel 68020 Mach IV set 2), feagpriv (Elite Private Line, EAG 6081 conversion): scripts, _art, .uci…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
-- [98dd217](https://github.com/RandyR99/mame_for_picochess/commit/98dd217) 2026-10-15 mame_for_picochess: compan2, enterp: new engines; compan levels = 6
 - [ba03af4](https://github.com/RandyR99/chessengine/commit/ba03af4) 2026-10-15 chessengine: compan2, enterp: new interfaces from MessChess, ported to MAME 0.289
+- [98dd217](https://github.com/RandyR99/mame_for_picochess/commit/98dd217) 2026-10-15 mame_for_picochess: compan2, enterp: new engines; compan levels = 6
 
 </details>
 
@@ -139,8 +139,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
-- [9f15c7d](https://github.com/RandyR99/chessengine/commit/9f15c7d) 2026-10-29 chessengine: expchess (Explorer Chess): new interface on top of compan2 - 12 buttons with other ports; Set Up = 2nd F + a piece key, New Game clears the board in set up,…
 - [6832820](https://github.com/RandyR99/mame_for_picochess/commit/6832820) 2026-10-29 mame_for_picochess: New engines expchess (SciSys Explorer Chess), fex68km4a (Excel 68020 Mach IV set 2), feagpriv (Elite Private Line, EAG 6081 conversion): scripts, _art, .uci…
+- [9f15c7d](https://github.com/RandyR99/chessengine/commit/9f15c7d) 2026-10-29 chessengine: expchess (Explorer Chess): new interface on top of compan2 - 12 buttons with other ports; Set Up = 2nd F + a piece key, New Game clears the board in set up,…
 
 </details>
 
@@ -160,8 +160,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [765f1f0](https://github.com/RandyR99/mame_for_picochess/commit/765f1f0) 2026-10-19 mame_for_picochess: turbo16k family: conquist/tmate 8 levels; new turbo16k, compan3, t1850
 - [4053c46](https://github.com/RandyR99/chessengine/commit/4053c46) 2026-10-19 chessengine: turbo16k family: port conquist to MAME 0.289; new turbo16k, compan3, t1850 (from MessChess); verify Multi Move LED in edit_game; boot wait 11 s; t1850 has 16…
+- [765f1f0](https://github.com/RandyR99/mame_for_picochess/commit/765f1f0) 2026-10-19 mame_for_picochess: turbo16k family: conquist/tmate 8 levels; new turbo16k, compan3, t1850
 
 </details>
 
@@ -211,8 +211,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [3318a19](https://github.com/RandyR99/chessengine/commit/3318a19) 2026-10-16 chessengine: intchess: port to MAME 0.289 (output proxies), 6522 VIA reset workaround
 - [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
+- [3318a19](https://github.com/RandyR99/chessengine/commit/3318a19) 2026-10-16 chessengine: intchess: port to MAME 0.289 (output proxies), 6522 VIA reset workaround
 
 </details>
 
@@ -283,8 +283,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [6617fe0](https://github.com/RandyR99/chessengine/commit/6617fe0) 2026-10-18 chessengine: schess: port to MAME 0.289 (output proxies); slow board input, wait out check display
 - [cd4344b](https://github.com/RandyR99/mame_for_picochess/commit/cd4344b) 2026-10-18 mame_for_picochess: schess: fix module loading for MAME 0.289; add Strong Play and Hyper Modern engines
+- [6617fe0](https://github.com/RandyR99/chessengine/commit/6617fe0) 2026-10-18 chessengine: schess: port to MAME 0.289 (output proxies); slow board input, wait out check display
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [625d02a](https://github.com/RandyR99/chessengine/commit/625d02a) 2026-10-13 chessengine: Convert CRLF line endings to LF
 
@@ -308,8 +308,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [6617fe0](https://github.com/RandyR99/chessengine/commit/6617fe0) 2026-10-18 chessengine: schess: port to MAME 0.289 (output proxies); slow board input, wait out check display
 - [cd4344b](https://github.com/RandyR99/mame_for_picochess/commit/cd4344b) 2026-10-18 mame_for_picochess: schess: fix module loading for MAME 0.289; add Strong Play and Hyper Modern engines
+- [6617fe0](https://github.com/RandyR99/chessengine/commit/6617fe0) 2026-10-18 chessengine: schess: port to MAME 0.289 (output proxies); slow board input, wait out check display
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [625d02a](https://github.com/RandyR99/chessengine/commit/625d02a) 2026-10-13 chessengine: Convert CRLF line endings to LF
 
@@ -333,8 +333,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [6617fe0](https://github.com/RandyR99/chessengine/commit/6617fe0) 2026-10-18 chessengine: schess: port to MAME 0.289 (output proxies); slow board input, wait out check display
 - [cd4344b](https://github.com/RandyR99/mame_for_picochess/commit/cd4344b) 2026-10-18 mame_for_picochess: schess: fix module loading for MAME 0.289; add Strong Play and Hyper Modern engines
+- [6617fe0](https://github.com/RandyR99/chessengine/commit/6617fe0) 2026-10-18 chessengine: schess: port to MAME 0.289 (output proxies); slow board input, wait out check display
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [625d02a](https://github.com/RandyR99/chessengine/commit/625d02a) 2026-10-13 chessengine: Convert CRLF line endings to LF
 
@@ -402,8 +402,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [765f1f0](https://github.com/RandyR99/mame_for_picochess/commit/765f1f0) 2026-10-19 mame_for_picochess: turbo16k family: conquist/tmate 8 levels; new turbo16k, compan3, t1850
 - [4053c46](https://github.com/RandyR99/chessengine/commit/4053c46) 2026-10-19 chessengine: turbo16k family: port conquist to MAME 0.289; new turbo16k, compan3, t1850 (from MessChess); verify Multi Move LED in edit_game; boot wait 11 s; t1850 has 16…
+- [765f1f0](https://github.com/RandyR99/mame_for_picochess/commit/765f1f0) 2026-10-19 mame_for_picochess: turbo16k family: conquist/tmate 8 levels; new turbo16k, compan3, t1850
 
 </details>
 
@@ -428,8 +428,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [b62aa45](https://github.com/RandyR99/mame_for_picochess/commit/b62aa45) 2026-10-19 mame_for_picochess: tschess: new engine (SciSys Travel Sensor Chess), 4 levels
 - [b187063](https://github.com/RandyR99/chessengine/commit/b187063) 2026-10-19 chessengine: tschess: new interface (from MessChess, ported to MAME 0.289); level via LED, slow-board waits
+- [b62aa45](https://github.com/RandyR99/mame_for_picochess/commit/b62aa45) 2026-10-19 mame_for_picochess: tschess: new engine (SciSys Travel Sensor Chess), 4 levels
 
 </details>
 
@@ -450,8 +450,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [765f1f0](https://github.com/RandyR99/mame_for_picochess/commit/765f1f0) 2026-10-19 mame_for_picochess: turbo16k family: conquist/tmate 8 levels; new turbo16k, compan3, t1850
 - [4053c46](https://github.com/RandyR99/chessengine/commit/4053c46) 2026-10-19 chessengine: turbo16k family: port conquist to MAME 0.289; new turbo16k, compan3, t1850 (from MessChess); verify Multi Move LED in edit_game; boot wait 11 s; t1850 has 16…
+- [765f1f0](https://github.com/RandyR99/mame_for_picochess/commit/765f1f0) 2026-10-19 mame_for_picochess: turbo16k family: conquist/tmate 8 levels; new turbo16k, compan3, t1850
 
 </details>
 

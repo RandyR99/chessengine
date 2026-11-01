@@ -87,8 +87,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [d4eed72](https://github.com/RandyR99/mame_for_picochess/commit/d4eed72) 2026-10-20 mame_for_picochess: uci: short tournament headings ('40/2h', '60/5m') as '40 moves/2h', units h/m
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [f321da6](https://github.com/RandyR99/chessengine/commit/f321da6) 2026-10-14 chessengine: nmicro2: port to MAME 0.289, re-enable set_pos; drop references to removed sets
+- [4d4a2eb](https://github.com/RandyR99/mame_for_picochess/commit/4d4a2eb) 2026-10-11 mame_for_picochess: retro_additions: add tascr30a (Tasc R30, The King 2.20)
 - [fcfdd95](https://github.com/RandyR99/mame_for_picochess/commit/fcfdd95) 2026-10-11 mame_for_picochess: Add Chess King Master, move vetted tascr30a and master into retro.ini
 - [32f72d8](https://github.com/RandyR99/chessengine/commit/32f72d8) 2026-10-11 chessengine: tascr30: port to MAME 0.289, fix Level option never being applied
-- [4d4a2eb](https://github.com/RandyR99/mame_for_picochess/commit/4d4a2eb) 2026-10-11 mame_for_picochess: retro_additions: add tascr30a (Tasc R30, The King 2.20)
 
 </details>
