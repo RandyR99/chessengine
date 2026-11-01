@@ -1,25 +1,25 @@
 # MAME chess machines in picochess
 
-Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-10-31 from chessengine `6a076b4` and mame_for_picochess `6832820`.
+Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-01 from chessengine `021277d` and mame_for_picochess `cc0c072`.
 
 | Machines | Interface files | MAME drivers | FEN setup | History replay | Live info | Ponder |
 |---:|---:|---:|---:|---:|---:|---:|
-| 426 | 284 | 133 | 408 | 394 | 151 | 209 |
+| 426 | 284 | 133 | 408 | 394 | 183 | 209 |
 
 **Machines by manufacturer** (feature table and details per machine):
 
 | Manufacturer | Machines | FEN setup | History | Live info | With known limits |
 |---|---:|---:|---:|---:|---:|
 | [Chafitz/Applied Concepts](machines/chafitz-applied-concepts.md) | 13 | 13 | 6 | 0 | 7 |
-| [CXG](machines/cxg.md) | 22 | 21 | 18 | 2 | 6 |
+| [CXG](machines/cxg.md) | 22 | 21 | 18 | 8 | 6 |
 | [Elektor](machines/elektor.md) | 4 | 0 | 0 | 0 | 4 |
 | [Fidelity](machines/fidelity.md) | 99 | 97 | 97 | 33 | 31 |
-| [Mephisto](machines/mephisto.md) | 118 | 118 | 118 | 70 | 40 |
+| [Mephisto](machines/mephisto.md) | 118 | 118 | 118 | 95 | 40 |
 | [Novag](machines/novag.md) | 59 | 59 | 54 | 23 | 13 |
 | [Saitek](machines/saitek.md) | 44 | 40 | 44 | 14 | 28 |
 | [SciSys](machines/scisys.md) | 19 | 19 | 19 | 2 | 12 |
 | [Tasc](machines/tasc.md) | 4 | 4 | 4 | 4 | 0 |
-| [VEB](machines/veb.md) | 8 | 5 | 5 | 0 | 5 |
+| [VEB](machines/veb.md) | 8 | 5 | 5 | 1 | 5 |
 | [Various](machines/various.md) | 36 | 32 | 29 | 3 | 18 |
 
 ## Legend and general limits
@@ -27,7 +27,7 @@ Every machine in picochess `retro.ini` after the port of the chessengine interfa
 **Columns**
 
 - **FEN**: the interface can set up a position (`set_pos`). Without it the machine plays from the start position only.
-- **History**: the interface can replay a game's moves into the machine (`edit_game`), so a game can continue after takebacks or a restart.
+- **History**: the interface can replay a game's moves into the machine (`edit_game`), so a game can continue after takebacks or a restart. picochess sees it as `edit` in the engine name and then sends the move history with Set Pos and Read Game.
 - **Info**: live depth, score and main line while the machine thinks (`show_info`), read without key presses.
 - **Ponder**: `ponder/brain = y` in retro.ini: the machine thinks on the player's time (measured from a non-book position, not taken from the manual).
 - **Levels**: entries in the machine's .uci file, fastest to slowest. **Elo** comes from CB-Emu Programs.txt.
@@ -74,6 +74,9 @@ The interface files were ported to MAME 0.289 (output values through `machine.de
 | 3e53188 | 2026-10-30 | `format_info()`: `show_info()` returns `{depth, seldepth, score, mate, pv}` (old strings still work) and init.lua writes the info line the way python-chess parses it: empty fields left out, castling notations converted, pv cut at its first illegal move. New `interface.info_every`. |
 | 506d638 | 2026-10-30 | `show_info` runs every 10 s of emulated time (or `info_every`) instead of every 500 ticks; key-pressing show_info switched off (a press could hide the machine's move). |
 | 542b983 | 2026-10-30 | `depth 0` (before the first iteration) is left out of the info line. |
+| da0d4a3 | 2026-11-01 | Chessmate sets (ccmk2, ccmk2a, chmate) run setup and game edits unthrottled; the talking machines stay throttled (unthrottled speech plays partly sped up). |
+| f0b8554 | 2026-11-01 | Set Pos / Read Game: a replayed history leaves the machine in edit mode and idle until `go` (a player move arriving first is keyed in as part of the history), so it no longer moves for the player; generalizes Johan's MM V fix. The id name reports `edit` (e.g. `(pos+edit+info)`), which picochess uses to decide whether Set Pos sends the history. Talking machines in one `keep_throttled` table; dead `sc80`/`sparc` code removed. |
+| 021277d | 2026-11-01 | `interface.no_soft_reset` replaces the name list that skips the soft reset on `ucinewgame`; clones inherit it (avrmaxg hung in a second game). |
 
 **Interface hooks used by init.lua**
 
@@ -90,9 +93,11 @@ The interface files were ported to MAME 0.289 (output values through `machine.de
 | `show_pv_after_move_emu` / `_player` | Older info hooks, kept only where show_info needs them (ccmk5, risc2500, super9cc). |
 | `game_over()`, `resigned()` | Game end and resignation → `bestmove 0000`. |
 | `ignore_late_go` | Flag for machines that answer the player's move on their own. |
+| `no_soft_reset` | Flag for machines that hang after a soft reset on `ucinewgame` (avrmax, kblitz, fphantom, cphantom families). |
 
 ## Open items
 
-- **Still without live info**: montec, smondial, mm2, mm2nona, modena, sdtor, mephisto3, chessmstdm, mrisc, ggm steinitz (their info pages could only be read with key presses during the search).
+- **Still without live info**: ggm steinitz (no score variable found in RAM).
+- **Game history from a custom FEN** fails on cc3, electrio, pmicrodx and triomphe; fex68k can't replay a history.
 - **Custom artwork check** against the 0.289 layouts and output names.
 - **picochess live info for MAME engines**: upstream proposal once enough machines are confirmed in picochess.

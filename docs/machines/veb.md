@@ -6,7 +6,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 |---|---|---:|---:|---:|:-:|:-:|:-:|:-:|---:|
 | `chessmst` | VEB ChessMaster | 1984 | 1150 | 7 | ✓ | ✓ | – | – |  |
 | `chessmsta` | VEB ChessMaster G-5003-500 | 1984 | 1100 | 7 | ✓ | ✓ | – | – |  |
-| `chessmstdm` | VEB ChessMaster Diamond PM10 Openings | 1987 | 1190 | 8 | ✓ | ✓ | – | – |  |
+| `chessmstdm` | VEB ChessMaster Diamond PM10 Openings | 1987 | 1190 | 8 | ✓ | ✓ | ✓ | – |  |
 | `sc2` | VEB Schachcomputer SC2 | 1981 | 700 | 7 | ✓ | ✓ | – | – | 1 |
 | `sc2a` | VEB Schachcomputer SC2 (rev. 0) | 1981 | 700 | 7 | ✓ | ✓ | – | – | 1 |
 | `lc80e` | VEB Schachcomputer SC80 | 1984 | 700 | 5 | – | – | – | – | 3 |
@@ -58,6 +58,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [5d7a2a4](https://github.com/RandyR99/chessengine/commit/5d7a2a4) 2026-10-31 chessengine: show_info: chessmstdm sends the evaluation and the best move, without key presses.
 - [506d638](https://github.com/RandyR99/chessengine/commit/506d638) 2026-10-30 chessengine: show_info: no key presses during the machine's search. 16 interfaces read their info by pressing keys (INFO, page keys, CL) while the machine thinks; a press…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [d4eed72](https://github.com/RandyR99/mame_for_picochess/commit/d4eed72) 2026-10-20 mame_for_picochess: uci: short tournament headings ('40/2h', '60/5m') as '40 moves/2h', units h/m
@@ -83,8 +84,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [cffddda](https://github.com/RandyR99/mame_for_picochess/commit/cffddda) 2026-10-13 mame_for_picochess: Convert CRLF line endings to LF
-- [9f577dc](https://github.com/RandyR99/chessengine/commit/9f577dc) 2026-10-12 chessengine: sc2: add set_pos and edit_game via problem mode
 - [55c235d](https://github.com/RandyR99/chessengine/commit/55c235d) 2026-10-12 chessengine: sc2: port to MAME 0.289
+- [9f577dc](https://github.com/RandyR99/chessengine/commit/9f577dc) 2026-10-12 chessengine: sc2: add set_pos and edit_game via problem mode
 
 </details>
 
@@ -106,9 +107,9 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [55c235d](https://github.com/RandyR99/chessengine/commit/55c235d) 2026-10-12 chessengine: sc2: port to MAME 0.289
-- [9f577dc](https://github.com/RandyR99/chessengine/commit/9f577dc) 2026-10-12 chessengine: sc2: add set_pos and edit_game via problem mode
-- [19805d9](https://github.com/RandyR99/mame_for_picochess/commit/19805d9) 2026-10-12 mame_for_picochess: Move vetted poly880s and sc2a into retro.ini
 - [26ac50d](https://github.com/RandyR99/mame_for_picochess/commit/26ac50d) 2026-10-12 mame_for_picochess: Add sc2a (Schachcomputer SC 2 rev. 0) to retro_additions
+- [19805d9](https://github.com/RandyR99/mame_for_picochess/commit/19805d9) 2026-10-12 mame_for_picochess: Move vetted poly880s and sc2a into retro.ini
+- [9f577dc](https://github.com/RandyR99/chessengine/commit/9f577dc) 2026-10-12 chessengine: sc2: add set_pos and edit_game via problem mode
 
 </details>
 
@@ -155,10 +156,10 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - [6f4c493](https://github.com/RandyR99/chessengine/commit/6f4c493) 2026-10-29 chessengine: Game end: optional interface.game_over() - when it returns true on the machine's turn, init.lua sends 'bestmove 0000' once (reset by the next 'position'); pi…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
+- [c50bfb9](https://github.com/RandyR99/mame_for_picochess/commit/c50bfb9) 2026-10-12 mame_for_picochess: Add Poly-Computer 880 SC1 (poly880s)
+- [19805d9](https://github.com/RandyR99/mame_for_picochess/commit/19805d9) 2026-10-12 mame_for_picochess: Move vetted poly880s and sc2a into retro.ini
 - [bd0c81b](https://github.com/RandyR99/chessengine/commit/bd0c81b) 2026-10-12 chessengine: poly880s: add interface (from MessChess sc880.lua, MAME 0.289)
 - [7364ca9](https://github.com/RandyR99/mame_for_picochess/commit/7364ca9) 2026-10-12 mame_for_picochess: slc1, poly880s: levels from the SCC-8 manual, drop postal level
-- [19805d9](https://github.com/RandyR99/mame_for_picochess/commit/19805d9) 2026-10-12 mame_for_picochess: Move vetted poly880s and sc2a into retro.ini
-- [c50bfb9](https://github.com/RandyR99/mame_for_picochess/commit/c50bfb9) 2026-10-12 mame_for_picochess: Add Poly-Computer 880 SC1 (poly880s)
 
 </details>
 
@@ -188,8 +189,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [a4241dc](https://github.com/RandyR99/chessengine/commit/a4241dc) 2026-10-30 chessengine: slc1: facing mate on the next move the machine often gives up without a move and without its 'I LOSE' 09-flash - the display stays blank, shows only the inpu…
 - [6f4c493](https://github.com/RandyR99/chessengine/commit/6f4c493) 2026-10-29 chessengine: Game end: optional interface.game_over() - when it returns true on the machine's turn, init.lua sends 'bestmove 0000' once (reset by the next 'position'); pi…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
+- [c50bfb9](https://github.com/RandyR99/mame_for_picochess/commit/c50bfb9) 2026-10-12 mame_for_picochess: Add Poly-Computer 880 SC1 (poly880s)
 - [0c65ec9](https://github.com/RandyR99/chessengine/commit/0c65ec9) 2026-10-12 chessengine: slc1: port to MAME 0.289, report unsupported underpromotion
 - [7364ca9](https://github.com/RandyR99/mame_for_picochess/commit/7364ca9) 2026-10-12 mame_for_picochess: slc1, poly880s: levels from the SCC-8 manual, drop postal level
-- [c50bfb9](https://github.com/RandyR99/mame_for_picochess/commit/c50bfb9) 2026-10-12 mame_for_picochess: Add Poly-Computer 880 SC1 (poly880s)
 
 </details>

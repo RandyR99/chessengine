@@ -101,9 +101,9 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [b480ed4](https://github.com/RandyR99/chessengine/commit/b480ed4) 2026-10-09 chessengine: ggm_steinitz: replace deprecated output:get_value, fix throttle restores
-- [323dfbe](https://github.com/RandyR99/chessengine/commit/323dfbe) 2026-10-09 chessengine: ggm: drop the Gruenfeld opening cartridges
 - [2a0eac1](https://github.com/RandyR99/chessengine/commit/2a0eac1) 2026-10-09 chessengine: ggm_boris25: replace deprecated output:get_value
 - [03888dd](https://github.com/RandyR99/chessengine/commit/03888dd) 2026-10-09 chessengine: ggm: drop Capablanca and unknown Steinitz cartridge entries
+- [323dfbe](https://github.com/RandyR99/chessengine/commit/323dfbe) 2026-10-09 chessengine: ggm: drop the Gruenfeld opening cartridges
 
 </details>
 
@@ -123,9 +123,9 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [b480ed4](https://github.com/RandyR99/chessengine/commit/b480ed4) 2026-10-09 chessengine: ggm_steinitz: replace deprecated output:get_value, fix throttle restores
-- [323dfbe](https://github.com/RandyR99/chessengine/commit/323dfbe) 2026-10-09 chessengine: ggm: drop the Gruenfeld opening cartridges
 - [2a0eac1](https://github.com/RandyR99/chessengine/commit/2a0eac1) 2026-10-09 chessengine: ggm_boris25: replace deprecated output:get_value
 - [03888dd](https://github.com/RandyR99/chessengine/commit/03888dd) 2026-10-09 chessengine: ggm: drop Capablanca and unknown Steinitz cartridge entries
+- [323dfbe](https://github.com/RandyR99/chessengine/commit/323dfbe) 2026-10-09 chessengine: ggm: drop the Gruenfeld opening cartridges
 
 </details>
 
@@ -144,9 +144,9 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [b480ed4](https://github.com/RandyR99/chessengine/commit/b480ed4) 2026-10-09 chessengine: ggm_steinitz: replace deprecated output:get_value, fix throttle restores
-- [323dfbe](https://github.com/RandyR99/chessengine/commit/323dfbe) 2026-10-09 chessengine: ggm: drop the Gruenfeld opening cartridges
 - [2a0eac1](https://github.com/RandyR99/chessengine/commit/2a0eac1) 2026-10-09 chessengine: ggm_boris25: replace deprecated output:get_value
 - [03888dd](https://github.com/RandyR99/chessengine/commit/03888dd) 2026-10-09 chessengine: ggm: drop Capablanca and unknown Steinitz cartridge entries
+- [323dfbe](https://github.com/RandyR99/chessengine/commit/323dfbe) 2026-10-09 chessengine: ggm: drop the Gruenfeld opening cartridges
 
 </details>
 
@@ -163,9 +163,9 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [b480ed4](https://github.com/RandyR99/chessengine/commit/b480ed4) 2026-10-09 chessengine: ggm_steinitz: replace deprecated output:get_value, fix throttle restores
-- [323dfbe](https://github.com/RandyR99/chessengine/commit/323dfbe) 2026-10-09 chessengine: ggm: drop the Gruenfeld opening cartridges
 - [2a0eac1](https://github.com/RandyR99/chessengine/commit/2a0eac1) 2026-10-09 chessengine: ggm_boris25: replace deprecated output:get_value
 - [03888dd](https://github.com/RandyR99/chessengine/commit/03888dd) 2026-10-09 chessengine: ggm: drop Capablanca and unknown Steinitz cartridge entries
+- [323dfbe](https://github.com/RandyR99/chessengine/commit/323dfbe) 2026-10-09 chessengine: ggm: drop the Gruenfeld opening cartridges
 
 </details>
 
