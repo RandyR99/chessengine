@@ -1,5 +1,6 @@
 local interface = {}
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
+interface.no_soft_reset = true -- a soft reset on ucinewgame leaves the machine unresponsive
 
 interface.level = "a1"
 interface.cur_level = nil

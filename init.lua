@@ -966,9 +966,7 @@ local function execute_uci_command(cmd)
       edit_open = false
     end
     if game_started == true then
-      if (module ~= "feasgla" and module ~= "avrmax" and module ~= "cc2schach" and 
-          module ~= "atm18mcc" and module ~= "kblitz" and module ~= "fphantom" and 
-          module ~= "cphantom") then
+      if not interface.no_soft_reset then
         manager.machine:soft_reset()
       end
       board_reset()
