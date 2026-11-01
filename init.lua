@@ -42,6 +42,7 @@ local piece_to = nil
 local prev_move = nil
 local moved_since_position = false -- the machine sent a bestmove after the last "position" command
 local game_over_sent = false -- "bestmove 0000" was sent for the machine's resignation or draw claim
+local edit_open = false -- a replayed history left the machine in edit mode until the next 'go' (Set Pos)
 local resigned = false       -- the machine resigned together with its move (interface.resigned()); answered on its next turn
 local pos_count = {}         -- occurrences of each position (board + side to move) in this game, for threefold repetition
 local turn_since = nil       -- emulated time when the machine's current turn began
@@ -59,25 +60,20 @@ local scr = [[
   end
 ]]
 
+-- talking machines stay throttled for smoother speech
+local keep_throttled = {
+  ivant = true, igor = true, chessac = true, schachak = true,
+  vcc = true, vsc = true, csc = true, csce = true, gambitv = true,
+  kishon = true, kishona = true, super9cc = true }
+
 local function describe_system()
   return manager.machine.system.description
 end
 
 local function board_reset()
   local throttle_state = manager.machine.video.throttled
-  -- talking machines stay throttled for smoother speech
-  if manager.machine.system.name ~= 'ivant' and
-       manager.machine.system.name ~= 'igor' and
-       manager.machine.system.name ~= 'chessac' and
-       manager.machine.system.name ~= 'schachak' and
-       manager.machine.system.name ~= 'vcc' and
-       manager.machine.system.name ~= 'vsc' and
-       manager.machine.system.name ~= 'csc' and
-       manager.machine.system.name ~= 'csce' and
-       manager.machine.system.name ~= 'gambitv' and
-       manager.machine.system.name ~= 'kishon' and
-       manager.machine.system.name ~= 'kishona' and
-       manager.machine.system.name ~= 'super9cc' then
+  edit_open = false
+  if not keep_throttled[manager.machine.system.name] then
     manager.machine.video.throttled = false
   end
   game_started = false
@@ -365,12 +361,6 @@ local function send_move(move)
   elseif (protocol == "uci") then
     send_cmd("bestmove " .. move)
     lastpos = lastpos .. " " .. move
-  end
-  if (module == "sc80") then
-    local rate = manager.machine.video.throttle_rate
-    manager.machine.video.throttle_rate = 10.0
-    emu.wait(15)
-    manager.machine.video.throttle_rate = rate
   end
 end
 
@@ -834,21 +824,12 @@ local function play_moves(old, new)
   local n = 0
   local move = ""
   local throttle_state = manager.machine.video.throttled
-  if manager.machine.system.name ~= 'ivant' and
-     manager.machine.system.name ~= 'igor' and
-     manager.machine.system.name ~= 'chessac' and
-     manager.machine.system.name ~= 'schachak' and
-     manager.machine.system.name ~= 'vcc' and
-     manager.machine.system.name ~= 'vsc' and
-     manager.machine.system.name ~= 'csc' and
-     manager.machine.system.name ~= 'csce' and
-     manager.machine.system.name ~= 'gambitv' and
-     manager.machine.system.name ~= 'kishon' and
-     manager.machine.system.name ~= 'kishona' and
-     manager.machine.system.name ~= 'super9cc' then
+  if not keep_throttled[manager.machine.system.name] then
     manager.machine.video.throttled = false
   end
-  interface.edit_game(true)
+  if not edit_open then
+    interface.edit_game(true)
+  end
   while temp ~= "" do
     n = temp:find(" ")
     move = temp:sub(1,n-1)
@@ -859,17 +840,29 @@ local function play_moves(old, new)
     piece_to = nil
     sel_started = false
   end
-  interface.edit_game(false)
   manager.machine.video.throttled = throttle_state
   manager.machine:popmessage("Game edit is complete!")
-  if module == "mm5" then
-    -- Proof of concept: Set Pos may replay a move stack without an immediate
-    -- go.  Do not let MM V start playing merely because replay has finished.
-    wait_for_go()
-  elseif interface.start_play then
-    interface.start_play(false)
-    my_color = ply
+  -- Set Pos may replay a move stack without an immediate go: keep the machine
+  -- in edit mode and idle. A player move is keyed in as part of the history;
+  -- the next go leaves edit mode and starts the machine (close_edit).
+  edit_open = true
+  wait_for_go()
+end
+
+local function close_edit()
+  local throttle_state = manager.machine.video.throttled
+  if not keep_throttled[manager.machine.system.name] then
+    manager.machine.video.throttled = false
   end
+  interface.edit_game(false)
+  edit_open = false
+  manager.machine.video.throttled = throttle_state
+  if interface.start_play then
+    interface.start_play(false)
+  end
+  my_color = ply
+  game_started = true
+  sel_started = false
 end
 
 local function execute_uci_command(cmd)
@@ -930,22 +923,20 @@ local function execute_uci_command(cmd)
     manager.ui.show_fps = true
     protocol = cmd
     --send_cmd("id name " .. describe_system())
-    local l_opt = " ("
+    -- capability markers parsed by picochess: pos = FEN setup, edit = history replay, info = engine info
+    local features = {}
     if interface.set_pos then
-      l_opt = l_opt .. "pos"
+      features[#features + 1] = "pos"
     end
-
+    if interface.edit_game then
+      features[#features + 1] = "edit"
+    end
     if interface.show_pv_after_move or interface.show_info then
-      if interface.set_pos then
-        l_opt = l_opt .. "+info)"
-      else
-        l_opt = l_opt .. "info)"
-      end
-    else
-      l_opt = l_opt .. ")"
+      features[#features + 1] = "info"
     end
-    if l_opt == " ()" then
-      l_opt = ""
+    local l_opt = ""
+    if #features > 0 then
+      l_opt = " (" .. table.concat(features, "+") .. ")"
     end
 
     if interface.get_module then
@@ -953,11 +944,7 @@ local function execute_uci_command(cmd)
     else
       send_cmd("id name " .. describe_system() .. l_opt)
     end
-    if manager.machine.system.name == "sparc" then
-      send_cmd("id year 1993")
-    else
-      send_cmd("id year " .. manager.machine.system.year)
-    end
+    send_cmd("id year " .. manager.machine.system.year)
 
     send_cmd("option name Speed type spin default 100 min 0 max 10000")
     if interface.get_options then
@@ -974,6 +961,10 @@ local function execute_uci_command(cmd)
     end
     editmode = 0
     lastpos = "position startpos moves"
+    if edit_open then
+      interface.edit_game(false)
+      edit_open = false
+    end
     if game_started == true then
       if (module ~= "feasgla" and module ~= "avrmax" and module ~= "cc2schach" and 
           module ~= "atm18mcc" and module ~= "kblitz" and module ~= "fphantom" and 
@@ -1006,6 +997,8 @@ local function execute_uci_command(cmd)
     if editmode == -1 then
       editmode = 0
       return
+    elseif edit_open then
+      close_edit()
     elseif interface.ignore_late_go and moved_since_position then
       -- the machine answered the last position on its own before this 'go' arrived;
       -- start_play would make it move again, for the other side
@@ -1048,9 +1041,7 @@ local function execute_uci_command(cmd)
     -- Picochess sets up a PGN position and python-chess sends the same position
     -- again immediately before go.
     elseif (cmd == lastpos or last_move == prev_move) then
-      if module == "mm5" then
-        wait_for_go()
-      else
+      if not edit_open then
         my_color = ply
         sel_started = false
         if interface.start_play then
@@ -1066,9 +1057,12 @@ local function execute_uci_command(cmd)
       piece_from = nil
       piece_to = nil
       sel_started = false
+      if edit_open then
+        wait_for_go()
+      end
     end
   elseif cmd == "stop" then
-    if game_started == true and my_color == ply then
+    if game_started == true and my_color == ply and not edit_open then
       if interface.stop_play then
         interface.stop_play()
       elseif interface.start_play then
@@ -1119,18 +1113,7 @@ local function update()
 
       if protocol == "uci" then
         local throttle_state = manager.machine.video.throttled
-        if manager.machine.system.name ~= 'ivant' and
-           manager.machine.system.name ~= 'igor' and
-           manager.machine.system.name ~= 'chessac' and
-           manager.machine.system.name ~= 'schachak' and
-           manager.machine.system.name ~= 'vcc' and
-           manager.machine.system.name ~= 'vsc' and
-           manager.machine.system.name ~= 'csc' and
-           manager.machine.system.name ~= 'csce' and
-           manager.machine.system.name ~= 'gambitv' and
-           manager.machine.system.name ~= 'kishon' and
-           manager.machine.system.name ~= 'kishona' and
-           manager.machine.system.name ~= 'super9cc' then
+        if not keep_throttled[manager.machine.system.name] then
           manager.machine.video.throttled = false
         end
         
