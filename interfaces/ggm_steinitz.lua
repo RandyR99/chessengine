@@ -1,5 +1,6 @@
 interface = {}
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
+interface.info_every = 1 -- show_info only reads values saved by the write taps
 
 interface.turn = true
 interface.color = "B"
@@ -218,99 +219,46 @@ function interface.promote(x, y, piece)
 	-- TODO
 end
 
-local function digit_ascii(value)
-	if     value == nil then return " "
-	elseif value == 0   then return " "
-	elseif value == 192 then return "-"
-	elseif value == 63  then return "0"
-	elseif value == 191 then return "0"
-	elseif value == 6   then return "1"
-	elseif value == 134 then return "1"
-	elseif value == 768 then return "1"
-	elseif value == 91  then return "2"
-	elseif value == 219 then return "2"
-	elseif value == 79  then return "3"
-	elseif value == 207 then return "3"
-	elseif value == 102 then return "4"
-	elseif value == 230 then return "4"
-	elseif value == 109 then return "5"
-	elseif value == 237 then return "5"
-	elseif value == 125 then return "6"
-	elseif value == 253 then return "6"
-	elseif value == 7   then return "7"
-	elseif value == 135 then return "7"
-	elseif value == 127 then return "8"
-	elseif value == 255 then return "8"
-	elseif value == 111 then return "9"
-	elseif value == 239 then return "9"
-	elseif value == 55  then return "n"
-	elseif value == 247 then return "a"
-	elseif value == 975 then return "b"
-	elseif value == 57  then return "c"
-	elseif value == 783 then return "d"
-	elseif value == 121 then return "e"
-	elseif value == 249 then return "e"
-	elseif value == 241 then return "f"
-	elseif value == 189 then return "g"
-	elseif value == 246 then return "h"
-	elseif value == 8   then return "_"
-	elseif value == 56  then return "l"
-	elseif value == 83  then return "?"
-	elseif value == 115 then return "p"
-	elseif value == 80  then return "r"
-	elseif value == 48  then return "i"
-	elseif value == 62  then return "u"
-	elseif value == 49  then return "t"
-	elseif value == 110 then return "y"
-	else                     return ""
+-- Live info from the search (no key presses): when a root move improves the score, the code
+-- at 0x77f4 stores the new bound (0x08b0 high, 0x08cd low; 1/64 pawn, from the opponent's side)
+-- while the move is still in $c2 (from) / $ee (to, 0x88 squares). $b9 is the iteration depth.
+-- A write of 0xff to 0x0846 by 0xe9c9 starts a new search.
+local cpu = machine.devices[":maincpu"]
+local sp = cpu.spaces["program"]
+local best = nil
+interface.taps = {
+	sp:install_write_tap(0x08b0, 0x08b0, "steinitz_best", function(offset, data, mask)
+		if cpu.state["PC"].value == 0x77f4 then
+			local s = data << 8 | sp:read_u8(0x08cd)
+			if s >= 0x8000 then
+				s = s - 0x10000
+			end
+			best = { from = sp:read_u8(0xc2), to = sp:read_u8(0xee) & 0x77, score = -s }
+		end
+	end),
+	sp:install_write_tap(0x0846, 0x0846, "steinitz_start", function(offset, data, mask)
+		if data == 0xff and cpu.state["PC"].value == 0xe9c9 then
+			best = nil
+		end
+	end),
+}
+
+local function square(v)
+	if v & 0x88 == 0 then
+		return string.char(0x61 + (v & 7)) .. ((v >> 4) + 1)
 	end
 end
 
 function interface.show_info(on)
-    if on and interface.Ticker == 0 then
-		local depth = 0
-		local score = 0
-		send_input(":IN.3", 0x01, 0.25) -- LEVEL
-		emu.wait(0.5)
-		local d1 = digit(6)
-		local d6 = digit(1)
-		local d7 = digit(0)
-		if digit_ascii(d1) ~= "e" then
-			interface.Ticker = 1
-			send_input(":IN.3", 0x10, 0.25) -- ENTER
-			return
-		end
-		depth = digit_ascii(d6) .. digit_ascii(d7)
-		send_input(":IN.3", 0x04, 0.25) -- score
-		emu.wait(0.5)
-		local d0 = digit(7)
-		local d4, d5
-		d4 = digit(3)
-		d5 = digit(2)
-		d6 = digit(1)
-		d7 = digit(0)
-		if digit_ascii(d0) ~= "5" then
-			interface.Ticker = 1
-			send_input(":IN.3", 0x10, 0.25) -- ENTER
-			return
-		end
-		score = digit_ascii(d4) .. digit_ascii(d5) .. digit_ascii(d6) .. digit_ascii(d7)
-		send_input(":IN.3", 0x10, 0.5) -- ENTER
-		emu.wait(0.6)
-		d0 = digit(7)
-		d1 = digit(6)
-		local d3 = digit(4)
-		d4 = digit(3)
-		interface.Ticker = 1
-		return "info score cp " .. score .. " depth " .. depth .. " pv " .. digit_ascii(d0) .. digit_ascii(d1) .. digit_ascii(d3) .. digit_ascii(d4)
+	-- a shown move (digit 7 lit) ends the search; the machine then thinks on the player's time
+	if not on or not best or digit(7) ~= 0 then
+		return nil
 	end
-	interface.Ticker = interface.Ticker + 1
-	if interface.Ticker == 4 then
-		interface.Ticker = 0
+	local from, to = square(best.from), square(best.to)
+	if not from or not to then
+		return nil
 	end
+	return { depth = sp:read_u8(0xb9), score = best.score * 100 // 64, pv = { from .. to } }
 end
--- off: show_info presses keys while the machine searches, and a press can land just as the move appears and hide it
--- (as on montec/mm4); to come back once the info can be read from RAM without key presses
-interface.show_info = nil
 
 return interface
