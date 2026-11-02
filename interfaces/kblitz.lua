@@ -4,8 +4,8 @@ interface.no_soft_reset = true -- a soft reset on ucinewgame leaves the machine 
 
 -- Based on the MessNew (CB-Emu) kblitzx interface. In MAME 0.289 the cursor keys
 -- became two dials. They can only be turned from Lua in MAME 0.290 or later (0.289's
--- analog_field::read ignored mask/shift/remap for set_value overrides);
--- kblitz.lua.0289 is the reduced interface for MAME 0.289.
+-- analog_field::read ignored mask/shift/remap for set_value overrides), or in a 0.289
+-- build with that ioport.cpp fix.
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
