@@ -72,20 +72,30 @@ function interface.set_pos(mode)
 	machine.video.throttled = throttled_state
 end
 
+-- The Granit S program can lock up (frozen LEDs, no reply) after a history replay in
+-- Monitor Mode. Replay the history on the plugin's board only and set the machine up
+-- with the final position, the same way as a FEN.
 function interface.edit_game(on)
-	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
 	interface.editing = on
-	send_input(":IN.0", 0x20, 0.5) -- OPTIONS
-	sb_press_square(":board", 0.1, 3, 1) -- Monitor mode
-	send_input(":IN.0", 0x01, 0.5) -- CLEAR
-	emu.wait(0.5)
-	machine.video.throttled = throttled_state
+	if on then
+		interface.last_mover = 0
+	elseif interface.last_mover ~= 0 then
+		interface.set_pos(0)
+		if interface.last_mover > 0 then
+			interface.set_pos(-1) -- Black to move
+		else
+			interface.set_pos(1) -- White to move
+		end
+		emu.wait(1)
+	end
 end
 
 function interface.select_piece(x, y, event)
 	if interface.editing then
-		emu.wait(1) -- in Monitor Mode the Granit misses a fast lift/put (Qd8-h4+ in chk_h)
+		if event == "get" then
+			interface.last_mover = get_piece_id(x, y)
+		end
+		return
 	end
 	sb_select_piece(":board", 1, x, y, event)
 end
