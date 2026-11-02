@@ -61,8 +61,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [1668b8a](https://github.com/RandyR99/mame_for_picochess/commit/1668b8a) 2026-10-13 mame_for_picochess: Move ch3008 from retro_additions.ini to retro.ini
 - [7aa15ac](https://github.com/RandyR99/chessengine/commit/7aa15ac) 2026-10-13 chessengine: ch3008: new interface from CB-Emu MessNew, ported to MAME 0.289
+- [1668b8a](https://github.com/RandyR99/mame_for_picochess/commit/1668b8a) 2026-10-13 mame_for_picochess: Move ch3008 from retro_additions.ini to retro.ini
 - [a0b69ca](https://github.com/RandyR99/mame_for_picochess/commit/a0b69ca) 2026-10-13 mame_for_picochess: Add ch3008 (CXG Chess 3008); tidy ch2001 levels
 
 </details>
@@ -83,8 +83,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
-- [6fdc56c](https://github.com/RandyR99/mame_for_picochess/commit/6fdc56c) 2026-10-13 mame_for_picochess: Move scpchess and scpchessa to retro.ini (scpchessa ROM bug noted in comments)
 - [e2edc7a](https://github.com/RandyR99/chessengine/commit/e2edc7a) 2026-10-13 chessengine: scpchess/scpchessa: port to MAME 0.289, swap to match 0.289 sets, enable set_pos
+- [6fdc56c](https://github.com/RandyR99/mame_for_picochess/commit/6fdc56c) 2026-10-13 mame_for_picochess: Move scpchess and scpchessa to retro.ini (scpchessa ROM bug noted in comments)
 - [4a1f3a8](https://github.com/RandyR99/mame_for_picochess/commit/4a1f3a8) 2026-10-13 mame_for_picochess: scpchess/scpchessa: .uci levels from measured think times; add to retro_additions
 
 </details>
@@ -110,8 +110,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [6fdc56c](https://github.com/RandyR99/mame_for_picochess/commit/6fdc56c) 2026-10-13 mame_for_picochess: Move scpchess and scpchessa to retro.ini (scpchessa ROM bug noted in comments)
 - [e2edc7a](https://github.com/RandyR99/chessengine/commit/e2edc7a) 2026-10-13 chessengine: scpchess/scpchessa: port to MAME 0.289, swap to match 0.289 sets, enable set_pos
+- [6fdc56c](https://github.com/RandyR99/mame_for_picochess/commit/6fdc56c) 2026-10-13 mame_for_picochess: Move scpchess and scpchessa to retro.ini (scpchessa ROM bug noted in comments)
 - [4a1f3a8](https://github.com/RandyR99/mame_for_picochess/commit/4a1f3a8) 2026-10-13 mame_for_picochess: scpchess/scpchessa: .uci levels from measured think times; add to retro_additions
 
 </details>
@@ -169,8 +169,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
-- [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes
 - [4d53174](https://github.com/RandyR99/chessengine/commit/4d53174) 2026-10-13 chessengine: cpchess2: port to MAME 0.289 output proxies, stable level bar
+- [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes
 
 </details>
 
@@ -381,8 +381,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes
 - [f4afb96](https://github.com/RandyR99/chessengine/commit/f4afb96) 2026-10-13 chessengine: senterp/senterpc: new interfaces from CB-Emu MessChess, ported to MAME 0.289
+- [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes
 
 </details>
 
@@ -398,8 +398,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Commits**
 
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
-- [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes
 - [9844e5a](https://github.com/RandyR99/chessengine/commit/9844e5a) 2026-10-13 chessengine: kchal: rework for this plugin and MAME 0.289; add slegend
+- [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes
 
 </details>
 
