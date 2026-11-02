@@ -10,7 +10,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `ggm_boris25` | Chafitz/Applied Concepts GGM Boris 2.5 | 1980 | 1370 | 5 | ✓ | – | – | – | 1 |
 | `ggm_morphy` | Chafitz/Applied Concepts GGM Morphy Edition | 1981 | 1450 | 8 | ✓ | – | – | ✓ | 1 |
 | `ggm_sandy` | Chafitz/Applied Concepts GGM Sandy | 1981 | 1450 | 7 | ✓ | – | – | – | 1 |
-| `ggm_steinitz` | Chafitz/Applied Concepts GGM Steinitz | 1982 | 1575 | 8 | ✓ | ✓ | – | – |  |
+| `ggm_steinitz` | Chafitz/Applied Concepts GGM Steinitz | 1982 | 1575 | 8 | ✓ | ✓ | ✓ | – |  |
 | `arb_gms3` | ARB Sargon 3.0 Grand Master Series | 1981 | 1500 | 7 | ✓ | ✓ | – | – |  |
 | `arb_gms4` | ARB Sargon 4.0 Grand Master Series | 1984 | 1705 | 9 | ✓ | ✓ | – | – |  |
 | `prodigy` | Chafitz/Applied Concepts Destiny/Prodigy | 1982 | 1465 | 7 | ✓ | – | – | – | 1 |
@@ -171,6 +171,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [dddd952](https://github.com/RandyR99/chessengine/commit/dddd952) 2026-11-02 chessengine: ggm_steinitz: live info from the search through write taps, no key presses
 - [506d638](https://github.com/RandyR99/chessengine/commit/506d638) 2026-10-30 chessengine: show_info: no key presses during the machine's search. 16 interfaces read their info by pressing keys (INFO, page keys, CL) while the machine thinks; a press…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…

@@ -1,16 +1,16 @@
 # MAME chess machines in picochess
 
-Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-02 from chessengine `e18dfde` and mame_for_picochess `1c9c0ae`.
+Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-02 from chessengine `ccd2c4a` and mame_for_picochess `1c9c0ae`.
 
 | Machines | Interface files | MAME drivers | FEN setup | History replay | Live info | Ponder |
 |---:|---:|---:|---:|---:|---:|---:|
-| 431 | 284 | 133 | 413 | 399 | 184 | 216 |
+| 431 | 284 | 133 | 413 | 399 | 185 | 216 |
 
 **Machines by manufacturer** (feature table and details per machine):
 
 | Manufacturer | Machines | FEN setup | History | Live info | With known limits |
 |---|---:|---:|---:|---:|---:|
-| [Chafitz/Applied Concepts](machines/chafitz-applied-concepts.md) | 13 | 13 | 6 | 0 | 7 |
+| [Chafitz/Applied Concepts](machines/chafitz-applied-concepts.md) | 13 | 13 | 6 | 1 | 7 |
 | [CXG](machines/cxg.md) | 22 | 21 | 18 | 8 | 6 |
 | [Elektor](machines/elektor.md) | 4 | 0 | 0 | 0 | 4 |
 | [Fidelity](machines/fidelity.md) | 100 | 98 | 98 | 33 | 32 |
@@ -97,7 +97,6 @@ The interface files were ported to MAME 0.289 (output values through `machine.de
 
 ## Open items
 
-- **Still without live info**: ggm steinitz (no score variable found in RAM).
 - **Game history from a custom FEN** fails on cc3, electrio, pmicrodx and triomphe; fex68k can't replay a history.
-- **Custom artwork check** against the 0.289 layouts and output names.
+- **Custom artwork check** against MAME 0.289 (in progress: layouts that fail to load, missing images, output and input names).
 - **picochess live info for MAME engines**: upstream proposal once enough machines are confirmed in picochess.

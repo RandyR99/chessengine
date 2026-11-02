@@ -423,7 +423,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - Set 1 can hang after a bishop underpromotion (kblitza doesn't).
 - Stops thinking in dead draws (K+minor vs K, bare kings); picochess ends these games itself.
-- Needs MAME 0.290 (or the 0.289 ioport.cpp fix) to turn the dials; a stock 0.289 build only gets the reduced kblitz.lua.0289.
+- Needs MAME 0.290 (or the 0.289 ioport.cpp fix) to turn the dials; the picochess MAME build has that fix.
 
 - MAME set `kblitz` (Kasparov Blitz (set 1)), driver `saitek/blitz.cpp`
 - script runs `mess kblitz`
@@ -440,6 +440,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [ccd2c4a](https://github.com/RandyR99/chessengine/commit/ccd2c4a) 2026-11-02 chessengine: kblitz: remove the reduced MAME 0.289 interface
 - [021277d](https://github.com/RandyR99/chessengine/commit/021277d) 2026-11-01 chessengine: ucinewgame: skip the soft reset via interface.no_soft_reset instead of a name list
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [263ceda](https://github.com/RandyR99/mame_for_picochess/commit/263ceda) 2026-10-25 mame_for_picochess: mm2.cpp family: .uci levels from the manuals (bup 9, mm2 8, mm4/mm5 11, rebel5 8, new mm4rebel 8 with '8 sss' levels), clones share the parent's file; mm4/mm…
@@ -461,7 +462,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - Stops thinking in dead draws (K+minor vs K, bare kings); picochess ends these games itself.
-- Needs MAME 0.290 (or the 0.289 ioport.cpp fix) to turn the dials; a stock 0.289 build only gets the reduced kblitz.lua.0289.
+- Needs MAME 0.290 (or the 0.289 ioport.cpp fix) to turn the dials; the picochess MAME build has that fix.
 
 - MAME set `kblitza` (Kasparov Blitz (set 2)), driver `saitek/blitz.cpp`, clone of `kblitz`
 - script runs `mess kblitza`
