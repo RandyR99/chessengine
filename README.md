@@ -26,7 +26,7 @@ and talk UCI to it on stdin/stdout (`uci`, `isready`, `ucinewgame`, `position ..
 
 The ROMs are not included.
 
-`kblitz` (Kasparov Blitz) needs MAME 0.290, or 0.289 with the `ioport.cpp` fix for analog `set_value` overrides, to turn its dials. `interfaces/kblitz.lua.0289` is a reduced interface for a stock 0.289 build.
+`kblitz` (Kasparov Blitz) needs MAME 0.290, or 0.289 with the `ioport.cpp` fix for analog `set_value` overrides, to turn its dials.
 
 ## Machines
 

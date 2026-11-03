@@ -430,7 +430,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `kblitz.lua`
 - retro.ini: elo 1770, levels 11, ponder/brain y
 
-**retro.ini comment:** Needs MAME 0.290 or later (analog set_value fix for the Shuttle Dial); with MAME 0.289 use chessengine interfaces/kblitz.lua.0289 (computer cannot move first, no setup). ROM bug: hangs after the player underpromotes to a bishop (set 2, kblitza, is fine)
+**retro.ini comment:** Needs MAME 0.290 or later, or 0.289 with the ioport.cpp fix (analog set_value, for the Shuttle Dial). ROM bug: hangs after the player underpromotes to a bishop (set 2, kblitza, is fine)
 
 **Test notes**
 
@@ -440,6 +440,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [e4d68c9](https://github.com/RandyR99/chessengine/commit/e4d68c9) 2026-11-02 chessengine: docs: live info on GGM Steinitz; kblitz needs the ioport fix (reduced 0.289 interface removed)
 - [ccd2c4a](https://github.com/RandyR99/chessengine/commit/ccd2c4a) 2026-11-02 chessengine: kblitz: remove the reduced MAME 0.289 interface
 - [021277d](https://github.com/RandyR99/chessengine/commit/021277d) 2026-11-01 chessengine: ucinewgame: skip the soft reset via interface.no_soft_reset instead of a name list
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
