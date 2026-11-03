@@ -32,6 +32,8 @@ The ROMs are not included.
 
 **[docs/MACHINES.md](docs/MACHINES.md)** lists every machine: whether it supports position setup, history replay, live info and pondering, its levels and Elo, its known limits, and the commits that changed it. It also describes the `init.lua` changes made during the 0.289 port and the hooks an interface can provide.
 
+The same overview as an interactive page, with search and filters: **[MAME Chess Machines](https://randyr99.github.io/chessengine/machines.html)**.
+
 ## Writing an interface
 
 An interface is a Lua file that returns a table of functions. The main hooks are `setup_machine`, `start_play`, `is_selected` and `select_piece` (reading and entering moves), `set_pos` (FEN setup), `edit_game` (history replay), the promotion functions, `setlevel`/`get_options`/`set_option`, and optionally `show_info`, `game_over`, `resigned` and the `ignore_late_go` flag. See [docs/MACHINES.md](docs/MACHINES.md#plugin-core-initlua) for what each one does, and the interfaces of similar machines for examples. Interfaces run in a sandbox with `machine`, `emu`, `send_input`, the `sb_*` sensor-board helpers, `pairs`, `ipairs`, `string` and `math`, but no `table`, `os` or `io`.
