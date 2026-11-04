@@ -63,10 +63,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `leonardo.lua`
 - retro.ini: elo 1950, levels 9, ponder/brain y
 
-**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game
+**Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/2h; 5m game; 15m game; 30m game
 
 **Commits**
 
+- [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
 - [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
@@ -440,6 +441,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [b2aafad](https://github.com/RandyR99/chessengine/commit/b2aafad) 2026-11-03 chessengine: README, docs: drop the kblitz.lua.0289 references (file removed in ccd2c4a)
+- [815bda5](https://github.com/RandyR99/mame_for_picochess/commit/815bda5) 2026-11-03 mame_for_picochess: retro.ini: kblitz comment no longer points to the removed kblitz.lua.0289
 - [e4d68c9](https://github.com/RandyR99/chessengine/commit/e4d68c9) 2026-11-02 chessengine: docs: live info on GGM Steinitz; kblitz needs the ioport fix (reduced 0.289 interface removed)
 - [ccd2c4a](https://github.com/RandyR99/chessengine/commit/ccd2c4a) 2026-11-02 chessengine: kblitz: remove the reduced MAME 0.289 interface
 - [021277d](https://github.com/RandyR99/chessengine/commit/021277d) 2026-11-01 chessengine: ucinewgame: skip the soft reset via interface.no_soft_reset instead of a name list
@@ -614,10 +617,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
 
-**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game
+**Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/2h; 5m game; 15m game; 30m game
 
 **Commits**
 
+- [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
 - [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
 - [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
@@ -644,10 +648,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
 
-**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game
+**Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/2h; 5m game; 15m game; 30m game
 
 **Commits**
 
+- [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
 - [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
 - [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
@@ -674,10 +679,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
 
-**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game
+**Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/2h; 5m game; 15m game; 30m game
 
 **Commits**
 
+- [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
 - [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
 - [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
@@ -704,10 +710,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
 
-**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game
+**Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/2h; 5m game; 15m game; 30m game
 
 **Commits**
 
+- [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
 - [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
 - [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
@@ -758,10 +765,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - renaissa/renaissaa/sparc1: FEN setup must enter SET UP before the board rebuild (else "start + 1 white move" reverses the board).
 
-**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 40 Moves/2 Hours; 7 - 5 Minutes/Game; 8 - 15 Minutes/Game; 9 - 30 Minutes/Game; Analysis
+**Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/2h; 5m game; 15m game; 30m game; Analysis
 
 **Commits**
 
+- [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [4af7906](https://github.com/RandyR99/chessengine/commit/4af7906) 2026-10-31 chessengine: show_info: renaissa. With SCROLL pressed three times (setup_machine) the LCD board's info line shows Info 4: search depth, the first move of the main line an…
 - [06f1eba](https://github.com/RandyR99/chessengine/commit/06f1eba) 2026-10-30 chessengine: show_info: kchal, super9cc, berl16, renaissa. kchal (Krypton Challenge): the minus sign in the first character of the score page was ignored (queen-down posi…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…

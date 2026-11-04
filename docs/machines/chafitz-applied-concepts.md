@@ -122,10 +122,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `ggm_morphy.lua` → `ggm_boris25.lua`
 - retro.ini: elo 1450, levels 8, ponder/brain y
 
-**Levels:** 1 - 5 Seconds/Move; 2 - 8-15 Seconds/Move; 3 - 10-40 Seconds/Move; 4 - 20-90 Seconds/Move; 5 - 1-4 Minutes/Move; 6 - 10-40 Minutes/Move; 7 - 30 Moves/1 Hour; 8 - 20 Moves/1 Hour
+**Levels:** 5s move; 8-15s move; 10-40s move; 20-90s move; 1-4m move; 10-40m move; 30 moves/1h; 20 moves/1h
 
 **Commits**
 
+- [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
@@ -190,10 +191,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `arb_gms3.lua` → `arb_sargon25.lua`
 - retro.ini: elo 1500, levels 7, ponder/brain n
 
-**Levels:** 1 - 5 Seconds/Move; 2 - 10 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 5 Minutes/Move; 6 - 10 Minutes/Move; 7 - Analysis
+**Levels:** 5s move; 10s move; 30s move; 1m move; 5m move; 10m move; Analysis
 
 **Commits**
 
+- [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [07601a1](https://github.com/RandyR99/mame_for_picochess/commit/07601a1) 2026-10-16 mame_for_picochess: retro.ini: unique small/medium names (arb, feas, tascr30, cmpchess), fill cp2000 and tkinga names
 - [a3178e7](https://github.com/RandyR99/chessengine/commit/a3178e7) 2026-10-10 chessengine: arb: replace deprecated output calls, fix hang after reset
@@ -207,10 +209,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `arb_gms4.lua`
 - retro.ini: elo 1705, levels 9, ponder/brain n
 
-**Levels:** 1 - 5 Seconds/Move; 2 - 15 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 2 Minutes/Move; 6 - 3 Minutes/Move; 7 - 4 Minutes/Move; 8 - 6 Minutes/Move; 9 - Analysis
+**Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 3m move; 4m move; 6m move; Analysis
 
 **Commits**
 
+- [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [07601a1](https://github.com/RandyR99/mame_for_picochess/commit/07601a1) 2026-10-16 mame_for_picochess: retro.ini: unique small/medium names (arb, feas, tascr30, cmpchess), fill cp2000 and tkinga names
 - [a3178e7](https://github.com/RandyR99/chessengine/commit/a3178e7) 2026-10-10 chessengine: arb: replace deprecated output calls, fix hang after reset
@@ -246,10 +249,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `arb_sargon25.lua`
 - retro.ini: elo 1370, levels 7, ponder/brain n
 
-**Levels:** 1 - 5 Seconds/Move; 2 - 10 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 5 Minutes/Move; 6 - 10 Minutes/Move; 7 - Analysis
+**Levels:** 5s move; 10s move; 30s move; 1m move; 5m move; 10m move; Analysis
 
 **Commits**
 
+- [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [07601a1](https://github.com/RandyR99/mame_for_picochess/commit/07601a1) 2026-10-16 mame_for_picochess: retro.ini: unique small/medium names (arb, feas, tascr30, cmpchess), fill cp2000 and tkinga names
@@ -265,10 +269,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `arb_sargon35.lua` → `arb_sargon25.lua`
 - retro.ini: elo 1500, levels 7, ponder/brain n
 
-**Levels:** 1 - 5 Seconds/Move; 2 - 10 Seconds/Move; 3 - 30 Seconds/Move; 4 - 1 Minute/Move; 5 - 5 Minutes/Move; 6 - 10 Minutes/Move; 7 - Analysis
+**Levels:** 5s move; 10s move; 30s move; 1m move; 5m move; 10m move; Analysis
 
 **Commits**
 
+- [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [07601a1](https://github.com/RandyR99/mame_for_picochess/commit/07601a1) 2026-10-16 mame_for_picochess: retro.ini: unique small/medium names (arb, feas, tascr30, cmpchess), fill cp2000 and tkinga names
 - [a3178e7](https://github.com/RandyR99/chessengine/commit/a3178e7) 2026-10-10 chessengine: arb: replace deprecated output calls, fix hang after reset
