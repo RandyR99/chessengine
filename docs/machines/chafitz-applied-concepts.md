@@ -85,6 +85,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [cc06fdd](https://github.com/RandyR99/chessengine/commit/cc06fdd) 2026-11-04 chessengine: borisdpl: set the level again after the RESET of a position setup
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
@@ -204,6 +205,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [f09b1ae](https://github.com/RandyR99/chessengine/commit/f09b1ae) 2026-11-04 chessengine: arb: set the level again after the reset of a position setup
 - [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [07601a1](https://github.com/RandyR99/mame_for_picochess/commit/07601a1) 2026-10-16 mame_for_picochess: retro.ini: unique small/medium names (arb, feas, tascr30, cmpchess), fill cp2000 and tkinga names
@@ -222,6 +224,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [f09b1ae](https://github.com/RandyR99/chessengine/commit/f09b1ae) 2026-11-04 chessengine: arb: set the level again after the reset of a position setup
 - [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [07601a1](https://github.com/RandyR99/mame_for_picochess/commit/07601a1) 2026-10-16 mame_for_picochess: retro.ini: unique small/medium names (arb, feas, tascr30, cmpchess), fill cp2000 and tkinga names
@@ -263,6 +266,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [f09b1ae](https://github.com/RandyR99/chessengine/commit/f09b1ae) 2026-11-04 chessengine: arb: set the level again after the reset of a position setup
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
@@ -284,6 +288,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [f09b1ae](https://github.com/RandyR99/chessengine/commit/f09b1ae) 2026-11-04 chessengine: arb: set the level again after the reset of a position setup
 - [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [07601a1](https://github.com/RandyR99/mame_for_picochess/commit/07601a1) 2026-10-16 mame_for_picochess: retro.ini: unique small/medium names (arb, feas, tascr30, cmpchess), fill cp2000 and tkinga names
