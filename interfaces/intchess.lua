@@ -189,8 +189,28 @@ function interface.set_option(name, value)
 	end
 end
 
+-- the machine underpromotes when that is better. It flashes the pawn for about 8 s, then puts the
+-- new piece on the target square: VRAM 0x1800 = a8, low 3 bits = piece, bit 3 = white. Checking the
+-- color skips a captured piece that is still shown there.
 function interface.get_promotion(x, y)
-	return 'q'	-- TODO
+	local pieces = { [2] = 'n', [3] = 'b', [4] = 'r', [5] = 'q' }
+	local color = (y == 8) and 8 or 0
+	local program = machine.devices[":maincpu"].spaces["program"]
+	local throttled_state = machine.video.throttled
+	machine.video.throttled = false
+	local piece = nil
+	for i = 1, 80 do
+		local square = program:read_u8(0x1800 + (8 - y) * 8 + x - 1)
+		if ((square & 8) == color) then
+			piece = pieces[square & 7]
+		end
+		if (piece ~= nil) then
+			break
+		end
+		emu.wait(0.25)
+	end
+	machine.video.throttled = throttled_state
+	return piece or 'q'
 end
 
 function interface.promote(x, y, piece)
