@@ -1,7 +1,6 @@
 interface = {}
 interface.setup_underpromotion = true -- the player's underpromotion goes in through the position setup
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
-interface.info_every = 1 -- show_info only reads the display
 
 interface.turn = true
 interface.color = "B"
@@ -128,10 +127,9 @@ end
 function interface.stop_play()
 end
 
-local xval = { 0x3cf, 0x0e3f, 0x00f3, 0x0c3f, 0x01f3, 0x01c3, 0x02fb, 0x03cc }
-local yval = { 0xc31, 0x0377, 0x023f, 0x038c, 0x03bb, 0x03fb, 0x4803, 0x03ff }
-
 function interface.is_selected_int(x, y)
+	local xval = { 0x3cf, 0x0e3f, 0x00f3, 0x0c3f, 0x01f3, 0x01c3, 0x02fb, 0x03cc }
+	local yval = { 0xc31, 0x0377, 0x023f, 0x038c, 0x03bb, 0x03fb, 0x4803, 0x03ff }
 	local root = machine.devices[":"]
 	local function digit(n)
 		local node = root:output("digit" .. n)
@@ -180,37 +178,6 @@ function interface.select_piece(x, y, event)
 			interface.turn = not interface.turn
 		end
 	end
-end
-
--- While thinking, Boris shows its best move so far (from digit7..6, to digit4..3) and the seconds
--- left on the level (digit1..0)
-function interface.show_info(on)
-	if not on then
-		return nil
-	end
-	local root = machine.devices[":"]
-	local function digit(n)
-		local node = root:output("digit" .. n)
-		return node and node:get() or 0
-	end
-	if digit(0) == 0 and digit(1) == 0 then
-		return nil
-	end
-	local function index(list, value)
-		for i = 1, 8 do
-			if list[i] == value then
-				return i
-			end
-		end
-		return nil
-	end
-	local fx, fy = index(xval, digit(7)), index(yval, digit(6))
-	local tx, ty = index(xval, digit(4)), index(yval, digit(3))
-	if not (fx and fy and tx and ty) then
-		return nil
-	end
-	local files = "abcdefgh"
-	return "info pv " .. files:sub(fx, fx) .. fy .. files:sub(tx, tx) .. ty
 end
 
 function interface.get_options()
