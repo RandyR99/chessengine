@@ -47,6 +47,9 @@ function interface.set_pos(mode)
 		ioport.ports[":IN.1"]:field(0x02):set_value(0)
 		ioport.ports[":IN.1"]:field(0x01):set_value(0)
 		sb_clear_board(":board")
+		emu.wait(1)
+		interface.cur_level = 1 -- RESET also clears the level
+		interface.setlevel()
 		return (":board")
 	else
 		send_input(":IN.0", 0x10, 1) -- Change Board
