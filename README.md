@@ -42,6 +42,7 @@ An interface is a Lua file that returns a table of functions. The main hooks are
 
 - **Sandro Ronco** wrote the plugin and the first interfaces.
 - **Franz Huber** updated them for his CB-Emu program (MessChess and MessNew) and added many interfaces.
+- **Guido Marquardt** extended the interfaces' functionality for his Mysticum project.
 - **Randy Reade** updated the plugin and the interfaces for MAME 0.289, working with Claude (Anthropic).
 
 Licence: BSD 3-Clause.
