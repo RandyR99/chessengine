@@ -57,6 +57,9 @@ end
 function interface.set_pos(mode)
 	if mode == 0 then
 		send_input(":RESET", 0x01, 0.5) -- RESET
+		emu.wait(1)
+		interface.cur_level = "000000" -- RESET also clears the level
+		interface.setlevel()
 		return ("")
 	else
 		local throttled_state = machine.video.throttled
