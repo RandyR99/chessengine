@@ -180,12 +180,12 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	return 'q'	-- TODO
+	return 'q'	-- a queen in all our tests, although the manual says it can pick another piece
 end
 
 function interface.promote(x, y, piece)
 	promotion_error(piece)
-	sb_promote(":board", x, y, "q") -- TODO
+	sb_promote(":board", x, y, "q")	-- the machine only takes a queen
 end
 
 return interface

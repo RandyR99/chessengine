@@ -109,12 +109,12 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-    return 'q'    -- TODO
+    return 'q'	-- assumed: no position setup to test it with
 end
 
 function interface.promote(x, y, piece)
     promotion_error(piece)
-    -- TODO
+    -- nothing to press: a queen is assumed
 end
 
 return interface

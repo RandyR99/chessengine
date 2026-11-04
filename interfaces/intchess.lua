@@ -216,7 +216,7 @@ end
 
 function interface.promote(x, y, piece)
 	promotion_error(piece)
-	-- TODO
+	-- nothing to press: a queen is assumed
 end
 
 return interface

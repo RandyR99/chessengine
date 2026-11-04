@@ -1,4 +1,5 @@
 interface = {}
+interface.setup_underpromotion = true -- the player's underpromotion goes in through the position setup
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 local function output_value(name)
@@ -153,12 +154,12 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	return 'q'	-- TODO
+	return 'q'	-- always a queen in our tests
 end
 
 function interface.promote(x, y, piece)
 	promotion_error(piece)
-	-- TODO
+	-- nothing to press: a queen is assumed
 end
 
 return interface

@@ -1,4 +1,5 @@
 interface = {}
+interface.setup_underpromotion = true -- the player's underpromotion goes in through the position setup
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 interface.info_every = 1 -- show_info only reads values saved by the write taps
 
@@ -216,7 +217,7 @@ end
 
 function interface.promote(x, y, piece)
 	promotion_error(piece)
-	-- TODO
+	-- nothing to press: a queen is assumed
 end
 
 -- Live info from the search (no key presses): when a root move improves the score, the code

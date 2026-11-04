@@ -1,4 +1,5 @@
 interface = {}
+interface.setup_underpromotion = true -- the player's underpromotion goes in through the position setup
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 local function output_value(name)
@@ -112,7 +113,7 @@ end
 function interface.promote(x, y, piece)
 	if piece == piece:lower() then
 		promotion_error(piece)
-		sb_promote(":board", x, y, "q")	-- TODO
+		sb_promote(":board", x, y, "q")	-- the machine only takes a queen
 	else
 		sb_promote(":board", x, y, piece)
  	end

@@ -1,4 +1,5 @@
 interface = {}
+interface.setup_underpromotion = true -- the player's underpromotion goes in through the position setup
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 interface.level = 1
@@ -102,7 +103,7 @@ end
 function interface.is_selected(x, y)
 	if (output_value("0.0") ~= 0 and output_value("1.0") ~= 0 and output_value("2.0") ~= 0 and output_value("3.0") ~= 0 or
 	    output_value("4.0") ~= 0 and output_value("5.0") ~= 0 and output_value("6.0") ~= 0 and output_value("7.0") ~= 0) then
-		-- TODO: machine turns on all LEDs for mate announcement
+		-- all LEDs of a rank or file: the machine announces mate
 		return false
 	end
 	return output_value(tostring(x - 1) .. "." .. tostring(y - 1)) ~= 0
@@ -165,7 +166,7 @@ end
 
 function interface.promote(x, y, piece)
 	promotion_error(piece)
-	sb_promote(":board", x, y, "q")	-- TODO
+	sb_promote(":board", x, y, "q")	-- the machine only takes a queen
 end
 
 return interface

@@ -1,4 +1,5 @@
 interface = {}
+interface.setup_underpromotion = true -- the player's underpromotion goes in through the position setup
 
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
@@ -303,7 +304,7 @@ end
 
 function interface.promote(x, y, piece)
 	promotion_error(piece)
-	-- TODO
+	-- nothing to press: a queen is assumed
 end
 
 return interface

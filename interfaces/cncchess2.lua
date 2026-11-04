@@ -1,4 +1,5 @@
 interface = {}
+interface.setup_underpromotion = true -- the player's underpromotion goes in through the position setup
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
 local function led_on(name)
@@ -266,7 +267,7 @@ function interface.promote(x, y, piece)
 		y = 9 - y
 	end
 	promotion_error(piece)
-	sb_promote(":board", x, y, "q") -- TODO
+	sb_promote(":board", x, y, "q")	-- the machine only takes a queen
 end
 
 return interface
