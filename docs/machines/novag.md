@@ -4,7 +4,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 | System | Name | Year | Elo | Levels | FEN | History | Info | Ponder | Limits |
 |---|---|---:|---:|---:|:-:|:-:|:-:|:-:|---:|
-| `accord` | Novag Accord | 1987 | 1280 | 8 | ✓ | ✓ | – | – |  |
+| `accord` | Novag Accord | 1987 | 1280 | 8 | ✓ | ✓ | – | – | 1 |
 | `beluga` | Novag Beluga | 1990 | 1770 | 11 | ✓ | ✓ | – | – |  |
 | `ccdelta1` | Novag Chess Champion Delta-1 | 1980 | 685 | 8 | ✓ | ✓ | – | – |  |
 | `ccmk1` | Novag Chess Champion MK1 | 1978 | 715 | 5 | ✓ | – | – | – | 2 |
@@ -66,6 +66,10 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 <details><summary><code>accord</code> Novag Accord</summary>
 
+**Known limits**
+
+- In one rare endgame (only kings and g/h pawns locked on g7, h7, g6, h6) the ROM thinks forever; with any more material it plays.
+
 - MAME set `accord` (Accord), driver `novag/accord.cpp`
 - script runs `mess accord`
 - interface `accord.lua`
@@ -75,6 +79,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [255c534](https://github.com/RandyR99/chessengine/commit/255c534) 2026-11-04 chessengine: accord, constjr: back to their own underpromotion in Set Up mode
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [8b0248b](https://github.com/RandyR99/mame_for_picochess/commit/8b0248b) 2026-10-26 mame_for_picochess: modular_tm.cpp (TM / 68030 modules): port32t .uci = Portorose 10 levels (TURN 08 = 40 moves/2h, verified), other 7 = Berlin Pro 11 levels; retro: new lyon32t…
@@ -397,6 +402,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [255c534](https://github.com/RandyR99/chessengine/commit/255c534) 2026-11-04 chessengine: accord, constjr: back to their own underpromotion in Set Up mode
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…

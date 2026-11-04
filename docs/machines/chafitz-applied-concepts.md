@@ -4,8 +4,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 | System | Name | Year | Elo | Levels | FEN | History | Info | Ponder | Limits |
 |---|---|---:|---:|---:|:-:|:-:|:-:|:-:|---:|
-| `boris` | Chafitz/Applied Concepts Boris (rev. 01) | 1978 | 985 | 8 | ✓ | – | – | – | 1 |
-| `borisa` | Chafitz/Applied Concepts Boris (rev. 00) | 1978 | 985 | 9 | ✓ | – | – | – | 1 |
+| `boris` | Chafitz/Applied Concepts Boris (rev. 01) | 1978 | 985 | 8 | ✓ | – | ✓ | – | 1 |
+| `borisa` | Chafitz/Applied Concepts Boris (rev. 00) | 1978 | 985 | 9 | ✓ | – | ✓ | – | 1 |
 | `borisdpl` | Chafitz/Applied Concepts Boris Diplomat | 1979 | 985 | 8 | ✓ | – | – | – | 1 |
 | `ggm_boris25` | Chafitz/Applied Concepts GGM Boris 2.5 | 1980 | 1370 | 5 | ✓ | – | – | – | 1 |
 | `ggm_morphy` | Chafitz/Applied Concepts GGM Morphy Edition | 1981 | 1450 | 8 | ✓ | – | – | ✓ | 1 |
@@ -33,6 +33,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [ab1d2a1](https://github.com/RandyR99/chessengine/commit/ab1d2a1) 2026-11-04 chessengine: boris: live info, the best move so far from the display
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
@@ -57,6 +58,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [ab1d2a1](https://github.com/RandyR99/chessengine/commit/ab1d2a1) 2026-11-04 chessengine: boris: live info, the best move so far from the display
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
