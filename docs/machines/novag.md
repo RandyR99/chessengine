@@ -79,6 +79,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [e0f9db4](https://github.com/RandyR99/chessengine/commit/e0f9db4) 2026-11-04 chessengine: docs: live info on Boris, accord limit
 - [255c534](https://github.com/RandyR99/chessengine/commit/255c534) 2026-11-04 chessengine: accord, constjr: back to their own underpromotion in Set Up mode
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…

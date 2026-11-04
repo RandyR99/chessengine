@@ -1,16 +1,16 @@
 # MAME chess machines in picochess
 
-Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-04 from chessengine `255c534` and mame_for_picochess `78a6e2a`.
+Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-04 from chessengine `8f8e383` and mame_for_picochess `78a6e2a`.
 
 | Machines | Interface files | MAME drivers | FEN setup | History replay | Live info | Ponder |
 |---:|---:|---:|---:|---:|---:|---:|
-| 431 | 284 | 133 | 413 | 399 | 187 | 216 |
+| 431 | 284 | 133 | 413 | 399 | 185 | 216 |
 
 **Machines by manufacturer** (feature table and details per machine):
 
 | Manufacturer | Machines | FEN setup | History | Live info | With known limits |
 |---|---:|---:|---:|---:|---:|
-| [Chafitz/Applied Concepts](machines/chafitz-applied-concepts.md) | 13 | 13 | 6 | 3 | 7 |
+| [Chafitz/Applied Concepts](machines/chafitz-applied-concepts.md) | 13 | 13 | 6 | 1 | 7 |
 | [CXG](machines/cxg.md) | 22 | 21 | 18 | 8 | 6 |
 | [Elektor](machines/elektor.md) | 4 | 0 | 0 | 0 | 4 |
 | [Fidelity](machines/fidelity.md) | 100 | 98 | 98 | 33 | 32 |
