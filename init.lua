@@ -865,7 +865,67 @@ local function close_edit()
   sel_started = false
 end
 
-local function execute_uci_command(cmd)
+local execute_uci_command
+
+-- FEN of the internal board; castling rights are not tracked, so they are not set
+local function board_fen()
+  local letters = { "k", "q", "r", "b", "n", "p" }
+  local ranks = {}
+  for y = 8, 1, -1 do
+    local rank, empty = "", 0
+    for x = 1, 8 do
+      local p = board[y][x]
+      if p == 0 then
+        empty = empty + 1
+      else
+        if empty > 0 then
+          rank = rank .. empty
+          empty = 0
+        end
+        rank = rank .. (p > 0 and letters[p]:upper() or letters[-p])
+      end
+    end
+    ranks[#ranks + 1] = rank .. (empty > 0 and empty or "")
+  end
+  return table.concat(ranks, "/") .. (ply == "W" and " w" or " b") .. " - - 0 1"
+end
+
+local function has_underpromotion(moves)
+  for move in moves:gmatch("%S+") do
+    if move:match("^%a%d%a%d[rbn]$") then
+      return true
+    end
+  end
+  return false
+end
+
+-- Machines that only promote to a queen can't take an underpromotion as a move. With
+-- interface.setup_underpromotion they get the position after 'moves' through their position setup
+-- instead, as for a new FEN. Picochess keeps the game, so only the machine's history is lost.
+local function setup_after_moves(moves, cmd)
+  local side, last = (ply == "W") and 1 or -1, nil
+  for move in moves:gmatch("%S+") do
+    if try_move(board, move, side, last) == nil then
+      emu.print_error("ERROR: illegal move '" .. move .. "' in '" .. cmd .. "'")
+      return
+    end
+    side, last = -side, move
+  end
+  ply = (side == 1) and "W" or "B"
+  local fen = board_fen()
+  if edit_open then
+    interface.edit_game(false)
+    edit_open = false
+  end
+  if not interface.no_soft_reset then
+    manager.machine:soft_reset()
+  end
+  board_reset()
+  execute_uci_command("position fen " .. fen)
+  lastpos = cmd
+end
+
+function execute_uci_command(cmd)
   local m
 
   if cmd:match("^position ") ~= nil then
@@ -1025,7 +1085,10 @@ local function execute_uci_command(cmd)
     for i in string.gmatch(cmd, "%S+") do
       last_move = i
     end
-    if cmd:len() > lastpos:len() + 6 then
+    local new_moves = cmd:sub(lastpos:len() + 2)
+    if cmd:len() > lastpos:len() and interface.setup_underpromotion and has_underpromotion(new_moves) then
+      setup_after_moves(new_moves, cmd)
+    elseif cmd:len() > lastpos:len() + 6 then
       if interface.edit_game then
         play_moves(lastpos, cmd)
         return

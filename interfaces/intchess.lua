@@ -1,5 +1,6 @@
 interface = {}
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
+interface.setup_underpromotion = true -- the player's underpromotion goes in through the position setup
 
 interface.turn = true
 interface.level = 1
