@@ -1,6 +1,6 @@
 # MAME chess machines in picochess
 
-Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-04 from chessengine `b2aafad` and mame_for_picochess `78a6e2a`.
+Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-04 from chessengine `26c26de` and mame_for_picochess `78a6e2a`.
 
 | Machines | Interface files | MAME drivers | FEN setup | History replay | Live info | Ponder |
 |---:|---:|---:|---:|---:|---:|---:|
@@ -15,7 +15,7 @@ Every machine in picochess `retro.ini` after the port of the chessengine interfa
 | [Elektor](machines/elektor.md) | 4 | 0 | 0 | 0 | 4 |
 | [Fidelity](machines/fidelity.md) | 100 | 98 | 98 | 33 | 32 |
 | [Mephisto](machines/mephisto.md) | 119 | 119 | 119 | 96 | 41 |
-| [Novag](machines/novag.md) | 59 | 59 | 54 | 23 | 13 |
+| [Novag](machines/novag.md) | 59 | 59 | 54 | 23 | 12 |
 | [Saitek](machines/saitek.md) | 47 | 43 | 47 | 14 | 31 |
 | [SciSys](machines/scisys.md) | 19 | 19 | 19 | 2 | 12 |
 | [Tasc](machines/tasc.md) | 4 | 4 | 4 | 4 | 0 |
@@ -77,6 +77,7 @@ The interface files were ported to MAME 0.289 (output values through `machine.de
 | da0d4a3 | 2026-11-01 | Chessmate sets (ccmk2, ccmk2a, chmate) run setup and game edits unthrottled; the talking machines stay throttled (unthrottled speech plays partly sped up). |
 | f0b8554 | 2026-11-01 | Set Pos / Read Game: a replayed history leaves the machine in edit mode and idle until `go` (a player move arriving first is keyed in as part of the history), so it no longer moves for the player; generalizes Johan's MM V fix. The id name reports `edit` (e.g. `(pos+edit+info)`), which picochess uses to decide whether Set Pos sends the history. Talking machines in one `keep_throttled` table; dead `sc80`/`sparc` code removed. |
 | 021277d | 2026-11-01 | `interface.no_soft_reset` replaces the name list that skips the soft reset on `ucinewgame`; clones inherit it (avrmaxg hung in a second game). |
+| 9aee91d | 2026-11-04 | The player's underpromotion goes in through the position setup on queen-only machines (`interface.setup_underpromotion`). |
 
 **Interface hooks used by init.lua**
 
@@ -93,7 +94,18 @@ The interface files were ported to MAME 0.289 (output values through `machine.de
 | `show_pv_after_move_emu` / `_player` | Older info hooks, kept only where show_info needs them (ccmk5, risc2500, super9cc). |
 | `game_over()`, `resigned()` | Game end and resignation → `bestmove 0000`. |
 | `ignore_late_go` | Flag for machines that answer the player's move on their own. |
+| `setup_underpromotion` | Flag for queen-only machines: the player's underpromotion goes in through the position setup. |
 | `no_soft_reset` | Flag for machines that hang after a soft reset on `ucinewgame` (avrmax, kblitz, fphantom, cphantom families). |
+
+## Player underpromotion
+
+Most older machines promote to a queen by themselves and can't take another piece as a move. On machines with a position setup, the plugin plays the move on its own board, restarts the machine and sets up the resulting position, then the machine plays on. The same happens when a move list with an underpromotion is replayed. Tested in picochess, including selecting moves before and after the underpromotion and continuing the game. The level is kept. picochess keeps the game and its own clocks. Limits on the machine's side:
+
+- **Machine clock**: the machine's own clock restarts with each setup, on game and tournament levels. It can show a clock counting down that doesn't match picochess.
+- **Castling**: castling rights are not passed on, so the machine may refuse castling afterwards.
+- **Machine memory**: its own move list, takeback and repetition count start fresh.
+- **Refused positions**: a machine that treats the position as impossible doesn't take it, and picochess gets no move.
+- **No position setup**: the player's underpromotion can't be entered at all (see each machine's limits).
 
 ## Open items
 

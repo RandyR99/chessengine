@@ -105,6 +105,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [625d02a](https://github.com/RandyR99/chessengine/commit/625d02a) 2026-10-13 chessengine: Convert CRLF line endings to LF
 - [67c9a92](https://github.com/RandyR99/chessengine/commit/67c9a92) 2026-10-10 chessengine: cncchess2, regence: port to MAME 0.289; add concams and concglap
@@ -305,7 +306,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `debutm` (Debut-M), driver `ussr/debut.cpp`
 - script runs `mess debutm`
@@ -322,6 +323,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [7444248](https://github.com/RandyR99/chessengine/commit/7444248) 2026-10-19 chessengine: debutm: port to MAME 0.289 (output proxies); en passant: remove the captured pawn first
@@ -507,7 +509,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `intel02` (Intellect-02), driver `ussr/intellect02.cpp`
 - script runs `mess intel02 chess2`
@@ -522,6 +524,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [9d1e200](https://github.com/RandyR99/chessengine/commit/9d1e200) 2026-10-19 chessengine: intel02: port to MAME 0.289 (output proxies); chess2: restore set_pos, new edit_game (replay + final position)
 - [d9e12cc](https://github.com/RandyR99/mame_for_picochess/commit/d9e12cc) 2026-10-19 mame_for_picochess: intel02: fix swapped level files (chess2 4 levels, chess 3), spelling Intellect-02; add intel02a (chess cartridge)
@@ -545,6 +548,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [9d1e200](https://github.com/RandyR99/chessengine/commit/9d1e200) 2026-10-19 chessengine: intel02: port to MAME 0.289 (output proxies); chess2: restore set_pos, new edit_game (replay + final position)
 - [d9e12cc](https://github.com/RandyR99/mame_for_picochess/commit/d9e12cc) 2026-10-19 mame_for_picochess: intel02: fix swapped level files (chess2 4 levels, chess 3), spelling Intellect-02; add intel02a (chess cartridge)
 
@@ -691,7 +695,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `y301xl` (301 XL (Yeno)), driver `yeno/301xl.cpp`
 - script runs `mess y301xl`
@@ -706,6 +710,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [650d35d](https://github.com/RandyR99/chessengine/commit/650d35d) 2026-10-19 chessengine: y301xl: port to MAME 0.289 (output proxies); history replay via silent moves + final-position setup
 - [bc7cd06](https://github.com/RandyR99/mame_for_picochess/commit/bc7cd06) 2026-10-19 mame_for_picochess: y301xl: 7 levels per conventions, levels/ponder in retro.ini

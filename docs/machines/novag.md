@@ -6,11 +6,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 |---|---|---:|---:|---:|:-:|:-:|:-:|:-:|---:|
 | `accord` | Novag Accord | 1987 | 1280 | 8 | ✓ | ✓ | – | – |  |
 | `beluga` | Novag Beluga | 1990 | 1770 | 11 | ✓ | ✓ | – | – |  |
-| `ccdelta1` | Novag Chess Champion Delta-1 | 1980 | 685 | 8 | ✓ | ✓ | – | – | 1 |
+| `ccdelta1` | Novag Chess Champion Delta-1 | 1980 | 685 | 8 | ✓ | ✓ | – | – |  |
 | `ccmk1` | Novag Chess Champion MK1 | 1978 | 715 | 5 | ✓ | – | – | – | 2 |
 | `ccmk2` | Novag Chess Champion MK2 Vert | 1979 | 815 | 7 | ✓ | – | – | – | 2 |
 | `ccmk2a` | Novag Chess Champion MK2 Horz | 1979 | 815 | 7 | ✓ | – | – | – | 2 |
-| `cp2000` | Novag Chess Partner 2000 | 1980 | 1000 | 7 | ✓ | ✓ | – | – | 2 |
+| `cp2000` | Novag Chess Partner 2000 | 1980 | 1000 | 7 | ✓ | ✓ | – | – | 1 |
 | `robotadv` | Novag Chess Robot Adversary | 1982 | 1460 | 6 | ✓ | ✓ | – | – |  |
 | `chesstrv` | Novag Chess Traveler | 1980 | 1035 | 6 | ✓ | ✓ | – | – | 2 |
 | `const` | Novag Constellation | 1983 | 1695 | 7 | ✓ | ✓ | – | ✓ |  |
@@ -75,6 +75,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [8b0248b](https://github.com/RandyR99/mame_for_picochess/commit/8b0248b) 2026-10-26 mame_for_picochess: modular_tm.cpp (TM / 68030 modules): port32t .uci = Portorose 10 levels (TURN 08 = 40 moves/2h, verified), other 7 = Berlin Pro 11 levels; retro: new lyon32t…
 - [1fcb929](https://github.com/RandyR99/mame_for_picochess/commit/1fcb929) 2026-10-16 mame_for_picochess: electrio 5 levels; new kpchess, mk12, kpplus engines; accord large name shortened
@@ -102,10 +103,6 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 <details><summary><code>ccdelta1</code> Novag Chess Champion Delta-1</summary>
 
-**Known limits**
-
-- Player underpromotion can't be entered.
-
 - MAME set `ccdelta1` (Chess Champion: Delta-1), driver `saitek/delta1.cpp`
 - script runs `mess ccdelta1`
 - interface `ccdelta1.lua`
@@ -119,6 +116,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [56cb5bc](https://github.com/RandyR99/chessengine/commit/56cb5bc) 2026-10-16 chessengine: ccdelta1: port to MAME 0.289, re-enable set_pos, add edit_game
 - [626bc1a](https://github.com/RandyR99/mame_for_picochess/commit/626bc1a) 2026-10-16 mame_for_picochess: ccdelta1: 8 levels (5s-10m per move), levels = 8
@@ -205,7 +203,6 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - No castling as the first move after a position setup (manual: no castling after ENTER POS).
-- Player underpromotion can't be entered.
 
 - MAME set `cp2000` (Chess Partner 2000), driver `saitek/cp2000.cpp`
 - script runs `mess cp2000`
@@ -220,6 +217,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
+- [9aee91d](https://github.com/RandyR99/chessengine/commit/9aee91d) 2026-11-04 chessengine: init.lua: player's underpromotion through the position setup
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [ba2719e](https://github.com/RandyR99/chessengine/commit/ba2719e) 2026-10-16 chessengine: cp2000: port to MAME 0.289 (output proxies), fix capture-promotion hang
@@ -258,7 +257,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - Player castling as the first move after a position setup is rejected (no castling rights after setup).
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `chesstrv` (Chess Traveler), driver `saitek/chesstrv.cpp`
 - script runs `mess chesstrv`
@@ -269,6 +268,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [2b69860](https://github.com/RandyR99/chessengine/commit/2b69860) 2026-10-15 chessengine: chesstrv: port to MAME 0.289 (output proxies)
 - [bcd2acc](https://github.com/RandyR99/mame_for_picochess/commit/bcd2acc) 2026-10-15 mame_for_picochess: chessac/schachak 10 levels, chesstrv/chesstrvi 6 levels; chesstrvi added to retro.ini
@@ -397,6 +397,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [8b0248b](https://github.com/RandyR99/mame_for_picochess/commit/8b0248b) 2026-10-26 mame_for_picochess: modular_tm.cpp (TM / 68030 modules): port32t .uci = Portorose 10 levels (TURN 08 = 40 moves/2h, verified), other 7 = Berlin Pro 11 levels; retro: new lyon32t…
@@ -550,7 +551,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `mentor16` (Mentor 16), driver `novag/mentor16.cpp`
 - script runs `mess mentor16`
@@ -561,6 +562,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [6f4c493](https://github.com/RandyR99/chessengine/commit/6f4c493) 2026-10-29 chessengine: Game end: optional interface.game_over() - when it returns true on the machine's turn, init.lua sends 'bestmove 0000' once (reset by the next 'position'); pi…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
@@ -587,6 +589,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
@@ -610,6 +613,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
@@ -1057,6 +1061,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family

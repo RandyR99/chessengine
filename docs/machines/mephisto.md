@@ -139,6 +139,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [44e89ec](https://github.com/RandyR99/chessengine/commit/44e89ec) 2026-10-30 chessengine: show_info: tascr30, mephisto. tascr30 (TASC R30): the old code read fixed LCD positions that are empty on this display and sent only empty fields. The LCD sh…
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [92e759f](https://github.com/RandyR99/chessengine/commit/92e759f) 2026-10-23 chessengine: brikett family: rebuilt from the PicoChessv4 originals with output_value; mephisto3 info line no longer breaks on unknown digits, 1 s per board event during…
@@ -161,6 +162,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [44e89ec](https://github.com/RandyR99/chessengine/commit/44e89ec) 2026-10-30 chessengine: show_info: tascr30, mephisto. tascr30 (TASC R30): the old code read fixed LCD positions that are empty on this display and sent only empty fields. The LCD sh…
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
@@ -173,7 +175,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - Queenside castling right after a position setup fails (the setup has no castling rights; castling from a played game is fine).
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `mephisto1x` (Mephisto 1X), driver `hegenerglaser/brikett.cpp`
 - script runs `mess mephisto1x`
@@ -184,6 +186,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [92e759f](https://github.com/RandyR99/chessengine/commit/92e759f) 2026-10-23 chessengine: brikett family: rebuilt from the PicoChessv4 originals with output_value; mephisto3 info line no longer breaks on unknown digits, 1 s per board event during…
 - [4f06051](https://github.com/RandyR99/mame_for_picochess/commit/4f06051) 2026-10-23 mame_for_picochess: Mephisto I/1X/Junior/II/III: levels per Levels.txt in Level N format (verified on the display); new retro.ini entry mephisto1x; commented mephistoj levels 7
@@ -195,7 +198,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - Queenside castling right after a position setup fails (the setup has no castling rights; castling from a played game is fine).
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `mephisto2` (Mephisto II (set 1)), driver `hegenerglaser/brikett.cpp`
 - script runs `mess mephisto2`
@@ -206,6 +209,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [58716f1](https://github.com/RandyR99/mame_for_picochess/commit/58716f1) 2026-10-24 mame_for_picochess: mm1/mm1a/mmirage: .uci from the manuals (mm1 7 levels, mmirage = mephisto2 scheme), new mm1a scripts and retro entry; retro levels/ponder for mm1 (n) and mmi…
 - [92e759f](https://github.com/RandyR99/chessengine/commit/92e759f) 2026-10-23 chessengine: brikett family: rebuilt from the PicoChessv4 originals with output_value; mephisto3 info line no longer breaks on unknown digits, 1 s per board event during…
@@ -218,7 +222,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - Queenside castling right after a position setup fails (the setup has no castling rights; castling from a played game is fine).
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `mephisto2a` (Mephisto II (set 2)), driver `hegenerglaser/brikett.cpp`, clone of `mephisto2`
 - script runs `mess mephisto2a`
@@ -229,6 +233,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [92e759f](https://github.com/RandyR99/chessengine/commit/92e759f) 2026-10-23 chessengine: brikett family: rebuilt from the PicoChessv4 originals with output_value; mephisto3 info line no longer breaks on unknown digits, 1 s per board event during…
@@ -241,7 +246,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - Queenside castling right after a position setup fails (the setup has no castling rights; castling from a played game is fine).
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `mephisto2b` (Mephisto II (set 3)), driver `hegenerglaser/brikett.cpp`, clone of `mephisto2`
 - script runs `mess mephisto2b`
@@ -252,6 +257,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [92e759f](https://github.com/RandyR99/chessengine/commit/92e759f) 2026-10-23 chessengine: brikett family: rebuilt from the PicoChessv4 originals with output_value; mephisto3 info line no longer breaks on unknown digits, 1 s per board event during…
@@ -263,7 +269,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - Queenside castling right after a position setup fails (the setup has no castling rights; castling from a played game is fine).
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `mephistoe2` (Mephisto ESB II (ESB 6000 board)), driver `hegenerglaser/brikett.cpp`
 - script runs `mess mephistoe2`
@@ -274,6 +280,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [92e759f](https://github.com/RandyR99/chessengine/commit/92e759f) 2026-10-23 chessengine: brikett family: rebuilt from the PicoChessv4 originals with output_value; mephisto3 info line no longer breaks on unknown digits, 1 s per board event during…
@@ -285,7 +292,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - Queenside castling right after a position setup fails (the setup has no castling rights; castling from a played game is fine).
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `mephistoe2a` (Mephisto ESB II (ESB II board)), driver `hegenerglaser/brikett.cpp`, clone of `mephistoe2`
 - script runs `mess mephistoe2a`
@@ -296,6 +303,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [92e759f](https://github.com/RandyR99/chessengine/commit/92e759f) 2026-10-23 chessengine: brikett family: rebuilt from the PicoChessv4 originals with output_value; mephisto3 info line no longer breaks on unknown digits, 1 s per board event during…
@@ -1760,7 +1768,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - Queenside castling right after a position setup fails (no castling rights in setup, as Mephisto II).
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `mmirage` (Mephisto Mirage), driver `hegenerglaser/mm1.cpp`
 - script runs `mess mmirage`
@@ -1771,6 +1779,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [0a0e2fc](https://github.com/RandyR99/chessengine/commit/0a0e2fc) 2026-10-24 chessengine: mm1, mmirage: rebuilt from the PicoChessv4 originals with output_value (Gemini's mm1 pressed the nonexistent :KEY.0 and lost digit 4); mm1 promote() waits fo…
 - [58716f1](https://github.com/RandyR99/mame_for_picochess/commit/58716f1) 2026-10-24 mame_for_picochess: mm1/mm1a/mmirage: .uci from the manuals (mm1 7 levels, mmirage = mephisto2 scheme), new mm1a scripts and retro entry; retro levels/ponder for mm1 (n) and mmi…

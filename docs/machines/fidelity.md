@@ -159,6 +159,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [9def111](https://github.com/RandyR99/chessengine/commit/9def111) 2026-10-20 chessengine: cc7: port to MAME 0.289 (output proxies); restore MessChess set_pos, new edit_game (final position)
 - [8460a2b](https://github.com/RandyR99/mame_for_picochess/commit/8460a2b) 2026-10-20 mame_for_picochess: cc7, cc7a: 5 levels per conventions; new cc7a retro.ini entry
@@ -176,6 +177,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [9def111](https://github.com/RandyR99/chessengine/commit/9def111) 2026-10-20 chessengine: cc7: port to MAME 0.289 (output proxies); restore MessChess set_pos, new edit_game (final position)
 - [8460a2b](https://github.com/RandyR99/mame_for_picochess/commit/8460a2b) 2026-10-20 mame_for_picochess: cc7, cc7a: 5 levels per conventions; new cc7a retro.ini entry
@@ -193,6 +195,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [ff71ab9](https://github.com/RandyR99/chessengine/commit/ff71ab9) 2026-10-23 chessengine: vcc: output proxies via output_value; RE before the history set-up (Problem Mode re-entry flipped piece colors); cc10 set_pos clears empty squares (avcc keep…
 - [8f0951c](https://github.com/RandyR99/chessengine/commit/8f0951c) 2026-10-20 chessengine: cc10: port to MAME 0.289 (output proxies); new edit_game (final position)
@@ -212,6 +215,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [ff71ab9](https://github.com/RandyR99/chessengine/commit/ff71ab9) 2026-10-23 chessengine: vcc: output proxies via output_value; RE before the history set-up (Problem Mode re-entry flipped piece colors); cc10 set_pos clears empty squares (avcc keep…
 - [8f0951c](https://github.com/RandyR99/chessengine/commit/8f0951c) 2026-10-20 chessengine: cc10: port to MAME 0.289 (output proxies); new edit_game (final position)
@@ -230,6 +234,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [9b508fb](https://github.com/RandyR99/chessengine/commit/9b508fb) 2026-10-20 chessengine: cc1, cc3, cc10c: port to MAME 0.289 (output proxies); cc3 history replay via DM entries; cc10c set_pos via Problem Mode + edit_game
 - [1020164](https://github.com/RandyR99/mame_for_picochess/commit/1020164) 2026-10-20 mame_for_picochess: cc10, cc10a: 8 levels per conventions; new cc10a retro.ini entry; cc10c medium/large names within limits
@@ -543,6 +548,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [a20596e](https://github.com/RandyR99/chessengine/commit/a20596e) 2026-10-22 chessengine: fscc6, miniscc, classic, gambitv: output proxies via output_value; new edit_game (final position); classic shared by gambitv as in MessChess, full RAM board…
 - [79a093d](https://github.com/RandyR99/mame_for_picochess/commit/79a093d) 2026-10-22 mame_for_picochess: Phantoms, Sensory 12, SC6 family: levels per manuals, Level N headings; fphantom re-enabled (mate lockup gone); new retro.ini entries fscc12a, fscc6, miniscc…
@@ -561,6 +567,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [a20596e](https://github.com/RandyR99/chessengine/commit/a20596e) 2026-10-22 chessengine: fscc6, miniscc, classic, gambitv: output proxies via output_value; new edit_game (final position); classic shared by gambitv as in MessChess, full RAM board…
@@ -610,7 +617,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `feldo` (Eldorado Chess Challenger), driver `fidelity/eldorado.cpp`
 - script runs `mess feldo`
@@ -621,6 +628,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [90c6d0c](https://github.com/RandyR99/chessengine/commit/90c6d0c) 2026-10-21 chessengine: feldo: port to MAME 0.289 from the MessChess file; new edit_game (final position); no REVERSE after an instant forced reply
 - [2834f27](https://github.com/RandyR99/mame_for_picochess/commit/2834f27) 2026-10-21 mame_for_picochess: Prestige / Elite A/S / Avant Garde: common 12 levels per manuals, ponder y; 9 new retro.ini entries; Elo from Programs.txt (premiere, feldo, Elegance)
@@ -1155,7 +1163,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 - Gives up lost positions with a single legal move (no move).
 
 - MAME set `miniscco` (Mini Sensory Chess Challenger (Z8 version)), driver `fidelity/msc.cpp`, clone of `miniscc`
@@ -1167,6 +1175,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [9d2c7f1](https://github.com/RandyR99/chessengine/commit/9d2c7f1) 2026-10-21 chessengine: miniscco: output proxies via output_value; new edit_game (final position)
 - [985bb3d](https://github.com/RandyR99/mame_for_picochess/commit/985bb3d) 2026-10-21 mame_for_picochess: miniscco: Level N headings, new retro.ini entry
@@ -1188,6 +1197,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [046d8db](https://github.com/RandyR99/mame_for_picochess/commit/046d8db) 2026-10-23 mame_for_picochess: fscc8: 7 levels from the manual (Level N headings, 24 h and Analysis dropped); new retro entry; miniscc web name within 40 characters
 - [a20596e](https://github.com/RandyR99/chessengine/commit/a20596e) 2026-10-22 chessengine: fscc6, miniscc, classic, gambitv: output proxies via output_value; new edit_game (final position); classic shared by gambitv as in MessChess, full RAM board…
@@ -1812,6 +1822,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [7082407](https://github.com/RandyR99/chessengine/commit/7082407) 2026-10-23 chessengine: fscc8: output proxies via output_value; new edit_game (silent replay, RE, final position); get_module/get_author
 - [046d8db](https://github.com/RandyR99/mame_for_picochess/commit/046d8db) 2026-10-23 mame_for_picochess: fscc8: 7 levels from the manual (Level N headings, 24 h and Analysis dropped); new retro entry; miniscc web name within 40 characters
@@ -1903,6 +1914,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [a20596e](https://github.com/RandyR99/chessengine/commit/a20596e) 2026-10-22 chessengine: fscc6, miniscc, classic, gambitv: output proxies via output_value; new edit_game (final position); classic shared by gambitv as in MessChess, full RAM board…
 - [79a093d](https://github.com/RandyR99/mame_for_picochess/commit/79a093d) 2026-10-22 mame_for_picochess: Phantoms, Sensory 12, SC6 family: levels per manuals, Level N headings; fphantom re-enabled (mate lockup gone); new retro.ini entries fscc12a, fscc6, miniscc…
@@ -2055,7 +2067,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `vsc` (Voice Sensory Chess Challenger), driver `fidelity/vsc.cpp`
 - script runs `mess vsc`
@@ -2066,6 +2078,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [df424c7](https://github.com/RandyR99/chessengine/commit/df424c7) 2026-10-23 chessengine: vsc: output proxies via output_value; new edit_game (silent replay, RE, final position); set-up verified by Position Verification and repeated (keys pressed…
 - [c64c712](https://github.com/RandyR99/mame_for_picochess/commit/c64c712) 2026-10-23 mame_for_picochess: vsc: 9 levels per manual (Level N headings, H infinite dropped)

@@ -88,6 +88,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [2281abb](https://github.com/RandyR99/mame_for_picochess/commit/2281abb) 2026-10-17 mame_for_picochess: levels: 5 s minimum per move in all non-Fidelity/H+G .uci files; risc2500 family
 - [9dc2f03](https://github.com/RandyR99/chessengine/commit/9dc2f03) 2026-10-15 chessengine: compan: port to MAME 0.289, re-enable set_pos (board RAM via program space)
@@ -100,7 +101,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `compan2` (Chess Companion II), driver `saitek/companion2.cpp`
 - script runs `mess compan2`
@@ -111,6 +112,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [9f15c7d](https://github.com/RandyR99/chessengine/commit/9f15c7d) 2026-10-29 chessengine: expchess (Explorer Chess): new interface on top of compan2 - 12 buttons with other ports; Set Up = 2nd F + a piece key, New Game clears the board in set up,…
 - [6832820](https://github.com/RandyR99/mame_for_picochess/commit/6832820) 2026-10-29 mame_for_picochess: New engines expchess (SciSys Explorer Chess), fex68km4a (Excel 68020 Mach IV set 2), feagpriv (Elite Private Line, EAG 6081 conversion): scripts, _art, .uci…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
@@ -124,7 +126,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `expchess` (Explorer Chess), driver `saitek/companion2.cpp`, clone of `compan2`
 - script runs `mess expchess`
@@ -184,6 +186,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [635882d](https://github.com/RandyR99/chessengine/commit/635882d) 2026-10-16 chessengine: exechess: port to MAME 0.289 (output proxies), module name Executive Chess
@@ -210,6 +213,9 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
+- [9aee91d](https://github.com/RandyR99/chessengine/commit/9aee91d) 2026-11-04 chessengine: init.lua: player's underpromotion through the position setup
+- [1b1bc08](https://github.com/RandyR99/chessengine/commit/1b1bc08) 2026-11-04 chessengine: intchess: report the machine's underpromotion (read from the screen memory)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [3318a19](https://github.com/RandyR99/chessengine/commit/3318a19) 2026-10-16 chessengine: intchess: port to MAME 0.289 (output proxies), 6522 VIA reset workaround
 - [f170747](https://github.com/RandyR99/mame_for_picochess/commit/f170747) 2026-10-16 mame_for_picochess: intchess 9 levels; leonardo family 10 levels, leonardoa/b in retro.ini; ccmk5/ccmk6 8 levels (seconds per move, TOURN 40/90)
@@ -221,7 +227,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - Player castling as the first move after a position setup is rejected (no castling rights after setup).
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `chesstrvi` (Chess Intercontinental Traveler), driver `saitek/chesstrv.cpp`
 - script runs `mess chesstrvi`
@@ -242,7 +248,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `smchess` (Mini Chess), driver `saitek/minichess.cpp`
 - script runs `mess smchess`
@@ -257,6 +263,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
@@ -269,7 +276,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 - Classic, Strong and Hyper modules: after a position setup with the machine in check they start searching and then go idle.
 
 - MAME set `schess` (Sensor Chess), driver `saitek/schess.cpp`
@@ -281,6 +288,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [6617fe0](https://github.com/RandyR99/chessengine/commit/6617fe0) 2026-10-18 chessengine: schess: port to MAME 0.289 (output proxies); slow board input, wait out check display
@@ -294,7 +302,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 - Classic, Strong and Hyper modules: after a position setup with the machine in check they start searching and then go idle.
 
 - MAME set `schess` (Sensor Chess), driver `saitek/schess.cpp`
@@ -306,6 +314,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [6617fe0](https://github.com/RandyR99/chessengine/commit/6617fe0) 2026-10-18 chessengine: schess: port to MAME 0.289 (output proxies); slow board input, wait out check display
@@ -319,7 +328,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Known limits**
 
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 - Classic, Strong and Hyper modules: after a position setup with the machine in check they start searching and then go idle.
 
 - MAME set `schess` (Sensor Chess), driver `saitek/schess.cpp`
@@ -331,6 +340,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [6617fe0](https://github.com/RandyR99/chessengine/commit/6617fe0) 2026-10-18 chessengine: schess: port to MAME 0.289 (output proxies); slow board input, wait out check display
@@ -412,7 +422,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Known limits**
 
 - No castling-rights tracking in the ROM: it castles whenever its king is home, even without the rook.
-- Promotes only to a queen; a player underpromotion can't be entered.
+- Promotes only to a queen; a player underpromotion goes in through a position setup (see Player underpromotion).
 
 - MAME set `tschess` (Travel Sensor Chess), driver `saitek/tschess.cpp`
 - script runs `mess tschess`
@@ -427,6 +437,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [b187063](https://github.com/RandyR99/chessengine/commit/b187063) 2026-10-19 chessengine: tschess: new interface (from MessChess, ported to MAME 0.289); level via LED, slow-board waits
 - [b62aa45](https://github.com/RandyR99/mame_for_picochess/commit/b62aa45) 2026-10-19 mame_for_picochess: tschess: new engine (SciSys Travel Sensor Chess), 4 levels
