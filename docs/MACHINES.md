@@ -1,6 +1,6 @@
 # MAME chess machines in picochess
 
-Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-05 from chessengine `b61bde2` and mame_for_picochess `3a149ab`.
+Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-05 from chessengine `346cb87` and mame_for_picochess `3a149ab`.
 
 | Machines | Interface files | MAME drivers | FEN setup | History replay | Live info | Ponder |
 |---:|---:|---:|---:|---:|---:|---:|
@@ -78,6 +78,7 @@ The interface files were ported to MAME 0.289 (output values through `machine.de
 | f0b8554 | 2026-11-01 | Set Pos / Read Game: a replayed history leaves the machine in edit mode and idle until `go` (a player move arriving first is keyed in as part of the history), so it no longer moves for the player; generalizes Johan's MM V fix. The id name reports `edit` (e.g. `(pos+edit+info)`), which picochess uses to decide whether Set Pos sends the history. Talking machines in one `keep_throttled` table; dead `sc80`/`sparc` code removed. |
 | 021277d | 2026-11-01 | `interface.no_soft_reset` replaces the name list that skips the soft reset on `ucinewgame`; clones inherit it (avrmaxg hung in a second game). |
 | 9aee91d | 2026-11-04 | The player's underpromotion goes in through the position setup on queen-only machines (`interface.setup_underpromotion`). |
+| 346cb87 | 2026-11-05 | Sound is muted while the machine runs unthrottled (`sound.system_mute`), for all interfaces: speech and beeps are garbled at that speed. |
 
 **Interface hooks used by init.lua**
 

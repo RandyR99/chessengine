@@ -95,7 +95,7 @@ details.c pre { white-space: pre-wrap; font-family: var(--sans); font-size: 13px
 <header>
   <div class="eyebrow">chessengine plugin · MAME 0.289 · picochess</div>
   <h1>MAME Chess Machines</h1>
-  <p class="lede">Every machine in picochess <code>retro.ini</code> after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Status as of 2026-11-05 (chessengine b61bde2, mame_for_picochess 3a149ab).</p>
+  <p class="lede">Every machine in picochess <code>retro.ini</code> after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Status as of 2026-11-05 (chessengine 346cb87, mame_for_picochess 3a149ab).</p>
   <div class="stats" id="stats"></div>
 </header>
 
@@ -151,6 +151,7 @@ details.c pre { white-space: pre-wrap; font-family: var(--sans); font-size: 13px
 <tr><td>f0b8554</td><td>2026-11-01</td><td>Set Pos / Read Game: a replayed history leaves the machine in edit mode and idle until <code>go</code> (a player move arriving first is keyed in as part of the history), so it no longer moves for the player; generalizes Johan's MM V fix. The id name reports <code>edit</code> (e.g. <code>(pos+edit+info)</code>), which picochess uses to decide whether Set Pos sends the history. Talking machines in one <code>keep_throttled</code> table; dead <code>sc80</code>/<code>sparc</code> code removed.</td></tr>
 <tr><td>021277d</td><td>2026-11-01</td><td><code>interface.no_soft_reset</code> replaces the name list that skips the soft reset on <code>ucinewgame</code>; clones inherit it (avrmaxg hung in a second game).</td></tr>
 <tr><td>9aee91d</td><td>2026-11-04</td><td>The player's underpromotion goes in through the position setup on queen-only machines (<code>interface.setup_underpromotion</code>).</td></tr>
+<tr><td>346cb87</td><td>2026-11-05</td><td>Sound is muted while the machine runs unthrottled (<code>sound.system_mute</code>), for all interfaces: speech and beeps are garbled at that speed.</td></tr>
 </tbody></table></div>
 
 <h2>Interface hooks used by init.lua</h2>
