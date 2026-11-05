@@ -67,6 +67,17 @@ local function arm_idle()
 	return true
 end
 
+-- Wait for the power-on arm test to end. It runs for over 40 s with stops of up to 0.5 s,
+-- and may start a few seconds late, so quiet only counts after the first 10 s.
+local function wait_arm_test()
+	local waited, quiet = 0, 0
+	repeat
+		emu.wait(0.5)
+		waited = waited + 0.5
+		quiet = arm_idle() and quiet + 0.5 or 0
+	until (waited >= 10 and quiet >= 1) or waited >= 120
+end
+
 -- Wait until the arm has stayed idle for the given time: after a capture it starts
 -- centering the stored piece only a moment later, and presses made meanwhile are lost
 local function wait_arm_settled(quiet_time)
@@ -131,7 +142,7 @@ function interface.setup_machine()
 	if interface.initial_boot then
 		local throttled_state = machine.video.throttled
 		machine.video.throttled = false
-		emu.wait(40)
+		wait_arm_test()
 		machine.video.throttled = throttled_state
 		interface.initial_boot = false
 	else
