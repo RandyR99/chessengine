@@ -202,10 +202,11 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `arb_gms3.lua` → `arb_sargon25.lua`
 - retro.ini: elo 1500, levels 7, ponder/brain n
 
-**Levels:** 5s move; 10s move; 30s move; 1m move; 5m move; 10m move; Analysis
+**Levels:** 5s move; 15s move; 30s move; 1m move; 5m move; 20m move; Analysis
 
 **Commits**
 
+- [993d593](https://github.com/RandyR99/mame_for_picochess/commit/993d593) 2026-11-05 mame_for_picochess: arb modules: own artwork in the _art scripts, arb_gms3 level labels
 - [af76688](https://github.com/RandyR99/chessengine/commit/af76688) 2026-11-04 chessengine: docs: rebuild for the level fixes on borisdpl and arb
 - [f09b1ae](https://github.com/RandyR99/chessengine/commit/f09b1ae) 2026-11-04 chessengine: arb: set the level again after the reset of a position setup
 - [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
@@ -226,6 +227,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [993d593](https://github.com/RandyR99/mame_for_picochess/commit/993d593) 2026-11-05 mame_for_picochess: arb modules: own artwork in the _art scripts, arb_gms3 level labels
 - [af76688](https://github.com/RandyR99/chessengine/commit/af76688) 2026-11-04 chessengine: docs: rebuild for the level fixes on borisdpl and arb
 - [f09b1ae](https://github.com/RandyR99/chessengine/commit/f09b1ae) 2026-11-04 chessengine: arb: set the level again after the reset of a position setup
 - [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
@@ -269,6 +271,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [993d593](https://github.com/RandyR99/mame_for_picochess/commit/993d593) 2026-11-05 mame_for_picochess: arb modules: own artwork in the _art scripts, arb_gms3 level labels
 - [35a27dc](https://github.com/RandyR99/mame_for_picochess/commit/35a27dc) 2026-11-05 mame_for_picochess: arb_sargon25, arb_sargon35: level labels from measured move times
 - [af76688](https://github.com/RandyR99/chessengine/commit/af76688) 2026-11-04 chessengine: docs: rebuild for the level fixes on borisdpl and arb
 - [f09b1ae](https://github.com/RandyR99/chessengine/commit/f09b1ae) 2026-11-04 chessengine: arb: set the level again after the reset of a position setup
@@ -293,6 +296,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [993d593](https://github.com/RandyR99/mame_for_picochess/commit/993d593) 2026-11-05 mame_for_picochess: arb modules: own artwork in the _art scripts, arb_gms3 level labels
 - [35a27dc](https://github.com/RandyR99/mame_for_picochess/commit/35a27dc) 2026-11-05 mame_for_picochess: arb_sargon25, arb_sargon35: level labels from measured move times
 - [af76688](https://github.com/RandyR99/chessengine/commit/af76688) 2026-11-04 chessengine: docs: rebuild for the level fixes on borisdpl and arb
 - [f09b1ae](https://github.com/RandyR99/chessengine/commit/f09b1ae) 2026-11-04 chessengine: arb: set the level again after the reset of a position setup

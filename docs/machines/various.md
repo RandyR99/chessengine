@@ -524,6 +524,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [e3ebe99](https://github.com/RandyR99/chessengine/commit/e3ebe99) 2026-11-05 chessengine: docs: rebuild for the Sargon level labels and the intel02 note
 - [d644b6f](https://github.com/RandyR99/chessengine/commit/d644b6f) 2026-11-05 chessengine: intel02_chess2: the queen promotion is tested, not assumed
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
@@ -549,6 +550,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [e3ebe99](https://github.com/RandyR99/chessengine/commit/e3ebe99) 2026-11-05 chessengine: docs: rebuild for the Sargon level labels and the intel02 note
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [9d1e200](https://github.com/RandyR99/chessengine/commit/9d1e200) 2026-10-19 chessengine: intel02: port to MAME 0.289 (output proxies); chess2: restore set_pos, new edit_game (replay + final position)
 - [d9e12cc](https://github.com/RandyR99/mame_for_picochess/commit/d9e12cc) 2026-10-19 mame_for_picochess: intel02: fix swapped level files (chess2 4 levels, chess 3), spelling Intellect-02; add intel02a (chess cartridge)
