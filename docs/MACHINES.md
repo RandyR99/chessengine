@@ -1,6 +1,6 @@
 # MAME chess machines in picochess
 
-Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-05 from chessengine `e3ebe99` and mame_for_picochess `993d593`.
+Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-05 from chessengine `0d5650f` and mame_for_picochess `993d593`.
 
 | Machines | Interface files | MAME drivers | FEN setup | History replay | Live info | Ponder |
 |---:|---:|---:|---:|---:|---:|---:|
@@ -111,5 +111,3 @@ Most older machines promote to a queen by themselves and can't take another piec
 ## Open items
 
 - **Game history from a custom FEN** fails on cc3, electrio, pmicrodx and triomphe; fex68k can't replay a history.
-- **Custom artwork check** against MAME 0.289 (in progress: layouts that fail to load, missing images, output and input names).
-- **picochess live info for MAME engines**: upstream proposal once enough machines are confirmed in picochess.
