@@ -172,7 +172,7 @@ function interface.set_option(name, value)
 end
 
 function interface.get_promotion(x, y)
-	return 'q'	-- assumed: no position setup to test it with
+	return 'q'	-- queen only: nf_w and mr_w, where the piece then moved and checked as a queen
 end
 
 function interface.promote(x, y, piece)
