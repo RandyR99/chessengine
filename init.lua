@@ -1281,6 +1281,14 @@ function exports.startplugin()
 
   emu.register_periodic(
   function()
+    -- sound is garbled at unthrottled speed, so keep it silent
+    local sound = manager.machine.sound
+    if sound then -- not there yet at the very first call
+      local silent = not manager.machine.video.throttled
+      if sound.system_mute ~= silent then
+        sound.system_mute = silent
+      end
+    end
     if ((co == nil or coroutine.status(co) == "dead") and not manager.machine.paused) then
       co = coroutine.create(update)
       coroutine.resume(co)
