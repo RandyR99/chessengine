@@ -95,7 +95,7 @@ details.c pre { white-space: pre-wrap; font-family: var(--sans); font-size: 13px
 <header>
   <div class="eyebrow">chessengine plugin · MAME 0.289 · picochess</div>
   <h1>MAME Chess Machines</h1>
-  <p class="lede">Every machine in picochess <code>retro.ini</code> after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Status as of 2026-11-06 (chessengine 5c87fda, mame_for_picochess 993d593).</p>
+  <p class="lede">Every machine in picochess <code>retro.ini</code> after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Status as of 2026-11-06 (chessengine 9342a6a, mame_for_picochess 993d593).</p>
   <div class="stats" id="stats"></div>
 </header>
 
@@ -186,7 +186,7 @@ details.c pre { white-space: pre-wrap; font-family: var(--sans); font-size: 13px
 <ul>
 <li>Upstream since 2026-11-05: live info for MAME engines during their own search, and a failed search (<code>bestmove ----</code>) ending as an engine failure instead of a hang (PR #563).</li>
 <li>Upstream since 2026-11-06: <code>bestmove 0000</code> as a draw when threefold repetition or the fifty-move rule can be claimed (PR #567).</li>
-<li>Proposed upstream: MAME engines stop with UCI <code>quit</code> and, on a timeout, a kill of their own process group, in place of <code>pkill -9 -f mess</code>. Settings such as the chosen artwork view then persist in <code>cfg/</code> (PR #569, open).</li>
+<li>Upstream since 2026-11-06: MAME engines stop with UCI <code>quit</code> and, on a timeout, a kill of their own process group, in place of <code>pkill -9 -f mess</code>. Settings such as the chosen artwork view persist in <code>cfg/</code> (PR #569).</li>
 <li>Set Pos / Read Game with the <code>edit</code> marker (Johan's picochess 3e70cd8e) tested on a real board with MM V and Fidelity Excellence.</li>
 </ul>
 </section>
