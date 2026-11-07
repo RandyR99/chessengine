@@ -1,10 +1,10 @@
 # MAME chess machines in picochess
 
-Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-07 from chessengine `ed4df46` and mame_for_picochess `993d593`.
+Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-07 from chessengine `e672375` and mame_for_picochess `993d593`.
 
 | Machines | Interface files | MAME drivers | FEN setup | History replay | Live info | Ponder |
 |---:|---:|---:|---:|---:|---:|---:|
-| 431 | 284 | 133 | 413 | 399 | 214 | 216 |
+| 431 | 284 | 133 | 413 | 399 | 231 | 216 |
 
 **Machines by manufacturer** (feature table and details per machine):
 
@@ -15,12 +15,12 @@ Every machine in picochess `retro.ini` after the port of the chessengine interfa
 | [Elektor](machines/elektor.md) | 4 | 0 | 0 | 0 | 4 |
 | [Fidelity](machines/fidelity.md) | 100 | 98 | 98 | 48 | 32 |
 | [Mephisto](machines/mephisto.md) | 119 | 119 | 119 | 100 | 41 |
-| [Novag](machines/novag.md) | 59 | 59 | 54 | 28 | 13 |
-| [Saitek](machines/saitek.md) | 47 | 43 | 47 | 19 | 31 |
+| [Novag](machines/novag.md) | 59 | 59 | 54 | 35 | 13 |
+| [Saitek](machines/saitek.md) | 47 | 43 | 47 | 28 | 31 |
 | [SciSys](machines/scisys.md) | 19 | 19 | 19 | 2 | 12 |
 | [Tasc](machines/tasc.md) | 4 | 4 | 4 | 4 | 0 |
 | [VEB](machines/veb.md) | 8 | 5 | 5 | 1 | 5 |
-| [Various](machines/various.md) | 36 | 32 | 29 | 3 | 18 |
+| [Various](machines/various.md) | 36 | 32 | 29 | 4 | 18 |
 
 ## Legend and general limits
 

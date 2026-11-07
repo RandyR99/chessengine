@@ -1922,6 +1922,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [9de244a](https://github.com/RandyR99/chessengine/commit/9de244a) 2026-11-07 chessengine: docs: rebuild for the roma2, montreal and mondl68k info
 - [ed4df46](https://github.com/RandyR99/chessengine/commit/ed4df46) 2026-11-07 chessengine: roma2, montreal, mondl68k: show_info from the search text in RAM
 - [9bc2f04](https://github.com/RandyR99/chessengine/commit/9bc2f04) 2026-10-27 chessengine: mondl68k: player promotion pressed the square after the piece key (cleared the 'Pr' choice, no bestmove) - now piece key + ENT; output_value; ignore_late_go…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
@@ -2102,6 +2103,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [9de244a](https://github.com/RandyR99/chessengine/commit/9de244a) 2026-11-07 chessengine: docs: rebuild for the roma2, montreal and mondl68k info
 - [ed4df46](https://github.com/RandyR99/chessengine/commit/ed4df46) 2026-11-07 chessengine: roma2, montreal, mondl68k: show_info from the search text in RAM
 - [8947c8a](https://github.com/RandyR99/chessengine/commit/8947c8a) 2026-10-27 chessengine: roma2, montreal (roma2.cpp): NEW interfaces ported from MessChess - output_value, module/author names, ignore_late_go
 - [58ae61f](https://github.com/RandyR99/mame_for_picochess/commit/58ae61f) 2026-10-27 mame_for_picochess: roma2.cpp: new engines Mephisto Roma II and Montreal 68000 (scripts, 10-level .uci from the manuals, retro entries, ponder y measured)
@@ -2511,6 +2513,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [9de244a](https://github.com/RandyR99/chessengine/commit/9de244a) 2026-11-07 chessengine: docs: rebuild for the roma2, montreal and mondl68k info
 - [ed4df46](https://github.com/RandyR99/chessengine/commit/ed4df46) 2026-11-07 chessengine: roma2, montreal, mondl68k: show_info from the search text in RAM
 - [8947c8a](https://github.com/RandyR99/chessengine/commit/8947c8a) 2026-10-27 chessengine: roma2, montreal (roma2.cpp): NEW interfaces ported from MessChess - output_value, module/author names, ignore_late_go
 - [58ae61f](https://github.com/RandyR99/mame_for_picochess/commit/58ae61f) 2026-10-27 mame_for_picochess: roma2.cpp: new engines Mephisto Roma II and Montreal 68000 (scripts, 10-level .uci from the manuals, retro entries, ponder y measured)

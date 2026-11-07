@@ -4,7 +4,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 | System | Name | Year | Elo | Levels | FEN | History | Info | Ponder | Limits |
 |---|---|---:|---:|---:|:-:|:-:|:-:|:-:|---:|
-| `analystd2` | Saitek Analyst D (set 2) | 1989 | 1950 | 9 | ✓ | ✓ | – | ✓ | 1 |
+| `analystd2` | Saitek Analyst D (set 2) | 1989 | 1950 | 9 | ✓ | ✓ | ✓ | ✓ | 1 |
 | `centurion` | Saitek Centurion | 1998 | 2020 | 11 | ✓ | ✓ | ✓ | – | 1 |
 | `chessac` | Saitek Kasparov Chess Academy | 1997 | 1960 | 10 | ✓ | ✓ | – | ✓ |  |
 | `conquist` | Saitek Kasparov Conquistador | 1988 | 1615 | 8 | ✓ | ✓ | – | ✓ |  |
@@ -21,14 +21,14 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `gk2100` | Saitek GK 2100 | 1994 | 2020 | 11 | ✓ | ✓ | ✓ | – |  |
 | `kblitz` | Saitek Kasparov Blitz | 1990 | 1770 | 11 | ✓ | ✓ | – | ✓ | 3 |
 | `kblitza` | Saitek Kasparov Blitz (set 2) | 1990 | 1770 | 11 | ✓ | ✓ | – | ✓ | 2 |
-| `galileo` | Saitek Kasparov Galileo | 1988 | 1600 | 10 | ✓ | ✓ | – | ✓ | 1 |
-| `leonardo` | Saitek Kasparov Leonardo | 1986 | 1600 | 10 | ✓ | ✓ | – | ✓ | 1 |
-| `leonardoa` | Saitek Kasparov Leonardo v1.2 | 1986 | 1600 | 10 | ✓ | ✓ | – | ✓ | 1 |
-| `leonardob` | Saitek Kasparov Leonardo v1.0 | 1986 | 1600 | 10 | ✓ | ✓ | – | ✓ | 1 |
-| `maestrod2` | Saitek Maestro D (set 2) | 1989 | 1950 | 9 | ✓ | ✓ | – | ✓ | 1 |
-| `maestroa1` | Saitek Maestro A (set 1) | 1986 | 1800 | 9 | ✓ | ✓ | – | ✓ | 1 |
-| `maestroc1` | Saitek Maestro C (set 1) | 1988 | 1800 | 9 | ✓ | ✓ | – | ✓ | 1 |
-| `maestrod4` | Saitek Maestro D++ | 1990 | 2025 | 9 | ✓ | ✓ | – | ✓ | 1 |
+| `galileo` | Saitek Kasparov Galileo | 1988 | 1600 | 10 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `leonardo` | Saitek Kasparov Leonardo | 1986 | 1600 | 10 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `leonardoa` | Saitek Kasparov Leonardo v1.2 | 1986 | 1600 | 10 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `leonardob` | Saitek Kasparov Leonardo v1.0 | 1986 | 1600 | 10 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `maestrod2` | Saitek Maestro D (set 2) | 1989 | 1950 | 9 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `maestroa1` | Saitek Maestro A (set 1) | 1986 | 1800 | 9 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `maestroc1` | Saitek Maestro C (set 1) | 1988 | 1800 | 9 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `maestrod4` | Saitek Maestro D++ | 1990 | 2025 | 9 | ✓ | ✓ | ✓ | ✓ | 1 |
 | `prisma` | Saitek Kasparov Prisma | 1990 | 1770 | 10 | ✓ | ✓ | – | ✓ |  |
 | `sparc1` | Saitek Sparc Module (rev. 518) | 1993 | 2200 | 10 | ✓ | ✓ | ✓ | – | 1 |
 | `tmate` | Saitek Kasparov Team-Mate | 1988 | 1535 | 8 | ✓ | ✓ | – | ✓ |  |
@@ -63,10 +63,15 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `leonardo.lua`
 - retro.ini: elo 1950, levels 9, ponder/brain y
 
+**Test notes**
+
+- analystd2 (saitek/leonardo.cpp + Analyst module) \| live info from the module's 16-character LCD: setup selects info screen 2 (FUNCTION, INFO twice; it stays), pages "I 1 f8-c5 c2-c3" (main line 2 plies at a time) and "I Fd=4 +7.78" (depth, evaluation for White -&gt; machine side) \| 8/8, neg -767
+
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/2h; 5m game; 15m game; 30m game
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
 - [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
@@ -511,11 +516,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Test notes**
 
 - leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
+- leonardo, leonardoa, leonardob, galileo, maestroa1, maestroc1, maestrod2, maestrod4 (saitek/leonardo.cpp) \| live main line only, from the base unit's RAM at 0x45e6 (from/to pairs; Maestro modules pass their line to it); no score (LED-only display) \| info/neg 16/16, regression 24/24
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 15m game; 30m game; 40 moves/2h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
@@ -539,11 +546,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Test notes**
 
 - leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
+- leonardo, leonardoa, leonardob, galileo, maestroa1, maestroc1, maestrod2, maestrod4 (saitek/leonardo.cpp) \| live main line only, from the base unit's RAM at 0x45e6 (from/to pairs; Maestro modules pass their line to it); no score (LED-only display) \| info/neg 16/16, regression 24/24
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 15m game; 30m game; 40 moves/2h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
@@ -569,11 +578,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - leonardoa, leonardob (v1.2 / v1.0) \| 0ac6804 / f170747 \| 81 ok, 0 illegal \| ep_p; OPEN: machine promotion WITHOUT capture -&gt; stuck after player's reply (revisit) \| new retro.ini entries (vetted) \| 10 levels
 - leonardoa/leonardob: machine promotion needs lift / Normal / put (in leonardo.lua). ivant/igor: Verify+Clear after set up; Coach forced off (Option..COCH, No; Off key = power off!).
+- leonardo, leonardoa, leonardob, galileo, maestroa1, maestroc1, maestrod2, maestrod4 (saitek/leonardo.cpp) \| live main line only, from the base unit's RAM at 0x45e6 (from/to pairs; Maestro modules pass their line to it); no score (LED-only display) \| info/neg 16/16, regression 24/24
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 15m game; 30m game; 40 moves/2h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
@@ -598,11 +609,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - leonardoa, leonardob (v1.2 / v1.0) \| 0ac6804 / f170747 \| 81 ok, 0 illegal \| ep_p; OPEN: machine promotion WITHOUT capture -&gt; stuck after player's reply (revisit) \| new retro.ini entries (vetted) \| 10 levels
 - leonardoa/leonardob: machine promotion needs lift / Normal / put (in leonardo.lua). ivant/igor: Verify+Clear after set up; Coach forced off (Option..COCH, No; Off key = power off!).
+- leonardo, leonardoa, leonardob, galileo, maestroa1, maestroc1, maestrod2, maestrod4 (saitek/leonardo.cpp) \| live main line only, from the base unit's RAM at 0x45e6 (from/to pairs; Maestro modules pass their line to it); no score (LED-only display) \| info/neg 16/16, regression 24/24
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 15m game; 30m game; 40 moves/2h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [ecfba6c](https://github.com/RandyR99/chessengine/commit/ecfba6c) 2026-10-29 chessengine: leonardoa, leonardob (v1.2/v1.0): after the machine's own promotion these ROMs keep the move open (side light and piece light stay on) until the new piece is…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
@@ -625,12 +638,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
+- leonardo, leonardoa, leonardob, galileo, maestroa1, maestroc1, maestrod2, maestrod4 (saitek/leonardo.cpp) \| live main line only, from the base unit's RAM at 0x45e6 (from/to pairs; Maestro modules pass their line to it); no score (LED-only display) \| info/neg 16/16, regression 24/24
 
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/2h; 5m game; 15m game; 30m game
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
 - [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
@@ -656,12 +670,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
+- leonardo, leonardoa, leonardob, galileo, maestroa1, maestroc1, maestrod2, maestrod4 (saitek/leonardo.cpp) \| live main line only, from the base unit's RAM at 0x45e6 (from/to pairs; Maestro modules pass their line to it); no score (LED-only display) \| info/neg 16/16, regression 24/24
 
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/2h; 5m game; 15m game; 30m game
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
 - [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
@@ -687,12 +702,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
+- leonardo, leonardoa, leonardob, galileo, maestroa1, maestroc1, maestrod2, maestrod4 (saitek/leonardo.cpp) \| live main line only, from the base unit's RAM at 0x45e6 (from/to pairs; Maestro modules pass their line to it); no score (LED-only display) \| info/neg 16/16, regression 24/24
 
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/2h; 5m game; 15m game; 30m game
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
 - [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number
@@ -718,12 +734,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- leonardo, galileo (saitek/leonardo.cpp, v1.4) \| 0ac6804 / f170747 \| 77 ok + promo reruns ok, 0 illegal \| ep_p; stops at dead draws \| output port only; galileo/leonardoa/b are clones -&gt; parent-interface fallback (no own lua) \| 10 levels (5s-3m move, 5-30m game, 40/2h)
+- leonardo, leonardoa, leonardob, galileo, maestroa1, maestroc1, maestrod2, maestrod4 (saitek/leonardo.cpp) \| live main line only, from the base unit's RAM at 0x45e6 (from/to pairs; Maestro modules pass their line to it); no score (LED-only display) \| info/neg 16/16, regression 24/24
 
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/2h; 5m game; 15m game; 30m game
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [ca9e8fb](https://github.com/RandyR99/mame_for_picochess/commit/ca9e8fb) 2026-11-04 mame_for_picochess: .uci: 11 files use the standard [Level n - description] headers
 - [25e365b](https://github.com/RandyR99/mame_for_picochess/commit/25e365b) 2026-11-01 mame_for_picochess: Saitek Maestro/Analyst modules: entries for Maestro A, C and D++; remove near-duplicate sets
 - [dbc4bb5](https://github.com/RandyR99/mame_for_picochess/commit/dbc4bb5) 2026-11-01 mame_for_picochess: Maestro/Analyst module scripts: select the module set by name, not number

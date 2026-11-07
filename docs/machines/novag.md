@@ -26,7 +26,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `diablo68b` | Novag Diablo 68000 (set 3) | 1991 | 2040 | 11 | ✓ | ✓ | ✓ | – |  |
 | `diablo68c` | Novag Diablo 68000 (set 4) | 1991 | 2040 | 11 | ✓ | ✓ | ✓ | – |  |
 | `diamond` | Novag Diamond | 1994 | 2145 | 11 | ✓ | ✓ | ✓ | – |  |
-| `emerclp` | Novag Emerald Classic plus | 1997 | 2005 | 11 | ✓ | ✓ | – | – |  |
+| `emerclp` | Novag Emerald Classic plus | 1997 | 2005 | 11 | ✓ | ✓ | ✓ | – |  |
 | `scorpio68` | Novag Scorpio 68000 | 1991 | 2040 | 11 | ✓ | ✓ | ✓ | – |  |
 | `mentor16` | Novag Mentor 16 | 1989 | 1530 | 10 | ✓ | ✓ | – | – | 1 |
 | `nmicro` | Novag Micro Chess | 1981 | 925 | 7 | ✓ | – | – | – | 1 |
@@ -56,13 +56,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `ssensor4` | Novag Super Sensor IV | 1981 | 1200 | 7 | ✓ | ✓ | – | – | 1 |
 | `ssystem3` | Novag Chess Champion Super System III | 1979 | 1110 | 7 | ✓ | ✓ | – | – | 1 |
 | `supercon` | Novag Super Constellation | 1984 | 1810 | 7 | ✓ | ✓ | – | – |  |
-| `nsvip` | Novag Super VIP | 1989 | 1755 | 11 | ✓ | ✓ | – | – |  |
-| `nsvipa` | Novag Super VIP (v3.6) | 1989 | 1755 | 11 | ✓ | ✓ | – | – |  |
-| `nsvipb` | Novag Super VIP (v1.03) | 1989 | 1755 | 11 | ✓ | ✓ | – | – |  |
-| `nsvipc` | Novag Super VIP (v1.01) | 1989 | 1755 | 11 | ✓ | ✓ | – | – |  |
-| `nvip` | Novag VIP | 1987 | 1735 | 11 | ✓ | ✓ | – | – |  |
+| `nsvip` | Novag Super VIP | 1989 | 1755 | 11 | ✓ | ✓ | ✓ | – |  |
+| `nsvipa` | Novag Super VIP (v3.6) | 1989 | 1755 | 11 | ✓ | ✓ | ✓ | – |  |
+| `nsvipb` | Novag Super VIP (v1.03) | 1989 | 1755 | 11 | ✓ | ✓ | ✓ | – |  |
+| `nsvipc` | Novag Super VIP (v1.01) | 1989 | 1755 | 11 | ✓ | ✓ | ✓ | – |  |
+| `nvip` | Novag VIP | 1987 | 1735 | 11 | ✓ | ✓ | ✓ | – |  |
 | `supremo` | Novag Supremo | 1988 | 1695 | 11 | ✓ | ✓ | ✓ | ✓ |  |
-| `zircon2` | Novag Zircon II | 1995 | 2030 | 11 | ✓ | ✓ | – | – |  |
+| `zircon2` | Novag Zircon II | 1995 | 2030 | 11 | ✓ | ✓ | ✓ | – |  |
 
 <details><summary><code>accord</code> Novag Accord</summary>
 
@@ -527,13 +527,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `emerclp` (Emerald Classic Plus), driver `novag/emerclp.cpp`
 - script runs `mess emerclp`
-- interface `emerclp.lua`
+- interface `emerclp.lua` → `novag_lcd.lua`
 - retro.ini: elo 2005, levels 11, ponder/brain n
+
+**Test notes**
+
+- emerclp, obsidian (novag/emerclp.cpp) \| live info from the rotating LCD pages (Sapphire II format: 3 moves, score, depth, moves left, time) \| 8/8 each, neg about -1066
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 90s move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [234e408](https://github.com/RandyR99/chessengine/commit/234e408) 2026-10-14 chessengine: mentor16: port to MAME 0.289, re-press ignored squares; emerclp: same for TO squares
@@ -1147,13 +1152,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `nsvip` (Super VIP (v3.7)), driver `novag/vip.cpp`
 - script runs `mess nsvip`
-- interface `nsvip.lua`
+- interface `nsvip.lua` → `vip_line.lua`
 - retro.ini: elo 1755, levels 11, ponder/brain n
+
+**Test notes**
+
+- nvip, nsvip, nsvipa, nsvipb, nsvipc (novag/vip.cpp) \| live main line (first 3 moves) from RAM (nvip 0x4734, nsvip/a 0x26f4, b 0x2700, c 0x2704; 0x88 pairs); the LCD rotation shows only moves and time, no score \| nvip/nsvip 8/8, clones info/neg ok
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [9b4fadb](https://github.com/RandyR99/chessengine/commit/9b4fadb) 2026-10-15 chessengine: nvip/nsvip: port to MAME 0.289, verify typed moves, read promotions from RAM
@@ -1165,13 +1175,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `nsvipa` (Super VIP (v3.6)), driver `novag/vip.cpp`, clone of `nsvip`
 - script runs `mess nsvipa`
-- interface `nsvip.lua`
+- interface `nsvip.lua` → `vip_line.lua`
 - retro.ini: elo 1755, levels 11, ponder/brain n
+
+**Test notes**
+
+- nvip, nsvip, nsvipa, nsvipb, nsvipc (novag/vip.cpp) \| live main line (first 3 moves) from RAM (nvip 0x4734, nsvip/a 0x26f4, b 0x2700, c 0x2704; 0x88 pairs); the LCD rotation shows only moves and time, no score \| nvip/nsvip 8/8, clones info/neg ok
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [9b4fadb](https://github.com/RandyR99/chessengine/commit/9b4fadb) 2026-10-15 chessengine: nvip/nsvip: port to MAME 0.289, verify typed moves, read promotions from RAM
@@ -1182,13 +1197,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `nsvipb` (Super VIP (v1.03)), driver `novag/vip.cpp`, clone of `nsvip`
 - script runs `mess nsvipb`
-- interface `nsvip.lua`
+- interface `nsvip.lua` → `vip_line.lua`
 - retro.ini: elo 1755, levels 11, ponder/brain n
+
+**Test notes**
+
+- nvip, nsvip, nsvipa, nsvipb, nsvipc (novag/vip.cpp) \| live main line (first 3 moves) from RAM (nvip 0x4734, nsvip/a 0x26f4, b 0x2700, c 0x2704; 0x88 pairs); the LCD rotation shows only moves and time, no score \| nvip/nsvip 8/8, clones info/neg ok
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [9b4fadb](https://github.com/RandyR99/chessengine/commit/9b4fadb) 2026-10-15 chessengine: nvip/nsvip: port to MAME 0.289, verify typed moves, read promotions from RAM
@@ -1199,13 +1219,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `nsvipc` (Super VIP (v1.01)), driver `novag/vip.cpp`, clone of `nsvip`
 - script runs `mess nsvipc`
-- interface `nsvip.lua`
+- interface `nsvip.lua` → `vip_line.lua`
 - retro.ini: elo 1755, levels 11, ponder/brain n
+
+**Test notes**
+
+- nvip, nsvip, nsvipa, nsvipb, nsvipc (novag/vip.cpp) \| live main line (first 3 moves) from RAM (nvip 0x4734, nsvip/a 0x26f4, b 0x2700, c 0x2704; 0x88 pairs); the LCD rotation shows only moves and time, no score \| nvip/nsvip 8/8, clones info/neg ok
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [9b4fadb](https://github.com/RandyR99/chessengine/commit/9b4fadb) 2026-10-15 chessengine: nvip/nsvip: port to MAME 0.289, verify typed moves, read promotions from RAM
@@ -1216,13 +1241,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `nvip` (VIP (Novag)), driver `novag/vip.cpp`
 - script runs `mess nvip`
-- interface `nvip.lua`
+- interface `nvip.lua` → `vip_line.lua`
 - retro.ini: elo 1735, levels 11, ponder/brain n
+
+**Test notes**
+
+- nvip, nsvip, nsvipa, nsvipb, nsvipc (novag/vip.cpp) \| live main line (first 3 moves) from RAM (nvip 0x4734, nsvip/a 0x26f4, b 0x2700, c 0x2704; 0x88 pairs); the LCD rotation shows only moves and time, no score \| nvip/nsvip 8/8, clones info/neg ok
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [9b4fadb](https://github.com/RandyR99/chessengine/commit/9b4fadb) 2026-10-15 chessengine: nvip/nsvip: port to MAME 0.289, verify typed moves, read promotions from RAM
@@ -1254,13 +1284,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `zircon2` (Zircon II), driver `novag/zircon2.cpp`
 - script runs `mess zircon2`
-- interface `zircon2.lua`
+- interface `zircon2.lua` → `novag_lcd.lua`
 - retro.ini: elo 2030, levels 11, ponder/brain n
+
+**Test notes**
+
+- zircon2 (novag/zircon2.cpp) \| live info from the rotating LCD pages like the Sapphire (3 moves, score, depth, moves left, time; right panel digit4-7) \| 8/8, neg -999
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [6f4c493](https://github.com/RandyR99/chessengine/commit/6f4c493) 2026-10-29 chessengine: Game end: optional interface.game_over() - when it returns true on the machine's turn, init.lua sends 'bestmove 0000' once (reset by the next 'position'); pi…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'

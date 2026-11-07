@@ -39,7 +39,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `y532xl` | Yeno 532 XL Chess Partner | 1989 | 1750 | 8 | ✓ | ✓ | ✓ | ✓ |  |
 | `kchal` | Krypton Challenge | 1996 | 1775 | 10 | ✓ | ✓ | ✓ | – |  |
 | `kchala` | Krypton Challenge | 1994 | 1775 | 10 | ✓ | ✓ | ✓ | – |  |
-| `obsidian` | Perfect Technology Obsidian | 2003 | 2005 | 11 | ✓ | ✓ | – | – |  |
+| `obsidian` | Perfect Technology Obsidian | 2003 | 2005 | 11 | ✓ | ✓ | ✓ | – |  |
 
 <details><summary><code>chmate</code> Commodore Chessmate</summary>
 
@@ -431,6 +431,10 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `ivant.lua`
 - retro.ini: elo 1845, levels 8, ponder/brain n
 
+**Test notes**
+
+- ivant, ivanto (excalibur) \| no info: this ROM has no INFO option (that is the Ivan II), display static while thinking, no move list found in RAM
+
 **Levels:** 10s move; 30s move; 1m move; 5m game; 10m game; 15m game; 60m game; 120m game
 
 **Commits**
@@ -449,6 +453,10 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess ivanto`
 - interface `ivanto.lua`
 - retro.ini: elo 1845, levels 8, ponder/brain n
+
+**Test notes**
+
+- ivant, ivanto (excalibur) \| no info: this ROM has no INFO option (that is the Ivan II), display static while thinking, no move list found in RAM
 
 **Levels:** 10s move; 30s move; 1m move; 5m game; 10m game; 15m game; 60m game; 120m game
 
@@ -814,13 +822,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `obsidian` (Obsidian), driver `novag/emerclp.cpp`
 - script runs `mess obsidian`
-- interface `obsidian.lua` → `emerclp.lua`
+- interface `obsidian.lua` → `emerclp.lua` → `novag_lcd.lua`
 - retro.ini: elo 2005, levels 11, ponder/brain n
+
+**Test notes**
+
+- emerclp, obsidian (novag/emerclp.cpp) \| live info from the rotating LCD pages (Sapphire II format: 3 moves, score, depth, moves left, time) \| 8/8 each, neg about -1066
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 90s move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [18bf94f](https://github.com/RandyR99/chessengine/commit/18bf94f) 2026-10-14 chessengine: emerclp: port to MAME 0.289; new obsidian interface
 - [446c213](https://github.com/RandyR99/mame_for_picochess/commit/446c213) 2026-10-14 mame_for_picochess: emerclp/obsidian: 11 levels per conventions; obsidian new engine
