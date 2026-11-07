@@ -5,6 +5,8 @@ if ioport.ports[":IN.3"]:read() & 0x01 ~= 0 then -- Program switch: 2265
 	return load_interface("feagv4")
 end
 
+local rotating = load_interface("fidelity_rotating")
+
 interface.opt_clear_announcements = true
 interface.level = "a2"
 interface.cur_level = nil
@@ -128,6 +130,8 @@ function interface.setup_machine()
 	end
 	send_input(":IN.1", 0x01, 1) -- clear
 	emu.wait(0.2)
+
+	rotating.setup_vancouver() -- Rotating Display: search info while thinking
 	
 	-- Ponder ON
 	send_input(":IN.0", 0x02, 1) -- option
@@ -313,6 +317,9 @@ function interface.promote(x, y, piece)
 	elseif (piece == "n") then send_input(":IN.0", 0x08, 1)
 	end
 end
+
+interface.info_every = 0.25
+interface.show_info = rotating.reader(true)
 
 return interface
 
