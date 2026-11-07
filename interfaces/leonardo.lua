@@ -96,6 +96,15 @@ function interface.setup_machine()
     end
 	interface.cur_level = "a1"
 	interface.setlevel()
+	if module == 6 then
+		-- Analyst manual "The special Info display": FUNCTION, INFO cycles the info screens and the one chosen stays;
+		-- the second one shows the main line while the computer thinks, then the depth and the evaluation
+		for _ = 1, 2 do
+			send_input(":IN.3", 0x02, 0.5) -- FUNCTION
+			send_input(":IN.5", 0x01, 0.5) -- INFO
+			emu.wait(0.5)
+		end
+	end
 end
 
 function setpiece(n)
@@ -239,4 +248,108 @@ function interface.promote(x, y, piece)
 	interface.machine_promotion = false
 end
 
+-- Analyst module: its 16-character LCD (2 x 8 in DDRAM) shows on the second info screen the main line two plies at a time,
+-- "I 1 f8-c5 c2-c3", "I 2 c2-c3 c5-b6" ... ("-----" = not known yet), then the depth and the evaluation for White:
+-- "I Fd=4     +7.78"
+local analyst_pv = {}
+
+local function analyst_info(on, ply)
+	local lcd = machine.devices[":exp:analyst:lcd"]
+	if lcd == nil then
+		return nil
+	end
+	if not on then
+		analyst_pv = {}
+		interface.analyst_score, interface.analyst_depth = nil, nil
+		return nil
+	end
+	local ddram = emu.item(lcd.items["0/m_ddram"])
+	local text = ddram:read_block(0x00, 0x08) .. ddram:read_block(0x40, 0x08)
+	local page = tonumber(text:match("^. (%d) "))
+	if page then
+		local moves = {}
+		for m in text:sub(5):gmatch("%S+") do
+			moves[#moves + 1] = m
+		end
+		if page == 1 then
+			analyst_pv = {}
+		end
+		for i, m in ipairs(moves) do
+			local from, to, promo = m:match("^([a-h][1-8])[-x:]([a-h][1-8])=?([QRBNqrbn]?)$")
+			if from then
+				analyst_pv[page + i - 1] = from .. to .. promo:lower()
+			elseif m:match("^[O0]%-[O0]") then
+				analyst_pv[page + i - 1] = m
+			end
+		end
+	else
+		local depth = tonumber(text:match("d=(%d+)"))
+		local sign, pawns, hundredths = text:match("([+-])(%d+)%.(%d%d)%s*$")
+		if depth then
+			interface.analyst_depth = depth
+		end
+		if sign then
+			local cp = tonumber(pawns) * 100 + tonumber(hundredths)
+			if sign == "-" then
+				cp = -cp
+			end
+			interface.analyst_score = ply == "B" and -cp or cp -- the machine's side, as the info line wants it
+		end
+	end
+	local pv = {}
+	for i = 1, 16 do
+		if analyst_pv[i] == nil then
+			break
+		end
+		pv[i] = analyst_pv[i]
+	end
+	return { depth = interface.analyst_depth, score = interface.analyst_score, pv = #pv > 0 and pv or nil }
+end
+
+-- without the Analyst's LCD: the main line the program (or a Maestro module) works on is kept in RAM at 0x45e6 as
+-- from/to pairs, file * 16 + rank - 1 ("e7e5" = 46 44); the first pair that isn't a square ends it
+local stale_line = nil
+
+local function ram_line()
+	local sp = machine.devices[":maincpu"].spaces["program"]
+	local line = ""
+	for a = 0x45e6, 0x45e6 + 0x0f do
+		line = line .. string.char(sp:read_u8(a))
+	end
+	return line
+end
+
+local function ram_info(on)
+	local line = ram_line()
+	if not on then
+		stale_line = line
+		return nil
+	end
+	if line == stale_line then
+		return nil -- nothing from this search yet
+	end
+	stale_line = nil
+	local pv = {}
+	for i = 1, #line - 1, 2 do
+		local from, to = line:byte(i), line:byte(i + 1)
+		if from >> 4 > 7 or from & 0x0f > 7 or to >> 4 > 7 or to & 0x0f > 7 then
+			break
+		end
+		pv[#pv + 1] = string.char(97 + (from >> 4), 49 + (from & 0x0f), 97 + (to >> 4), 49 + (to & 0x0f))
+	end
+	if #pv == 0 then
+		return nil
+	end
+	return { pv = pv }
+end
+
+if machine.devices[":exp:analyst:lcd"] then
+	interface.show_info = analyst_info
+	interface.info_every = 0.3
+else
+	interface.show_info = ram_info
+	interface.info_every = 1
+end
+
 return interface
+

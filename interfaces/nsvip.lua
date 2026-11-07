@@ -237,4 +237,9 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- the main line from RAM, without key presses (the address moves with the ROM version)
+local line_address = { nsvipb = 0x2700, nsvipc = 0x2704 }
+interface.show_info = load_interface("vip_line").reader(line_address[prog] or 0x26f4)
+interface.info_every = 1
+
 return interface

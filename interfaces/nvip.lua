@@ -250,4 +250,8 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- the main line from RAM, without key presses
+interface.show_info = load_interface("vip_line").reader(0x4734)
+interface.info_every = 1
+
 return interface

@@ -22,10 +22,13 @@ lcd.digits6 = {
 	{ "s0.13", "s1.14", "s3.14", "s3.13", "s2.13", "s1.13", "s2.14" },
 }
 
+-- Zircon II: same rotation on the right LCD panel, outputs digit4-digit7
+lcd.digits_zircon2 = { 4, 5, 6, 7 }
+
 local chars = {
 	[0x00] = " ", [0x40] = "-",
 	[0x3f] = "0", [0x06] = "1", [0x5b] = "2", [0x4f] = "3", [0x66] = "4",
-	[0x6d] = "5", [0x7d] = "6", [0x07] = "7", [0x7f] = "8", [0x6f] = "9",
+	[0x6d] = "5", [0x7d] = "6", [0x07] = "7", [0x7f] = "8", [0x6f] = "9", [0x67] = "9",
 	[0x77] = "a", [0x5f] = "a", [0x7c] = "b", [0x58] = "c", [0x39] = "c", [0x5e] = "d",
 	[0x79] = "e", [0x7b] = "e", [0x71] = "f", [0x3d] = "g", [0x74] = "h", [0x76] = "h",
 }
@@ -39,9 +42,13 @@ local function page_text(digits)
 	local text = ""
 	for _, segments in ipairs(digits) do
 		local value = 0
-		for i, name in ipairs(segments) do
-			if output_value(name) ~= 0 then
-				value = value | (1 << (i - 1))
+		if tonumber(segments) then -- (type() is not in the interface environment)
+			value = output_value("digit" .. segments) & 0x7f -- the driver gives whole 7-segment digits
+		else
+			for i, name in ipairs(segments) do
+				if output_value(name) ~= 0 then
+					value = value | (1 << (i - 1))
+				end
 			end
 		end
 		text = text .. (chars[value] or "?")

@@ -152,4 +152,9 @@ function interface.game_over()
 	return end_seen >= 2
 end
 
+-- the machine rotates its search info on the LCD without key presses (manual 18, game information), as the Sapphire
+local lcd = load_interface("novag_lcd")
+interface.info_every = 0.5
+interface.show_info = lcd.reader(lcd.digits_zircon2)
+
 return interface

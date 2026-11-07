@@ -243,4 +243,10 @@ function interface.promote(x, y, piece)
 	sb_promote(":board", x, y, piece)
 end
 
+-- the machine rotates its search info on the LCD without key presses (manual 18, INFO key: "The rotating displays"),
+-- the same pages as the Sapphire II: 3 moves, score, depth, moves left, time
+local lcd = load_interface("novag_lcd")
+interface.info_every = 0.5
+interface.show_info = lcd.reader(lcd.digits6)
+
 return interface
