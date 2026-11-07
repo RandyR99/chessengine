@@ -81,7 +81,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `mm4tk` | Mephisto MM IV TurboKit | 1987 | 2080 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
 | `mm5` | Mephisto MM V | 1990 | 2005 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
 | `mm5a` | Mephisto MM V v5.0 | 1990 | 2005 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
-| `mm6` | Mephisto MM VI | 1996 | 2020 | 11 | ✓ | ✓ | – | ✓ |  |
+| `mm6` | Mephisto MM VI | 1996 | 2020 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `mmirage` | Mephisto Mirage | 1984 | 1545 | 8 | ✓ | ✓ | – | ✓ | 2 |
 | `modena` | Mephisto Modena | 1992 | 1965 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
 | `modenaa` | Mephisto Modena (set 2) | 1992 | 1965 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
@@ -1746,17 +1746,19 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `mm6` (Mephisto MM VI), driver `hegenerglaser/mm6.cpp`
 - script runs `mess mm6`
-- interface `mm6.lua`
+- interface `mm6.lua` → `saitek_rotating.lua`
 - retro.ini: elo 2020, levels 11, ponder/brain y
 
 **Test notes**
 
 - mm6 (hegenerglaser/mm6.cpp) \| (pending) \| 98/111 from blank EEPROM (only ep_p, ur_b2 + 11 illegal FENs) \| ep_p, ur_b2 \| rebuilt from MessNew: level via internal_ram share write_u16(0x3bc) (Gemini's setlevel never set a level); cold-EEPROM fix (Err: E -&gt; CLR + 5 s LED sweep) = no nvram file needed \| 11 levels (= gk2100 table); ponder YES
+- mm6 (hegenerglaser/mm6.cpp) \| d24b7b9 \| live info via keys (OPTION x3, ENT + next x6), same LCD as gk2000; the rotating display lights LEDs for the predicted moves, so a selection counts only once the move display has settled (piece icon or page unchanged 2.5 s) \| Pi check ok, LEDs no issue
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 5m move; 10m move; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [09bd21c](https://github.com/RandyR99/chessengine/commit/09bd21c) 2026-10-25 chessengine: mm6: rebuilt from the MessNew interface (Gemini's setlevel only pressed LEV and CLR, no level was ever set): level via internal_ram share, output_value; setu…
 - [29b87df](https://github.com/RandyR99/mame_for_picochess/commit/29b87df) 2026-10-25 mame_for_picochess: mm6: new engine (scripts, .uci = GK 2100 level table, 11 levels; retro entry, ponder measured y); no nvram file needed any more

@@ -5,20 +5,20 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | System | Name | Year | Elo | Levels | FEN | History | Info | Ponder | Limits |
 |---|---|---:|---:|---:|:-:|:-:|:-:|:-:|---:|
 | `analystd2` | Saitek Analyst D (set 2) | 1989 | 1950 | 9 | ✓ | ✓ | – | ✓ | 1 |
-| `centurion` | Saitek Centurion | 1998 | 2020 | 11 | ✓ | ✓ | – | – | 1 |
+| `centurion` | Saitek Centurion | 1998 | 2020 | 11 | ✓ | ✓ | ✓ | – | 1 |
 | `chessac` | Saitek Kasparov Chess Academy | 1997 | 1960 | 10 | ✓ | ✓ | – | ✓ |  |
 | `conquist` | Saitek Kasparov Conquistador | 1988 | 1615 | 8 | ✓ | ✓ | – | ✓ |  |
 | `corona` | Saitek Corona | 1990 | 1930 | 11 | ✓ | ✓ | ✓ | – | 1 |
 | `coronaa` | Saitek Corona C1 | 1988 | 1930 | 11 | ✓ | ✓ | ✓ | – | 1 |
 | `coronab` | Saitek Corona C2 | 1988 | 1930 | 11 | ✓ | ✓ | ✓ | – | 1 |
-| `cougar` | Saitek Cougar | 1998 | 2055 | 11 | ✓ | ✓ | – | – | 1 |
+| `cougar` | Saitek Cougar | 1998 | 2055 | 11 | ✓ | ✓ | ✓ | – | 1 |
 | `electrio` | Saitek Electronic Trio (Chess) | 1985 | 930 | 5 | – | ✓ | – | – | 1 |
 | `kpchess` | Saitek Kasparov Pocket Chess | 1985 | 930 | 5 | – | ✓ | – | – | 1 |
 | `mk12` | Saitek Kasparov Mk 12 | 1986 | 930 | 4 | – | ✓ | – | – | 1 |
 | `kpplus` | Saitek Kasparov Pocket Plus | 1986 | 930 | 4 | – | ✓ | – | – | 1 |
-| `gk2000` | Saitek GK 2000 | 1997 | 1965 | 11 | ✓ | ✓ | – | ✓ |  |
-| `gk2000a` | Saitek GK 2000 (H8/323) | 1992 | 1965 | 11 | ✓ | ✓ | – | ✓ |  |
-| `gk2100` | Saitek GK 2100 | 1994 | 2020 | 11 | ✓ | ✓ | – | – |  |
+| `gk2000` | Saitek GK 2000 | 1997 | 1965 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `gk2000a` | Saitek GK 2000 (H8/323) | 1992 | 1965 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `gk2100` | Saitek GK 2100 | 1994 | 2020 | 11 | ✓ | ✓ | ✓ | – |  |
 | `kblitz` | Saitek Kasparov Blitz | 1990 | 1770 | 11 | ✓ | ✓ | – | ✓ | 3 |
 | `kblitza` | Saitek Kasparov Blitz (set 2) | 1990 | 1770 | 11 | ✓ | ✓ | – | ✓ | 2 |
 | `galileo` | Saitek Kasparov Galileo | 1988 | 1600 | 10 | ✓ | ✓ | – | ✓ | 1 |
@@ -87,17 +87,19 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `centurion` (Kasparov Centurion), driver `saitek/gk2000.cpp`
 - script runs `mess centurion`
-- interface `centurion.lua`
+- interface `centurion.lua` → `saitek_rotating.lua`
 - retro.ini: elo 2020, levels 11, ponder/brain n
 
 **Test notes**
 
 - centurion, cougar (saitek/gk2000.cpp) \| 04d14dc / 1be06ee \| 77/75 ok + replays pass after fix, 0 illegal \| ep_p; stops at dead draws (K+minor vs K) \| FIX: boot wait 4 s -&gt; 6 s (LED sweep to 4.6 s ate the first key -&gt; lost replay moves, wrong side); cougar loads centurion \| 11 levels as gk2100
+- centurion, cougar, gk2000, gk2000a (saitek/gk2000.cpp) \| d24b7b9 \| live info: setup switches on the Rotating Display option (OPTION twice + squares A3-F3), reader saitek_rotating.lua; score is White's view in tenths, converted to the machine's side \| Pi check ok (centurion)
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 5m move; 10m move; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [04d14dc](https://github.com/RandyR99/chessengine/commit/04d14dc) 2026-10-16 chessengine: gk2000 family: port to MAME 0.289; new gk2000a; centurion/cougar boot wait 6 s
@@ -237,17 +239,19 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `cougar` (Kasparov Cougar), driver `saitek/gk2000.cpp`, clone of `centurion`
 - script runs `mess cougar`
-- interface `cougar.lua` → `centurion.lua`
+- interface `cougar.lua` → `centurion.lua` → `saitek_rotating.lua`
 - retro.ini: elo 2055, levels 11, ponder/brain n
 
 **Test notes**
 
 - centurion, cougar (saitek/gk2000.cpp) \| 04d14dc / 1be06ee \| 77/75 ok + replays pass after fix, 0 illegal \| ep_p; stops at dead draws (K+minor vs K) \| FIX: boot wait 4 s -&gt; 6 s (LED sweep to 4.6 s ate the first key -&gt; lost replay moves, wrong side); cougar loads centurion \| 11 levels as gk2100
+- centurion, cougar, gk2000, gk2000a (saitek/gk2000.cpp) \| d24b7b9 \| live info: setup switches on the Rotating Display option (OPTION twice + squares A3-F3), reader saitek_rotating.lua; score is White's view in tenths, converted to the machine's side \| Pi check ok (centurion)
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 5m move; 10m move; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [04d14dc](https://github.com/RandyR99/chessengine/commit/04d14dc) 2026-10-16 chessengine: gk2000 family: port to MAME 0.289; new gk2000a; centurion/cougar boot wait 6 s
 - [1be06ee](https://github.com/RandyR99/mame_for_picochess/commit/1be06ee) 2026-10-16 mame_for_picochess: exechess 7 levels; gk2000 family 11 levels, new gk2000a, gk2000 is the 1997 version; kblitz needs MAME 0.290
@@ -355,17 +359,19 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `gk2000` (Kasparov GK 2000 (H8/3212 version)), driver `saitek/gk2000.cpp`
 - script runs `mess gk2000`
-- interface `gk2000.lua`
+- interface `gk2000.lua` → `saitek_rotating.lua`
 - retro.ini: elo 1965, levels 11, ponder/brain y
 
 **Test notes**
 
 - gk2000, gk2000a, gk2100 (saitek/gk2000.cpp) \| 04d14dc / 1be06ee \| 82 ok each, 0 illegal \| ep_p; illegal FENs refused \| gk2000a NEW (load_interface gk2000); gk2000 renamed 1997 (H8/3212), gk2000a is the 1992 H8/323 \| 11 levels (5s-10m move, 5/10/15/30m game, 40/90)
+- centurion, cougar, gk2000, gk2000a (saitek/gk2000.cpp) \| d24b7b9 \| live info: setup switches on the Rotating Display option (OPTION twice + squares A3-F3), reader saitek_rotating.lua; score is White's view in tenths, converted to the machine's side \| Pi check ok (centurion)
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 5m move; 10m move; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
@@ -380,17 +386,19 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `gk2000a` (Kasparov GK 2000 (H8/323 version)), driver `saitek/gk2000.cpp`, clone of `gk2000`
 - script runs `mess gk2000a`
-- interface `gk2000a.lua` → `gk2000.lua`
+- interface `gk2000a.lua` → `gk2000.lua` → `saitek_rotating.lua`
 - retro.ini: elo 1965, levels 11, ponder/brain y
 
 **Test notes**
 
 - gk2000, gk2000a, gk2100 (saitek/gk2000.cpp) \| 04d14dc / 1be06ee \| 82 ok each, 0 illegal \| ep_p; illegal FENs refused \| gk2000a NEW (load_interface gk2000); gk2000 renamed 1997 (H8/3212), gk2000a is the 1992 H8/323 \| 11 levels (5s-10m move, 5/10/15/30m game, 40/90)
+- centurion, cougar, gk2000, gk2000a (saitek/gk2000.cpp) \| d24b7b9 \| live info: setup switches on the Rotating Display option (OPTION twice + squares A3-F3), reader saitek_rotating.lua; score is White's view in tenths, converted to the machine's side \| Pi check ok (centurion)
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 5m move; 10m move; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [04d14dc](https://github.com/RandyR99/chessengine/commit/04d14dc) 2026-10-16 chessengine: gk2000 family: port to MAME 0.289; new gk2000a; centurion/cougar boot wait 6 s
@@ -402,17 +410,19 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `gk2100` (Kasparov GK 2100), driver `saitek/gk2000.cpp`
 - script runs `mess gk2100`
-- interface `gk2100.lua` → `gk2000.lua`
+- interface `gk2100.lua` → `gk2000.lua` → `saitek_rotating.lua`
 - retro.ini: elo 2020, levels 11, ponder/brain n
 
 **Test notes**
 
 - gk2000, gk2000a, gk2100 (saitek/gk2000.cpp) \| 04d14dc / 1be06ee \| 82 ok each, 0 illegal \| ep_p; illegal FENs refused \| gk2000a NEW (load_interface gk2000); gk2000 renamed 1997 (H8/3212), gk2000a is the 1992 H8/323 \| 11 levels (5s-10m move, 5/10/15/30m game, 40/90)
+- gk2100 (saitek/gk2000.cpp) \| d24b7b9 \| live info via keys (OPTION x3, ENT + next x6) instead of the board squares \| ur_b2 also fails without the change
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 5m move; 10m move; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [1be06ee](https://github.com/RandyR99/mame_for_picochess/commit/1be06ee) 2026-10-16 mame_for_picochess: exechess 7 levels; gk2000 family 11 levels, new gk2000a, gk2000 is the 1997 version; kblitz needs MAME 0.290
 

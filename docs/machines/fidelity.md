@@ -57,20 +57,20 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `fexcelpa` | Fidelity The Par Excellence (set 2) | 1986 | 1875 | 7 | ✓ | ✓ | – | ✓ |  |
 | `miniscco` | Fidelity Mini Sensory Chess Challenger | 1981 | 1000 | 4 | ✓ | ✓ | – | – | 2 |
 | `miniscc` | Fidelity Mini Sensory Chess Challenger II | 1982 | 1000 | 4 | ✓ | ✓ | – | – | 1 |
-| `feagv4` | Fidelity Elite Avant Garde 2265 V4 | 1989 | 2055 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv4a` | Fidelity Elite Avant Garde 2265 V4 (set 2) | 1989 | 2055 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv4b` | Fidelity Elite Avant Garde 2265 V4 (set 3) | 1989 | 2055 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv5` | Fidelity Elite Avant Garde 2265 V5 | 1989 | 2050 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv7` | Fidelity Elite Avant Garde 2325 V7 | 1989 | 2125 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv7a` | Fidelity Elite Avant Garde 2325 V7 (set 2) | 1989 | 2125 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv7b` | Fidelity Elite Avant Garde 2325 V7 (set 3) | 1989 | 2125 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv7c` | Fidelity Elite Avant Garde 2325 V7 (set 4) | 1989 | 2125 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv9` | Fidelity Elite Avant Garde 2325 V9 | 1989 | 2160 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv9a` | Fidelity Elite Avant Garde 2325 V9 (set 2) | 1989 | 2160 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv9b` | Fidelity Elite Avant Garde 2325 V9 (set 3) | 1989 | 2160 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv9c` | Fidelity Elite Avant Garde 2325 V9 (set 4) | 1989 | 2160 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv10` | Fidelity Elite Avantgarde V10 | 1990 | 2165 | 11 | ✓ | ✓ | – | ✓ |  |
-| `feagv11` | Fidelity Elite Avantgarde V11 | 2001 | 2335 | 11 | ✓ | ✓ | – | ✓ |  |
+| `feagv4` | Fidelity Elite Avant Garde 2265 V4 | 1989 | 2055 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv4a` | Fidelity Elite Avant Garde 2265 V4 (set 2) | 1989 | 2055 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv4b` | Fidelity Elite Avant Garde 2265 V4 (set 3) | 1989 | 2055 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv5` | Fidelity Elite Avant Garde 2265 V5 | 1989 | 2050 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv7` | Fidelity Elite Avant Garde 2325 V7 | 1989 | 2125 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv7a` | Fidelity Elite Avant Garde 2325 V7 (set 2) | 1989 | 2125 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv7b` | Fidelity Elite Avant Garde 2325 V7 (set 3) | 1989 | 2125 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv7c` | Fidelity Elite Avant Garde 2325 V7 (set 4) | 1989 | 2125 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv9` | Fidelity Elite Avant Garde 2325 V9 | 1989 | 2160 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv9a` | Fidelity Elite Avant Garde 2325 V9 (set 2) | 1989 | 2160 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv9b` | Fidelity Elite Avant Garde 2325 V9 (set 3) | 1989 | 2160 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv9c` | Fidelity Elite Avant Garde 2325 V9 (set 4) | 1989 | 2160 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv10` | Fidelity Elite Avantgarde V10 | 1990 | 2165 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `feagv11` | Fidelity Elite Avantgarde V11 | 2001 | 2335 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `premiere` | Fidelity Elite Premiere Vancouver | 1992 | 2180 | 11 | ✓ | ✓ | – | ✓ | 2 |
 | `fpres` | Fidelity Prestige Challenger | 1982 | 1760 | 12 | ✓ | ✓ | ✓ | ✓ |  |
 | `fpresa` | Fidelity Prestige Challenger (set 2) | 1982 | 1760 | 12 | ✓ | ✓ | ✓ | ✓ |  |
@@ -1217,11 +1217,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Test notes**
 
 - feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [14e44b4](https://github.com/RandyR99/chessengine/commit/14e44b4) 2026-10-21 chessengine: feag/fex68k/premiere: port to MAME 0.289 (output proxies); EAG Monitor Mode on c1; new premiere (Vancouver)
@@ -1237,7 +1239,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
@@ -1256,12 +1258,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [14e44b4](https://github.com/RandyR99/chessengine/commit/14e44b4) 2026-10-21 chessengine: feag/fex68k/premiere: port to MAME 0.289 (output proxies); EAG Monitor Mode on c1; new premiere (Vancouver)
@@ -1277,7 +1280,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
@@ -1296,7 +1299,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
@@ -1315,7 +1318,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
@@ -1334,12 +1337,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [14e44b4](https://github.com/RandyR99/chessengine/commit/14e44b4) 2026-10-21 chessengine: feag/fex68k/premiere: port to MAME 0.289 (output proxies); EAG Monitor Mode on c1; new premiere (Vancouver)
@@ -1355,12 +1359,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [14e44b4](https://github.com/RandyR99/chessengine/commit/14e44b4) 2026-10-21 chessengine: feag/fex68k/premiere: port to MAME 0.289 (output proxies); EAG Monitor Mode on c1; new premiere (Vancouver)
@@ -1376,7 +1381,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
@@ -1395,12 +1400,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [14e44b4](https://github.com/RandyR99/chessengine/commit/14e44b4) 2026-10-21 chessengine: feag/fex68k/premiere: port to MAME 0.289 (output proxies); EAG Monitor Mode on c1; new premiere (Vancouver)
@@ -1416,12 +1422,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [14e44b4](https://github.com/RandyR99/chessengine/commit/14e44b4) 2026-10-21 chessengine: feag/fex68k/premiere: port to MAME 0.289 (output proxies); EAG Monitor Mode on c1; new premiere (Vancouver)
@@ -1437,12 +1444,13 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [14e44b4](https://github.com/RandyR99/chessengine/commit/14e44b4) 2026-10-21 chessengine: feag/fex68k/premiere: port to MAME 0.289 (output proxies); EAG Monitor Mode on c1; new premiere (Vancouver)
@@ -1458,7 +1466,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 
@@ -1478,7 +1486,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- feagv4 family (EAG 2265/2325 68000): manual = Fidelity_Elite_Avant_Garde_Custom_EN.pdf. OPTION pages OPn1/dSP2/POP3; Monitor Mode = c1 (old 6502 EAG manual says e6 -&gt; wrong). Levels like Excel 68000.
+- feagv4, feagv4a, feagv4b, feagv5, feagv7, feagv7a, feagv7b, feagv7c, feagv9, feagv9a, feagv9b, feagv9c, feagv10, feagv11 (fidelity/eag68k.cpp) \| d24b7b9 \| live info: Rotating Display via OPTION twice + squares A2 B2 C2 E2 F2 G2 (A2 = time off); OPTION reopens the page used last, so setup cycles back to OPn1 for Monitor Mode; score -9.99 is the display limit \| family 65/65, Pi check ok (feagv11)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 5m game; 10m game; 30m game; 40 moves/2h; 40 moves/2.5h
 

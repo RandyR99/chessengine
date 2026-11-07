@@ -25,21 +25,21 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `diablo68a` | Novag Diablo 68000 (set 2) | 1991 | 2040 | 11 | ✓ | ✓ | ✓ | – |  |
 | `diablo68b` | Novag Diablo 68000 (set 3) | 1991 | 2040 | 11 | ✓ | ✓ | ✓ | – |  |
 | `diablo68c` | Novag Diablo 68000 (set 4) | 1991 | 2040 | 11 | ✓ | ✓ | ✓ | – |  |
-| `diamond` | Novag Diamond | 1994 | 2145 | 11 | ✓ | ✓ | – | – |  |
+| `diamond` | Novag Diamond | 1994 | 2145 | 11 | ✓ | ✓ | ✓ | – |  |
 | `emerclp` | Novag Emerald Classic plus | 1997 | 2005 | 11 | ✓ | ✓ | – | – |  |
 | `scorpio68` | Novag Scorpio 68000 | 1991 | 2040 | 11 | ✓ | ✓ | ✓ | – |  |
 | `mentor16` | Novag Mentor 16 | 1989 | 1530 | 10 | ✓ | ✓ | – | – | 1 |
 | `nmicro` | Novag Micro Chess | 1981 | 925 | 7 | ✓ | – | – | – | 1 |
 | `nmicro2` | Novag Micro Chess II | 1982 | 965 | 7 | ✓ | – | – | – | 1 |
 | `nprimo` | Novag Primo | 1987 | 1730 | 11 | ✓ | ✓ | – | – |  |
-| `sapphire` | Novag Sapphire | 1994 | 2145 | 11 | ✓ | ✓ | – | – |  |
-| `sapphire2` | Novag Sapphire II | 1997 | 2150 | 11 | ✓ | ✓ | – | – |  |
+| `sapphire` | Novag Sapphire | 1994 | 2145 | 11 | ✓ | ✓ | ✓ | – |  |
+| `sapphire2` | Novag Sapphire II | 1997 | 2150 | 11 | ✓ | ✓ | ✓ | – |  |
 | `nsnova` | Novag Super Nova | 1990 | 1885 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `nsnovaa` | Novag Super Nova (set 2) | 1990 | 1885 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `savant` | Novag Savant | 1981 | 1365 | 6 | ✓ | ✓ | – | – | 1 |
 | `savant2` | Novag Savant II | 1982 | 1460 | 6 | ✓ | ✓ | – | – | 1 |
-| `sdiamond` | Novag Star Diamond | 2003 | 2185 | 11 | ✓ | ✓ | – | ✓ |  |
-| `diamond2` | Novag Diamond II | 1997 | 2150 | 11 | ✓ | ✓ | – | – |  |
+| `sdiamond` | Novag Star Diamond | 2003 | 2185 | 11 | ✓ | ✓ | ✓ | ✓ |  |
+| `diamond2` | Novag Diamond II | 1997 | 2150 | 11 | ✓ | ✓ | ✓ | – |  |
 | `sexperta` | Novag Super Expert A | 1988 | 2010 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `sexperta1` | Novag Super Expert A (set 2) | 1987 | 1865 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `sexperta2` | Novag Super Expert A (set 3) | 1987 | 1865 | 11 | ✓ | ✓ | ✓ | ✓ |  |
@@ -502,13 +502,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `diamond` (Diamond), driver `novag/diamond.cpp`
 - script runs `mess diamond`
-- interface `diamond.lua`
+- interface `diamond.lua` → `novag_lcd.lua`
 - retro.ini: elo 2145, levels 11, ponder/brain n
+
+**Test notes**
+
+- sapphire, sapphire2, diamond, diamond2, sdiamond (novag/sapphire.cpp, diamond.cpp) \| d24b7b9 \| live info from the LCD's own rotating search pages (moves, score, depth, moves left, time; 2 s per page, no key presses), shared reader novag_lcd.lua; score only counts right before a depth page (the moves-left page reads like a score) \| Pi picochess check ok 2026-11-07
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [8b0248b](https://github.com/RandyR99/mame_for_picochess/commit/8b0248b) 2026-10-26 mame_for_picochess: modular_tm.cpp (TM / 68030 modules): port32t .uci = Portorose 10 levels (TURN 08 = 40 moves/2h, verified), other 7 = Berlin Pro 11 levels; retro: new lyon32t…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
@@ -652,13 +657,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `sapphire` (Sapphire), driver `novag/sapphire.cpp`
 - script runs `mess sapphire`
-- interface `sapphire.lua`
+- interface `sapphire.lua` → `novag_lcd.lua`
 - retro.ini: elo 2145, levels 11, ponder/brain n
+
+**Test notes**
+
+- sapphire, sapphire2, diamond, diamond2, sdiamond (novag/sapphire.cpp, diamond.cpp) \| d24b7b9 \| live info from the LCD's own rotating search pages (moves, score, depth, moves left, time; 2 s per page, no key presses), shared reader novag_lcd.lua; score only counts right before a depth page (the moves-left page reads like a score) \| Pi picochess check ok 2026-11-07
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [5d91e04](https://github.com/RandyR99/chessengine/commit/5d91e04) 2026-10-24 chessengine: RAM access via memory shares / address spaces instead of save-state items: supremo, nsnova, renaissa (ram_block helper), sapphire, sapphire2 (:nvram), kblitz…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
@@ -671,13 +681,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `sapphire2` (Sapphire II), driver `novag/sapphire.cpp`
 - script runs `mess sapphire2`
-- interface `sapphire2.lua`
+- interface `sapphire2.lua` → `novag_lcd.lua`
 - retro.ini: elo 2150, levels 11, ponder/brain n
+
+**Test notes**
+
+- sapphire, sapphire2, diamond, diamond2, sdiamond (novag/sapphire.cpp, diamond.cpp) \| d24b7b9 \| live info from the LCD's own rotating search pages (moves, score, depth, moves left, time; 2 s per page, no key presses), shared reader novag_lcd.lua; score only counts right before a depth page (the moves-left page reads like a score) \| Pi picochess check ok 2026-11-07
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [5d91e04](https://github.com/RandyR99/chessengine/commit/5d91e04) 2026-10-24 chessengine: RAM access via memory shares / address spaces instead of save-state items: supremo, nsnova, renaissa (ram_block helper), sapphire, sapphire2 (:nvram), kblitz…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
@@ -782,13 +797,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `sdiamond` (Star Diamond), driver `novag/sdiamond.cpp`
 - script runs `mess sdiamond`
-- interface `sdiamond.lua`
+- interface `sdiamond.lua` → `novag_lcd.lua`
 - retro.ini: elo 2185, levels 11, ponder/brain y
+
+**Test notes**
+
+- sapphire, sapphire2, diamond, diamond2, sdiamond (novag/sapphire.cpp, diamond.cpp) \| d24b7b9 \| live info from the LCD's own rotating search pages (moves, score, depth, moves left, time; 2 s per page, no key presses), shared reader novag_lcd.lua; score only counts right before a depth page (the moves-left page reads like a score) \| Pi picochess check ok 2026-11-07
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
@@ -801,13 +821,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `diamond2` (Diamond II), driver `novag/diamond.cpp`
 - script runs `mess diamond2`
-- interface `diamond2.lua`
+- interface `diamond2.lua` → `novag_lcd.lua`
 - retro.ini: elo 2150, levels 11, ponder/brain n
+
+**Test notes**
+
+- sapphire, sapphire2, diamond, diamond2, sdiamond (novag/sapphire.cpp, diamond.cpp) \| d24b7b9 \| live info from the LCD's own rotating search pages (moves, score, depth, moves left, time; 2 s per page, no key presses), shared reader novag_lcd.lua; score only counts right before a depth page (the moves-left page reads like a score) \| Pi picochess check ok 2026-11-07
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 3m game; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [be75cdc](https://github.com/RandyR99/mame_for_picochess/commit/be75cdc) 2026-10-15 mame_for_picochess: zircon2: 11 levels like diamond2 (same level scheme), retro.ini levels = 11
