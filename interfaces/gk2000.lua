@@ -3,6 +3,9 @@ interface.ignore_late_go = true -- replies on its own once the player's move is 
 
 interface.level = "d1"
 interface.cur_level = nil
+interface.rotating = load_interface("saitek_rotating")
+interface.show_info = interface.rotating.show_info
+interface.info_every = 0.25
 local promcode = 0
 
 local function output_value(name)
@@ -28,10 +31,11 @@ function interface.setup_machine()
 	sb_reset_board(":board")
 	promcode = 0
 --	send_input(":IN.0", 0x01, 0.5) -- New Game
-	emu.wait(1)
+	emu.wait(6) -- the power-on LED sweep ends at ~4.6 s; a key pressed during it is lost
 
 	interface.cur_level = "d1"
 	interface.setlevel()
+	interface.rotating.select_pages()
 end
 
 function interface.start_play(init)

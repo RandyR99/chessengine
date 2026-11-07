@@ -9,6 +9,7 @@ function interface.setup_machine()
 
 	interface.cur_level = "a4"
 	interface.setlevel()
+	interface.rotating.select_pages()
 end
 
 return interface

@@ -348,4 +348,9 @@ function interface.promote(x, y, piece)
 end
 
 
+-- the machine rotates its search info on the LCD without key presses
+local lcd = load_interface("novag_lcd")
+interface.info_every = 0.5
+interface.show_info = lcd.reader(lcd.digits4)
+
 return interface

@@ -4,6 +4,9 @@ interface.ignore_late_go = true -- replies on its own once the player's move is 
 interface.invert = false
 interface.level = "a4"
 interface.cur_level = nil
+interface.rotating = load_interface("saitek_rotating")
+interface.show_info = interface.rotating.show_info
+interface.info_every = 0.25
 local promcode = 0
 
 local function output_value(name)
@@ -38,6 +41,7 @@ function interface.setup_machine()
 
 	interface.cur_level = "a4"
 	interface.setlevel()
+	interface.rotating.select_pages()
 end
 
 function interface.start_play(init)

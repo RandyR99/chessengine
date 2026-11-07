@@ -6,6 +6,17 @@ interface.level = "a4"
 interface.cur_level = nil
 local ram = machine.memory.shares[":maincpu:internal_ram"]
 
+-- the Rotating Display of the GK 2000 family (manual 6.3), with the keys and LCD of this module
+interface.rotating = load_interface("saitek_rotating")
+interface.rotating.lcd_device = ":display"
+interface.rotating.board = ":board:board"
+interface.rotating.option = { ":IN.0", 0x02 }
+interface.rotating.clear = { ":IN.1", 0x08 }
+interface.rotating.enter = { ":IN.1", 0x20 }
+interface.rotating.next = { ":IN.0", 0x20 }
+interface.show_info = interface.rotating.show_info
+interface.info_every = 0.25
+
 local function output_value(name)
 	local out = machine.devices[":"]:output(name)
 	return out ~= nil and out:get() or 0
@@ -52,6 +63,7 @@ function interface.setup_machine()
 
 	interface.cur_level = "a4"
 	interface.setlevel()
+	interface.rotating.select_pages(true)
 end
 
 function interface.start_play(init)
@@ -118,7 +130,7 @@ function interface.is_selected(x, y)
 		y = 9 - y
 	end
 	local z = (x-1)+(y-1)*8
-	return output_value("led" .. z) ~= 0
+	return output_value("led" .. z) ~= 0 and interface.rotating.move_settled()
 end
 
 function interface.select_piece(x, y, event)
