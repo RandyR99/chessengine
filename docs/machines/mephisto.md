@@ -88,7 +88,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `modenab` | Mephisto Modena (set 3) | 1992 | 1965 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
 | `mondial` | Mephisto Mondial | 1985 | 1745 | 7 | ✓ | ✓ | – | ✓ |  |
 | `mondial2` | Mephisto Mondial II | 1987 | 1800 | 7 | ✓ | ✓ | – | ✓ |  |
-| `mondl68k` | Mephisto Mondial 68000XL | 1988 | 2005 | 9 | ✓ | ✓ | – | ✓ |  |
+| `mondl68k` | Mephisto Mondial 68000XL | 1988 | 2005 | 9 | ✓ | ✓ | ✓ | ✓ |  |
 | `smondial` | Mephisto Super Mondial | 1986 | 1880 | 10 | ✓ | ✓ | ✓ | ✓ |  |
 | `smondialab` | Mephisto Super Mondial (ver. AB) | 1986 | 1880 | 10 | ✓ | ✓ | ✓ | ✓ |  |
 | `smondialb` | Mephisto Super Mondial (ver. B) | 1986 | 1880 | 10 | ✓ | ✓ | ✓ | ✓ |  |
@@ -97,7 +97,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `monteca` | Mephisto Monte Carlo (MC2) | 1987 | 1880 | 10 | ✓ | ✓ | ✓ | ✓ |  |
 | `montec4` | Mephisto Monte Carlo IV | 1989 | 1940 | 10 | ✓ | ✓ | ✓ | ✓ |  |
 | `montec4le` | Mephisto Monte Carlo IV LE | 1990 | 2015 | 10 | ✓ | ✓ | ✓ | ✓ |  |
-| `montreal` | Mephisto Montreal 68000 | 1993 | 2005 | 10 | ✓ | ✓ | – | ✓ |  |
+| `montreal` | Mephisto Montreal 68000 | 1993 | 2005 | 10 | ✓ | ✓ | ✓ | ✓ |  |
 | `montreux` | Mephisto Montreux | 1995 | 2260 | 11 | ✓ | ✓ | ✓ | – |  |
 | `mrisc` | Mephisto RISC (Ed Schroeder) | 1992 | 2260 | 11 | ✓ | ✓ | ✓ | ✓ | 2 |
 | `mrisca` | Mephisto RISC (v1.0) | 1992 | 2260 | 11 | ✓ | ✓ | ✓ | ✓ | 2 |
@@ -117,7 +117,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `rebel5b` | Mephisto Rebel 5.0 (set 3) | 1986 | 1870 | 8 | ✓ | ✓ | ✓ | ✓ | 1 |
 | `roma16` | Mephisto Roma 68000 | 1987 | 2005 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `roma16g` | Mephisto Roma 68000 (Glasgow) | 1987 | 2005 | 11 | ✓ | ✓ | ✓ | ✓ |  |
-| `roma2` | Mephisto Roma II | 1989 | 1970 | 10 | ✓ | ✓ | – | ✓ |  |
+| `roma2` | Mephisto Roma II | 1989 | 1970 | 10 | ✓ | ✓ | ✓ | ✓ |  |
 | `roma32` | Mephisto Roma | 1987 | 2075 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `van16` | Mephisto Vancouver 16Bit | 1991 | 2180 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `van32` | Mephisto Vancouver 32Bit | 1991 | 2220 | 11 | ✓ | ✓ | ✓ | ✓ |  |
@@ -584,6 +584,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [ed4df46](https://github.com/RandyR99/chessengine/commit/ed4df46) 2026-11-07 chessengine: roma2, montreal, mondl68k: show_info from the search text in RAM
 - [b6af4ba](https://github.com/RandyR99/chessengine/commit/b6af4ba) 2026-10-31 chessengine: show_info: amsterdg, dallas16g, roma16g (Amsterdam/Dallas/Roma programs on Glasgow hardware) use the amsterd RAM reader (loaded with load_interface, own envi…
 - [c22fdaa](https://github.com/RandyR99/chessengine/commit/c22fdaa) 2026-10-31 chessengine: show_info: amsterd, dallas16, dallas32, roma32 read the search information from RAM, without key presses. The Amsterdam program keeps the texts its INFO page…
 - [506d638](https://github.com/RandyR99/chessengine/commit/506d638) 2026-10-30 chessengine: show_info: no key presses during the machine's search. 16 interfaces read their info by pressing keys (INFO, page keys, CL) while the machine thinks; a press…
@@ -1910,13 +1911,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `mondl68k` (Mephisto Mondial 68000XL), driver `hegenerglaser/mondial68k.cpp`
 - script runs `mess mondl68k`
-- interface `mondl68k.lua`
+- interface `mondl68k.lua` → `amsterd.lua`
 - retro.ini: elo 2005, levels 9, ponder/brain y
+
+**Test notes**
+
+- roma2, montreal, mondl68k (hegenerglaser/roma2.cpp, mondial68k.cpp) \| live info without key presses: the Lang program keeps the INFO screens as text in RAM like the Amsterdam (" SUM" block at 0x801dd4 / 0xc01dd4: main line up to 8 moves, score, depth, selective depth), read by amsterd.lua \| info/neg + 5 regression tests each ok
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 2m move; 5m game; 15m game; 30m game; 40 moves/2h
 
 **Commits**
 
+- [ed4df46](https://github.com/RandyR99/chessengine/commit/ed4df46) 2026-11-07 chessengine: roma2, montreal, mondl68k: show_info from the search text in RAM
 - [9bc2f04](https://github.com/RandyR99/chessengine/commit/9bc2f04) 2026-10-27 chessengine: mondl68k: player promotion pressed the square after the piece key (cleared the 'Pr' choice, no bestmove) - now piece key + ENT; output_value; ignore_late_go…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [1d347e5](https://github.com/RandyR99/mame_for_picochess/commit/1d347e5) 2026-10-27 mame_for_picochess: mondl68k: new retro.ini entry (elo 2005, 9 levels, ponder y measured)
@@ -2085,13 +2091,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `montreal` (Mephisto Montreal 68000), driver `hegenerglaser/roma2.cpp`
 - script runs `mess montreal`
-- interface `montreal.lua`
+- interface `montreal.lua` → `amsterd.lua`
 - retro.ini: elo 2005, levels 10, ponder/brain y
+
+**Test notes**
+
+- roma2, montreal, mondl68k (hegenerglaser/roma2.cpp, mondial68k.cpp) \| live info without key presses: the Lang program keeps the INFO screens as text in RAM like the Amsterdam (" SUM" block at 0x801dd4 / 0xc01dd4: main line up to 8 moves, score, depth, selective depth), read by amsterd.lua \| info/neg + 5 regression tests each ok
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 2m move; 5m game; 10m game; 15m game; 30m game; 40 moves/2h
 
 **Commits**
 
+- [ed4df46](https://github.com/RandyR99/chessengine/commit/ed4df46) 2026-11-07 chessengine: roma2, montreal, mondl68k: show_info from the search text in RAM
 - [8947c8a](https://github.com/RandyR99/chessengine/commit/8947c8a) 2026-10-27 chessengine: roma2, montreal (roma2.cpp): NEW interfaces ported from MessChess - output_value, module/author names, ignore_late_go
 - [58ae61f](https://github.com/RandyR99/mame_for_picochess/commit/58ae61f) 2026-10-27 mame_for_picochess: roma2.cpp: new engines Mephisto Roma II and Montreal 68000 (scripts, 10-level .uci from the manuals, retro entries, ponder y measured)
 
@@ -2489,13 +2500,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `roma2` (Mephisto Roma II), driver `hegenerglaser/roma2.cpp`
 - script runs `mess roma2`
-- interface `roma2.lua`
+- interface `roma2.lua` → `amsterd.lua`
 - retro.ini: elo 1970, levels 10, ponder/brain y
+
+**Test notes**
+
+- roma2, montreal, mondl68k (hegenerglaser/roma2.cpp, mondial68k.cpp) \| live info without key presses: the Lang program keeps the INFO screens as text in RAM like the Amsterdam (" SUM" block at 0x801dd4 / 0xc01dd4: main line up to 8 moves, score, depth, selective depth), read by amsterd.lua \| info/neg + 5 regression tests each ok
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 2m move; 5m game; 10m game; 15m game; 30m game; 40 moves/2h
 
 **Commits**
 
+- [ed4df46](https://github.com/RandyR99/chessengine/commit/ed4df46) 2026-11-07 chessengine: roma2, montreal, mondl68k: show_info from the search text in RAM
 - [8947c8a](https://github.com/RandyR99/chessengine/commit/8947c8a) 2026-10-27 chessengine: roma2, montreal (roma2.cpp): NEW interfaces ported from MessChess - output_value, module/author names, ignore_late_go
 - [58ae61f](https://github.com/RandyR99/mame_for_picochess/commit/58ae61f) 2026-10-27 mame_for_picochess: roma2.cpp: new engines Mephisto Roma II and Montreal 68000 (scripts, 10-level .uci from the manuals, retro entries, ponder y measured)
 

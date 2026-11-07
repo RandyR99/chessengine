@@ -1525,6 +1525,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [281b4ad](https://github.com/RandyR99/chessengine/commit/281b4ad) 2026-11-07 chessengine: docs: rebuild for the premiere Vancouver info
 - [a853c2a](https://github.com/RandyR99/chessengine/commit/a853c2a) 2026-11-07 chessengine: premiere: show_info from the Vancouver rotating display
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [14e44b4](https://github.com/RandyR99/chessengine/commit/14e44b4) 2026-10-21 chessengine: feag/fex68k/premiere: port to MAME 0.289 (output proxies); EAG Monitor Mode on c1; new premiere (Vancouver)
