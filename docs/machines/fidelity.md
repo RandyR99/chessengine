@@ -71,7 +71,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `feagv9c` | Fidelity Elite Avant Garde 2325 V9 (set 4) | 1989 | 2160 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `feagv10` | Fidelity Elite Avantgarde V10 | 1990 | 2165 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `feagv11` | Fidelity Elite Avantgarde V11 | 2001 | 2335 | 11 | ✓ | ✓ | ✓ | ✓ |  |
-| `premiere` | Fidelity Elite Premiere Vancouver | 1992 | 2180 | 11 | ✓ | ✓ | – | ✓ | 2 |
+| `premiere` | Fidelity Elite Premiere Vancouver | 1992 | 2180 | 11 | ✓ | ✓ | ✓ | ✓ | 2 |
 | `fpres` | Fidelity Prestige Challenger | 1982 | 1760 | 12 | ✓ | ✓ | ✓ | ✓ |  |
 | `fpresa` | Fidelity Prestige Challenger (set 2) | 1982 | 1760 | 12 | ✓ | ✓ | ✓ | ✓ |  |
 | `fpresb` | Fidelity Prestige Challenger (set 3) | 1982 | 1760 | 12 | ✓ | ✓ | ✓ | ✓ |  |
@@ -1211,7 +1211,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv4` (Elite Avant Garde 2265 (model 6114-2/3/4, set 1)), driver `fidelity/eag68k.cpp`
 - script runs `mess feagv4`
-- interface `feagv4.lua`
+- interface `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2055, levels 11, ponder/brain y
 
 **Test notes**
@@ -1223,6 +1223,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [a853c2a](https://github.com/RandyR99/chessengine/commit/a853c2a) 2026-11-07 chessengine: premiere: show_info from the Vancouver rotating display
 - [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
@@ -1234,7 +1235,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv4a` (Elite Avant Garde 2265 (model 6114-2/3/4, set 2)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv4a`
-- interface `feagv4a.lua` → `feagv4.lua`
+- interface `feagv4a.lua` → `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2055, levels 11, ponder/brain y
 
 **Test notes**
@@ -1253,7 +1254,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv4b` (Elite Avant Garde 2265 (model 6114-2/3/4, set 3)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv4b`
-- interface `feagv4.lua`
+- interface `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2055, levels 11, ponder/brain y
 
 **Test notes**
@@ -1264,6 +1265,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [a853c2a](https://github.com/RandyR99/chessengine/commit/a853c2a) 2026-11-07 chessengine: premiere: show_info from the Vancouver rotating display
 - [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
@@ -1275,7 +1277,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv5` (Elite Avant Garde 2265 (model 6114-5)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv5`
-- interface `feagv5.lua` → `feagv4.lua`
+- interface `feagv5.lua` → `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2050, levels 11, ponder/brain y
 
 **Test notes**
@@ -1294,7 +1296,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv7` (Elite Avant Garde 2325 (model 6117-6/7, set 1)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv7`
-- interface `feagv7.lua` → `feagv4.lua`
+- interface `feagv7.lua` → `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2125, levels 11, ponder/brain y
 
 **Test notes**
@@ -1313,7 +1315,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv7a` (Elite Avant Garde 2325 (model 6117-6/7, set 2)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv7a`
-- interface `feagv7a.lua` → `feagv4.lua`
+- interface `feagv7a.lua` → `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2125, levels 11, ponder/brain y
 
 **Test notes**
@@ -1332,7 +1334,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv7b` (Elite Avant Garde 2325 (model 6117-6/7, set 3)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv7b`
-- interface `feagv4.lua`
+- interface `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2125, levels 11, ponder/brain y
 
 **Test notes**
@@ -1343,6 +1345,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [a853c2a](https://github.com/RandyR99/chessengine/commit/a853c2a) 2026-11-07 chessengine: premiere: show_info from the Vancouver rotating display
 - [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
@@ -1354,7 +1357,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv7c` (Elite Avant Garde 2325 (model 6117-6/7, set 4)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv7c`
-- interface `feagv4.lua`
+- interface `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2125, levels 11, ponder/brain y
 
 **Test notes**
@@ -1365,6 +1368,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [a853c2a](https://github.com/RandyR99/chessengine/commit/a853c2a) 2026-11-07 chessengine: premiere: show_info from the Vancouver rotating display
 - [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
@@ -1376,7 +1380,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv9` (Elite Avant Garde 2325 (model 6117-9, set 1)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv9`
-- interface `feagv9.lua` → `feagv4.lua`
+- interface `feagv9.lua` → `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2160, levels 11, ponder/brain y
 
 **Test notes**
@@ -1395,7 +1399,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv9a` (Elite Avant Garde 2325 (model 6117-9, set 2)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv9a`
-- interface `feagv4.lua`
+- interface `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2160, levels 11, ponder/brain y
 
 **Test notes**
@@ -1406,6 +1410,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [a853c2a](https://github.com/RandyR99/chessengine/commit/a853c2a) 2026-11-07 chessengine: premiere: show_info from the Vancouver rotating display
 - [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
@@ -1417,7 +1422,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv9b` (Elite Avant Garde 2325 (model 6117-9, set 3)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv9b`
-- interface `feagv4.lua`
+- interface `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2160, levels 11, ponder/brain y
 
 **Test notes**
@@ -1428,6 +1433,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [a853c2a](https://github.com/RandyR99/chessengine/commit/a853c2a) 2026-11-07 chessengine: premiere: show_info from the Vancouver rotating display
 - [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
@@ -1439,7 +1445,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv9c` (Elite Avant Garde 2325 (model 6117-9, set 4)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv9c`
-- interface `feagv4.lua`
+- interface `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2160, levels 11, ponder/brain y
 
 **Test notes**
@@ -1450,6 +1456,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [a853c2a](https://github.com/RandyR99/chessengine/commit/a853c2a) 2026-11-07 chessengine: premiere: show_info from the Vancouver rotating display
 - [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
@@ -1461,7 +1468,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv10` (Elite Avant Garde 2325 (model 6117-10)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv10`
-- interface `feagv10.lua` → `feagv4.lua`
+- interface `feagv10.lua` → `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2165, levels 11, ponder/brain y
 
 **Test notes**
@@ -1481,7 +1488,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `feagv11` (Elite Avant Garde 2325 (model 6117-11)), driver `fidelity/eag68k.cpp`, clone of `feagv4`
 - script runs `mess feagv11`
-- interface `feagv11.lua` → `feagv4.lua`
+- interface `feagv11.lua` → `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2335, levels 11, ponder/brain y
 
 **Test notes**
@@ -1507,13 +1514,18 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 - MAME set `premiere` (Elite Premiere), driver `fidelity/eag68k.cpp`
 - script runs `mess premiere`
-- interface `premiere.lua` → `feagv4.lua`
+- interface `premiere.lua` → `feagv4.lua` → `fidelity_rotating.lua`
 - retro.ini: elo 2180, levels 11, ponder/brain y
+
+**Test notes**
+
+- premiere (fidelity/eag68k.cpp) \| a853c2a \| live info with the Vancouver program: its option pages differ from the 2265 program (GAME E2/F2/G2 = hash tables, pawn structure, risky style); setup opens the "dISP" page, switches on rank 1 A1-E1 (depth, score, first 3 moves), cycles back to GAME for Monitor Mode; depth page "05.17" = depth 5, selective 17; score without dot in centipawns \| full suite 106/134, fails known; the 2265 program loads feagv4 (info since d24b7b9)
 
 **Levels:** 5s move; 10s move; 15s move; 30s move; 1m move; 2m move; 3m move; 5m game; 10m game; 30m game; 40 moves/2h
 
 **Commits**
 
+- [a853c2a](https://github.com/RandyR99/chessengine/commit/a853c2a) 2026-11-07 chessengine: premiere: show_info from the Vancouver rotating display
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [14e44b4](https://github.com/RandyR99/chessengine/commit/14e44b4) 2026-10-21 chessengine: feag/fex68k/premiere: port to MAME 0.289 (output proxies); EAG Monitor Mode on c1; new premiere (Vancouver)
 - [2834f27](https://github.com/RandyR99/mame_for_picochess/commit/2834f27) 2026-10-21 mame_for_picochess: Prestige / Elite A/S / Avant Garde: common 12 levels per manuals, ponder y; 9 new retro.ini entries; Elo from Programs.txt (premiere, feldo, Elegance)
