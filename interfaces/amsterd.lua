@@ -180,7 +180,8 @@ end
 -- searched "A 01" "E7E5" and the selective depth "S 12" (+0x18; amsterdg has no move there: +0x14); manual H.1-H.6
 local ram_ranges = { amsterd = { 0xffc000, 0xffffff }, dallas16 = { 0xffc000, 0xffffff }, roma16 = { 0xffc000, 0xffffff },
 	dallas32 = { 0x010000, 0x01ffff }, roma32 = { 0x010000, 0x01ffff },
-	amsterdg = { 0x01c000, 0x01ffff }, dallas16g = { 0x01c000, 0x01ffff }, roma16g = { 0x01c000, 0x01ffff } } -- Glasgow hardware
+	amsterdg = { 0x01c000, 0x01ffff }, dallas16g = { 0x01c000, 0x01ffff }, roma16g = { 0x01c000, 0x01ffff }, -- Glasgow hardware
+	roma2 = { 0x800000, 0x803fff }, montreal = { 0x800000, 0x803fff }, mondl68k = { 0xc00000, 0xc03fff } } -- later Lang 68000 programs
 local info_text = nil -- address of " SUM"
 local stale = nil     -- the texts as the previous search left them
 

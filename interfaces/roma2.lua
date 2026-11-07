@@ -195,4 +195,9 @@ function interface.promote(x, y, piece)
 	end
 end
 
+-- the Lang program keeps its search information as text in RAM, as the Amsterdam does: amsterd.lua reads it
+local amsterdam = load_interface("amsterd")
+interface.show_info = amsterdam.show_info
+interface.info_every = amsterdam.info_every
+
 return interface
