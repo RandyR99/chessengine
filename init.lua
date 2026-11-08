@@ -796,8 +796,14 @@ local function set_option(name, value)
   end
 
   if (string.lower(name) == "speed") then
-    manager.machine.video.throttled = true
-    manager.machine.video.throttle_rate = tonumber(value) / 100.0
+    -- percent of real time; 0 = unthrottled (as -nothrottle); a throttle rate of 0 would freeze the machine
+    local speed = tonumber(value) or 100
+    if speed <= 0 then
+      manager.machine.video.throttled = false
+    else
+      manager.machine.video.throttled = true
+      manager.machine.video.throttle_rate = speed / 100.0
+    end
   elseif (interface.set_option) then
     interface.set_option(string.lower(name), value)
   end
