@@ -22,8 +22,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `im01t` | Elektronika IM-01T | 1991 | 1300 | 7 | ✓ | ✓ | – | – | 1 |
 | `im05` | Elektronika IM-05 | 1993 | 1400 | 6 | ✓ | ✓ | – | – | 1 |
 | `igor` | Excalibur Igor | 1997 | 1830 | 8 | ✓ | ✓ | – | – |  |
-| `ivant` | Excalibur Ivan The Terrible | 1997 | 1845 | 8 | ✓ | ✓ | – | – |  |
-| `ivanto` | Excalibur Ivan The Terrible | 1996 | 1845 | 8 | ✓ | ✓ | – | – |  |
+| `ivant` | Excalibur Ivan The Terrible | 1997 | 1845 | 8 | ✓ | ✓ | – | – | 1 |
+| `ivanto` | Excalibur Ivan The Terrible | 1996 | 1845 | 8 | ✓ | ✓ | – | – | 1 |
 | `emirage` | Excalibur Mirage | 1996 | 1780 | 9 | ✓ | ✓ | – | – |  |
 | `regence` | Chafitz/Sandy La Regence TSB 4 | 1982 | 1700 | 7 | ✓ | ✓ | – | – | 1 |
 | `intel02` | BREA Intellect-02 | 1985 | 700 | 4 | ✓ | ✓ | – | – | 1 |
@@ -426,6 +426,10 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 <details><summary><code>ivant</code> Excalibur Ivan The Terrible</summary>
 
+**Known limits**
+
+- No live info: this ROM has no INFO option (the Ivan II has one), HINT is ignored while it thinks, and the hint move, score and depth that HINT shows on the player's turn are only stored when Ivan makes its move.
+
 - MAME set `ivant` (Ivan The Terrible (H8/3216 version)), driver `excalibur/ivant.cpp`
 - script runs `mess ivant`
 - interface `ivant.lua`
@@ -433,7 +437,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- ivant, ivanto (excalibur) \| no info: this ROM has no INFO option (that is the Ivan II), display static while thinking, no move list found in RAM
+- ivant, ivanto (excalibur) \| no info: no INFO option (the Ivan II has it); HINT is ignored while it thinks; the hint move, score and depth are written to RAM only when Ivan moves, nothing live during the search (checked 2026-11-08)
 
 **Levels:** 10s move; 30s move; 1m move; 5m game; 10m game; 15m game; 60m game; 120m game
 
@@ -449,6 +453,10 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 <details><summary><code>ivanto</code> Excalibur Ivan The Terrible</summary>
 
+**Known limits**
+
+- No live info: this ROM has no INFO option (the Ivan II has one), HINT is ignored while it thinks, and the hint move, score and depth that HINT shows on the player's turn are only stored when Ivan makes its move.
+
 - MAME set `ivanto` (Ivan The Terrible (H8/3256 version)), driver `excalibur/ivanto.cpp`, clone of `ivant`
 - script runs `mess ivanto`
 - interface `ivanto.lua`
@@ -456,7 +464,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Test notes**
 
-- ivant, ivanto (excalibur) \| no info: this ROM has no INFO option (that is the Ivan II), display static while thinking, no move list found in RAM
+- ivant, ivanto (excalibur) \| no info: no INFO option (the Ivan II has it); HINT is ignored while it thinks; the hint move, score and depth are written to RAM only when Ivan moves, nothing live during the search (checked 2026-11-08)
 
 **Levels:** 10s move; 30s move; 1m move; 5m game; 10m game; 15m game; 60m game; 120m game
 

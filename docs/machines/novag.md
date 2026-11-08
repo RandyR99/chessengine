@@ -1295,6 +1295,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [7936359](https://github.com/RandyR99/chessengine/commit/7936359) 2026-11-07 chessengine: docs: rebuild for the Leonardo, zircon2, VIP and Emerald info
 - [e672375](https://github.com/RandyR99/chessengine/commit/e672375) 2026-11-07 chessengine: show_info for the Leonardo family, zircon2, the VIPs, emerclp/obsidian
 - [6f4c493](https://github.com/RandyR99/chessengine/commit/6f4c493) 2026-10-29 chessengine: Game end: optional interface.game_over() - when it returns true on the machine's turn, init.lua sends 'bestmove 0000' once (reset by the next 'position'); pi…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
