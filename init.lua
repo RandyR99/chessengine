@@ -1192,7 +1192,10 @@ local function update()
         if command == "ucinewgame" then
           command = nil
         end
-        manager.machine.video.throttled = throttle_state
+        -- a speed option sets the throttle itself; restoring the old state would undo max (or a change from max)
+        if not (command and command:lower():match("^setoption name speed ")) then
+          manager.machine.video.throttled = throttle_state
+        end
       elseif protocol == "xboard" then
         execute_xboard_command(command)
         if command == "new" then
