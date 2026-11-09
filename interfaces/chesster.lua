@@ -44,13 +44,14 @@ end
 
 function interface.setup_machine()
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	-- let the power-on greeting play at real speed (sound is muted while unthrottled)
+	machine.video.throttled = true
 	sb_reset_board(":board")
+	emu.wait(5)
+	send_input(":IN.0", 0x20, 1) 		-- OPTION -- B1 turns the character voice off
 	emu.wait(1)
-	send_input(":IN.0", 0x20, 1) 		-- OPTION
-	emu.wait(1)
-	sb_press_square(":board", 1, 2, 1) 	-- b1
-	emu.wait(1)
+	sb_press_square(":board", 1, 2, 1) 	-- b1 (announced: wait for the speech before CLEAR)
+	emu.wait(4)
 	send_input(":IN.0", 0x01, 1) 		-- CLEAR
 	emu.wait(1)
 	machine.video.throttled = throttled_state
