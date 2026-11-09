@@ -157,6 +157,13 @@ function interface.setup_machine()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	if interface.initial_boot then
+		-- let the 4.5 s greeting play at real speed (sound is muted while unthrottled)
+		local left = 5 - machine.time:as_double()
+		if left > 0 then
+			machine.video.throttled = true
+			emu.wait(left)
+			machine.video.throttled = false
+		end
 		-- Power-on is already a new game. Let the self-test and centering finish first,
 		-- as keys pressed during it are ignored.
 		wait_arm_test()
