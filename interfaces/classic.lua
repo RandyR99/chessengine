@@ -72,13 +72,14 @@ function interface.setup_machine()
 	interface.invert = false
 	interface.stm = 1
 	interface.edit = false
-	emu.wait(1)
 	if machine.system.name == "gambitv" then
-		-- Gambit Voice ignores the board until its power-on speech is over
-		emu.wait(4)
-		send_input(":IN.0", 0x80, 1) -- RE/NEW GAME
-		emu.wait(1)
+		-- Gambit Voice ignores the board until its power-on speech is over;
+		-- let the 6 s greeting play at real speed (sound is muted while unthrottled)
+		machine.video.throttled = true
+		emu.wait(6.5)
+		machine.video.throttled = false
 	end
+	emu.wait(1)
 	send_input(":IN.0", 0x40, 0.6) -- CL/CLEAR
 	emu.wait(0.6)
 	machine.video.throttled = throttled_state
