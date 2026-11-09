@@ -66,6 +66,12 @@ local keep_throttled = {
   vcc = true, vsc = true, csc = true, csce = true, gambitv = true,
   kishon = true, kishona = true, super9cc = true }
 
+-- clones count as their parent (ivanto, cscet, avcc, vcca)
+local function is_talker()
+  local system = manager.machine.system
+  return keep_throttled[system.name] or keep_throttled[system.parent] or false
+end
+
 local function describe_system()
   return manager.machine.system.description
 end
@@ -73,7 +79,7 @@ end
 local function board_reset()
   local throttle_state = manager.machine.video.throttled
   edit_open = false
-  if not keep_throttled[manager.machine.system.name] then
+  if not is_talker() then
     manager.machine.video.throttled = false
   end
   game_started = false
@@ -830,7 +836,7 @@ local function play_moves(old, new)
   local n = 0
   local move = ""
   local throttle_state = manager.machine.video.throttled
-  if not keep_throttled[manager.machine.system.name] then
+  if not is_talker() then
     manager.machine.video.throttled = false
   end
   if not edit_open then
@@ -857,7 +863,7 @@ end
 
 local function close_edit()
   local throttle_state = manager.machine.video.throttled
-  if not keep_throttled[manager.machine.system.name] then
+  if not is_talker() then
     manager.machine.video.throttled = false
   end
   interface.edit_game(false)
@@ -1180,7 +1186,7 @@ local function update()
 
       if protocol == "uci" then
         local throttle_state = manager.machine.video.throttled
-        if not keep_throttled[manager.machine.system.name] then
+        if not is_talker() then
           manager.machine.video.throttled = false
         end
         
