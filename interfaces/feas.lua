@@ -92,9 +92,16 @@ end
 
 function interface.setup_machine()
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
 	sb_reset_board(":board")
-	emu.wait(5)
+	if machine.system.name == "feasx" then
+		machine.video.throttled = false
+		emu.wait(5)
+	else
+		-- let the greeting (up to 6 s) play at real speed (sound is muted while unthrottled)
+		machine.video.throttled = true
+		emu.wait(6.5)
+		machine.video.throttled = false
+	end
 	send_input(":IN.0", 0x01, 1)  -- Game Control
 	sb_press_square(":board", 1, 4, 8)  -- D8
 	send_input(":IN.1", 0x02, 1) -- CL
