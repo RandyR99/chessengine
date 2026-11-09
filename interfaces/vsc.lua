@@ -40,7 +40,7 @@ end
 function interface.setup_machine()
 	sb_reset_board(":board")
 --	send_input(":IN.0", 0x80, 1) -- RE
-	emu.wait(6.0) -- spoken introduction at power-on: keys are lost until it ends
+	emu.wait(8.75) -- spoken introduction (8.5 s): keys are lost until it ends, CL cuts it off
 	send_input(":IN.0", 0x40, 1) -- CL
 	emu.wait(1.0)
 
