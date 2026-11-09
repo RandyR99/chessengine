@@ -94,7 +94,7 @@ function interface.setup_machine()
 	interface.silent = false
 	interface.stm = 1
 	sb_reset_board(":board")
-	emu.wait(5)
+	emu.wait(7.5) -- the greeting lasts 7 s; CL cuts it off
 	send_input(":IN.8", 0x40, 1) -- CL
 	emu.wait(1.0)
 
