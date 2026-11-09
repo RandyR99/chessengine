@@ -63,6 +63,14 @@ end
 
 function interface.setup_machine()
 	sb_reset_board(":board")
+	if machine.system.name == "fexcelv" and machine.time:as_double() < 5.5 then
+		-- just powered on: let the 5 s greeting play at real speed before OPTIONS cuts it off
+		-- (sound is muted while unthrottled; later resets keep the sound off from B1)
+		local throttled_state = machine.video.throttled
+		machine.video.throttled = true
+		emu.wait(5.5 - machine.time:as_double())
+		machine.video.throttled = throttled_state
+	end
 	emu.wait(1)
 	if machine.system.name == "fexcelv" then
 		-- with speech on the Voice Excellence hangs a move after the player's en passant
