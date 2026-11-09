@@ -23,12 +23,35 @@ function interface.setlevel()
 	send_input(":IN.2", 0x01, 0.5) -- CL
 end
 
+local greeting = 8.5 -- the spoken introduction after a reset, in seconds
+local first_setup = true
+
+-- cc10's edit_game(false) calls setup_machine to clear the machine before the final position
+local cc10_edit_game = interface.edit_game
+function interface.edit_game(on)
+	interface.clearing = not on
+	cc10_edit_game(on)
+	interface.clearing = false
+end
+
 function interface.setup_machine()
 	interface.invert = false
 	interface.turn = true
-	-- RE: edit_game needs a clean board (in Problem Mode EN toggles the color of a piece already there)
-	send_input(":RESET", 0x01, 1)  -- RE
-	emu.wait(6.0) -- spoken introduction
+	if interface.clearing then
+		-- RE: edit_game needs a clean board (in Problem Mode EN toggles the color of a piece already there)
+		send_input(":RESET", 0x01, 1)  -- RE
+		emu.wait(6.0) -- spoken introduction
+	elseif first_setup then
+		-- just powered on: let the greeting finish instead of starting it again with RE
+		local left = greeting - machine.time:as_double()
+		if left > 0 then
+			emu.wait(left)
+		end
+	else
+		-- init.lua soft-resets the machine (same as RE) before this call
+		emu.wait(greeting)
+	end
+	first_setup = false
 	interface.set = false
 	interface.stm = 1
 
