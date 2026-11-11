@@ -55,6 +55,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `chessmstdm.lua`
 - retro.ini: elo 1190, levels 8, ponder/brain n
 
+**retro.ini comment:** Loads the PM10 openings cartridge
+
 **Levels:** 5s move; 10s move; 20s move; 30s move; 60s move; 90s move; 2m move; 40 moves/2h
 
 **Commits**

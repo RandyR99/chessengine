@@ -75,12 +75,14 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 | `mm2f` | Mephisto MM II (set 7) | 1985 | 1840 | 8 | ✓ | ✓ | ✓ | – | 1 |
 | `mm2nona` | Mephisto MM II Nona | 1985 | 1850 | 8 | ✓ | ✓ | ✓ | ✓ | 1 |
 | `mm4` | Mephisto MM IV | 1987 | 1955 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
-| `mm4a` | Mephisto MM IV v7.00 | 1987 | 1955 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
-| `mm4b` | Mephisto MM IV v6.00 | 1987 | 1955 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `mm4_exp` | Mephisto MM IV + HG 440 | 1987 | 1955 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `mm4a` | Mephisto MM IV v7.00 + HG 440 | 1987 | 1955 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `mm4b` | Mephisto MM IV v6.00 + HG 440 | 1987 | 1955 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
 | `mm4rebel` | Mephisto MM IV Rebel | 1989 | 2000 | 8 | ✓ | ✓ | ✓ | ✓ | 1 |
-| `mm4tk` | Mephisto MM IV TurboKit | 1987 | 2080 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `mm4tk` | Mephisto MM IV TurboKit + HG 440 | 1987 | 2080 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
 | `mm5` | Mephisto MM V | 1990 | 2005 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
-| `mm5a` | Mephisto MM V v5.0 | 1990 | 2005 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `mm5_exp` | Mephisto MM V + HG 550 | 1990 | 2005 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
+| `mm5a` | Mephisto MM V v5.0 + HG 550 | 1990 | 2005 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
 | `mm6` | Mephisto MM VI | 1996 | 2020 | 11 | ✓ | ✓ | ✓ | ✓ |  |
 | `mmirage` | Mephisto Mirage | 1984 | 1545 | 8 | ✓ | ✓ | – | ✓ | 2 |
 | `modena` | Mephisto Modena | 1992 | 1965 | 11 | ✓ | ✓ | ✓ | ✓ | 1 |
@@ -839,6 +841,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `bup.lua`
 - retro.ini: elo 1810, levels 9, ponder/brain n
 
+**retro.ini comment:** Loads the HG 240 opening book module
+
 **Test notes**
 
 - bup, bupa, bupb, bupp, bup25 (hegenerglaser/mm2.cpp) \| (pending) \| bup 95/111 before e.p. fix, then 19/19 e.p./castle/promo retest; clones smoke 5/5 \| ep_p, ur_b2; kc_/kp_/a8_br/bk_h1 illegal FENs refused \| V4 + output_value; FIX machine e.p. read from display (LEDs also light the captured pawn); digit order fixed (digit3 leftmost); broken show_info dropped \| 9 levels (bl3-6 5-30s, pl1/2/4/5 1m-10m, pl3 40/2h); NO ponder (manual claims PB)
@@ -1307,6 +1311,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `mm1.lua`
 - retro.ini: elo 1525, levels 7, ponder/brain n
 
+**retro.ini comment:** Loads the HG 170 opening book module
+
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 10m move; 40 moves/2h
 
 **Commits**
@@ -1324,6 +1330,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess mm1a hg170`
 - interface `mm1.lua`
 - retro.ini: elo 1525, levels 7, ponder/brain n
+
+**retro.ini comment:** Loads the HG 170 opening book module
 
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 10m move; 40 moves/2h
 
@@ -1346,6 +1354,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess mm2 hg240`
 - interface `mm2.lua` → `mm4.lua`
 - retro.ini: elo 1840, levels 8, ponder/brain n
+
+**retro.ini comment:** Loads the HG 240 opening book module
 
 **Test notes**
 
@@ -1376,6 +1386,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `mm2.lua` → `mm4.lua`
 - retro.ini: elo 1840, levels 8, ponder/brain n
 
+**retro.ini comment:** Loads the HG 240 opening book module
+
 **Test notes**
 
 - mm2, mm2a-f (mm2.cpp) \| (pending) \| mm2 92/111 before fix, 18/19 retest; clones 5/5 \| ep_p, ur_b2; stops at dead draws (r-Un: kn_k, up_cb, bare kings ka_1/ka_4), sometimes after one more king move \| display-first move read (e.p. fix) \| 8 levels (LE2-6, LE9 10m, LE7 40/2h, LE8 40/2.5h); NO ponder (manual claims PB); old mm2.uci 'level 0' was LE10 infinite
@@ -1402,6 +1414,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess mm2b hg240`
 - interface `mm2.lua` → `mm4.lua`
 - retro.ini: elo 1840, levels 8, ponder/brain n
+
+**retro.ini comment:** Loads the HG 240 opening book module
 
 **Test notes**
 
@@ -1430,6 +1444,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `mm2.lua` → `mm4.lua`
 - retro.ini: elo 1840, levels 8, ponder/brain n
 
+**retro.ini comment:** Loads the HG 240 opening book module
+
 **Test notes**
 
 - mm2, mm2a-f (mm2.cpp) \| (pending) \| mm2 92/111 before fix, 18/19 retest; clones 5/5 \| ep_p, ur_b2; stops at dead draws (r-Un: kn_k, up_cb, bare kings ka_1/ka_4), sometimes after one more king move \| display-first move read (e.p. fix) \| 8 levels (LE2-6, LE9 10m, LE7 40/2h, LE8 40/2.5h); NO ponder (manual claims PB); old mm2.uci 'level 0' was LE10 infinite
@@ -1456,6 +1472,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess mm2d hg240`
 - interface `mm2.lua` → `mm4.lua`
 - retro.ini: elo 1840, levels 8, ponder/brain n
+
+**retro.ini comment:** Loads the HG 240 opening book module
 
 **Test notes**
 
@@ -1484,6 +1502,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `mm2.lua` → `mm4.lua`
 - retro.ini: elo 1840, levels 8, ponder/brain n
 
+**retro.ini comment:** Loads the HG 240 opening book module
+
 **Test notes**
 
 - mm2, mm2a-f (mm2.cpp) \| (pending) \| mm2 92/111 before fix, 18/19 retest; clones 5/5 \| ep_p, ur_b2; stops at dead draws (r-Un: kn_k, up_cb, bare kings ka_1/ka_4), sometimes after one more king move \| display-first move read (e.p. fix) \| 8 levels (LE2-6, LE9 10m, LE7 40/2h, LE8 40/2.5h); NO ponder (manual claims PB); old mm2.uci 'level 0' was LE10 infinite
@@ -1510,6 +1530,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess mm2f hg240`
 - interface `mm2.lua` → `mm4.lua`
 - retro.ini: elo 1840, levels 8, ponder/brain n
+
+**retro.ini comment:** Loads the HG 240 opening book module
 
 **Test notes**
 
@@ -1560,7 +1582,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - Stops thinking in dead draws (K+minor vs K, bare kings); picochess ends these games itself.
 
 - MAME set `mm4` (Mephisto MM IV (v7.10)), driver `hegenerglaser/mm2.cpp`
-- script runs `mess mm4 hg440`
+- script runs `mess mm4`
 - interface `mm4.lua`
 - retro.ini: elo 1955, levels 11, ponder/brain y
 
@@ -1572,6 +1594,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [e0c57ef](https://github.com/RandyR99/mame_for_picochess/commit/e0c57ef) 2026-11-11 mame_for_picochess: mm4, mm5: run without the opening book modules; new mm4_exp, mm5_exp
 - [558e529](https://github.com/RandyR99/chessengine/commit/558e529) 2026-10-31 chessengine: show_info: polgar (milano, academy) and y532xl read the search information from RAM, without key presses. polgar keeps the same main line list as mega4 at 0x…
 - [42ec85f](https://github.com/RandyR99/chessengine/commit/42ec85f) 2026-10-31 chessengine: show_info: rebel5 (rebel5a, rebel5b) reads the evaluation and the first move of the main line from RAM like mm4. The Rebell 5.0 program keeps them in the sam…
 - [617edcb](https://github.com/RandyR99/chessengine/commit/617edcb) 2026-10-31 chessengine: show_info: mm4 (mm4a, mm4b, mm4tk, mm4rebel, mm5, mm5a) reads the evaluation and the first move of the main line from RAM, without key presses (the old INFO…
@@ -1583,7 +1606,36 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 </details>
 
-<details><summary><code>mm4a</code> Mephisto MM IV v7.00</summary>
+<details><summary><code>mm4_exp</code> Mephisto MM IV + HG 440</summary>
+
+**Known limits**
+
+- Stops thinking in dead draws (K+minor vs K, bare kings); picochess ends these games itself.
+
+- MAME set `mm4` (Mephisto MM IV (v7.10)), driver `hegenerglaser/mm2.cpp`
+- script runs `mess mm4 hg440`
+- interface `mm4.lua`
+- retro.ini: elo 1955, levels 11, ponder/brain y
+
+**retro.ini comment:** Loads the HG 440 opening book module
+
+**Levels:** 5s move; 10s move; 20s move; 1m move; 2m move; 6m move; 5m game; 10m game; 15m game; 30m game; 40 moves/2h
+
+**Commits**
+
+- [e0c57ef](https://github.com/RandyR99/mame_for_picochess/commit/e0c57ef) 2026-11-11 mame_for_picochess: mm4, mm5: run without the opening book modules; new mm4_exp, mm5_exp
+- [558e529](https://github.com/RandyR99/chessengine/commit/558e529) 2026-10-31 chessengine: show_info: polgar (milano, academy) and y532xl read the search information from RAM, without key presses. polgar keeps the same main line list as mega4 at 0x…
+- [42ec85f](https://github.com/RandyR99/chessengine/commit/42ec85f) 2026-10-31 chessengine: show_info: rebel5 (rebel5a, rebel5b) reads the evaluation and the first move of the main line from RAM like mm4. The Rebell 5.0 program keeps them in the sam…
+- [617edcb](https://github.com/RandyR99/chessengine/commit/617edcb) 2026-10-31 chessengine: show_info: mm4 (mm4a, mm4b, mm4tk, mm4rebel, mm5, mm5a) reads the evaluation and the first move of the main line from RAM, without key presses (the old INFO…
+- [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
+- [f5320db](https://github.com/RandyR99/chessengine/commit/f5320db) 2026-10-25 chessengine: mm2.cpp family: bup, mm2, mm4, rebel5 rebuilt from the PicoChessv4 originals with output_value (Gemini's rebel5 read the display reversed and pressed CL on K…
+- [263ceda](https://github.com/RandyR99/mame_for_picochess/commit/263ceda) 2026-10-25 mame_for_picochess: mm2.cpp family: .uci levels from the manuals (bup 9, mm2 8, mm4/mm5 11, rebel5 8, new mm4rebel 8 with '8 sss' levels), clones share the parent's file; mm4/mm…
+- [d4eed72](https://github.com/RandyR99/mame_for_picochess/commit/d4eed72) 2026-10-20 mame_for_picochess: uci: short tournament headings ('40/2h', '60/5m') as '40 moves/2h', units h/m
+- [a105b3b](https://github.com/RandyR99/mame_for_picochess/commit/a105b3b) 2026-10-10 mame_for_picochess: retro.ini: make all small names lowercase
+
+</details>
+
+<details><summary><code>mm4a</code> Mephisto MM IV v7.00 + HG 440</summary>
 
 **Known limits**
 
@@ -1593,6 +1645,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess mm4a hg440`
 - interface `mm4.lua`
 - retro.ini: elo 1955, levels 11, ponder/brain y
+
+**retro.ini comment:** Loads the HG 440 opening book module
 
 **Test notes**
 
@@ -1611,7 +1665,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 </details>
 
-<details><summary><code>mm4b</code> Mephisto MM IV v6.00</summary>
+<details><summary><code>mm4b</code> Mephisto MM IV v6.00 + HG 440</summary>
 
 **Known limits**
 
@@ -1621,6 +1675,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess mm4b hg440`
 - interface `mm4.lua`
 - retro.ini: elo 1955, levels 11, ponder/brain y
+
+**retro.ini comment:** Loads the HG 440 opening book module
 
 **Test notes**
 
@@ -1664,7 +1720,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 </details>
 
-<details><summary><code>mm4tk</code> Mephisto MM IV TurboKit</summary>
+<details><summary><code>mm4tk</code> Mephisto MM IV TurboKit + HG 440</summary>
 
 **Known limits**
 
@@ -1674,6 +1730,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess mm4tk hg440`
 - interface `mm4.lua`
 - retro.ini: elo 2080, levels 11, ponder/brain y
+
+**retro.ini comment:** Loads the HG 440 opening book module
 
 **Test notes**
 
@@ -1699,7 +1757,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - Stops thinking in dead draws (K+minor vs K, bare kings); picochess ends these games itself.
 
 - MAME set `mm5` (Mephisto MM V (v5.1)), driver `hegenerglaser/mm2.cpp`
-- script runs `mess mm5 hg550`
+- script runs `mess mm5`
 - interface `mm5.lua` → `mm4.lua`
 - retro.ini: elo 2005, levels 11, ponder/brain y
 
@@ -1711,6 +1769,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [e0c57ef](https://github.com/RandyR99/mame_for_picochess/commit/e0c57ef) 2026-11-11 mame_for_picochess: mm4, mm5: run without the opening book modules; new mm4_exp, mm5_exp
 - [f0b8554](https://github.com/RandyR99/chessengine/commit/f0b8554) 2026-11-01 chessengine: init.lua: Set Pos keeps the machine in edit mode until go; report the edit capability
 - [617edcb](https://github.com/RandyR99/chessengine/commit/617edcb) 2026-10-31 chessengine: show_info: mm4 (mm4a, mm4b, mm4tk, mm4rebel, mm5, mm5a) reads the evaluation and the first move of the main line from RAM, without key presses (the old INFO…
 - [263ceda](https://github.com/RandyR99/mame_for_picochess/commit/263ceda) 2026-10-25 mame_for_picochess: mm2.cpp family: .uci levels from the manuals (bup 9, mm2 8, mm4/mm5 11, rebel5 8, new mm4rebel 8 with '8 sss' levels), clones share the parent's file; mm4/mm…
@@ -1719,7 +1778,33 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 </details>
 
-<details><summary><code>mm5a</code> Mephisto MM V v5.0</summary>
+<details><summary><code>mm5_exp</code> Mephisto MM V + HG 550</summary>
+
+**Known limits**
+
+- Stops thinking in dead draws (K+minor vs K, bare kings); picochess ends these games itself.
+
+- MAME set `mm5` (Mephisto MM V (v5.1)), driver `hegenerglaser/mm2.cpp`
+- script runs `mess mm5 hg550`
+- interface `mm5.lua` → `mm4.lua`
+- retro.ini: elo 2005, levels 11, ponder/brain y
+
+**retro.ini comment:** Loads the HG 550 opening book module
+
+**Levels:** 5s move; 10s move; 20s move; 1m move; 2m move; 6m move; 5m game; 10m game; 15m game; 30m game; 40 moves/2h
+
+**Commits**
+
+- [e0c57ef](https://github.com/RandyR99/mame_for_picochess/commit/e0c57ef) 2026-11-11 mame_for_picochess: mm4, mm5: run without the opening book modules; new mm4_exp, mm5_exp
+- [f0b8554](https://github.com/RandyR99/chessengine/commit/f0b8554) 2026-11-01 chessengine: init.lua: Set Pos keeps the machine in edit mode until go; report the edit capability
+- [617edcb](https://github.com/RandyR99/chessengine/commit/617edcb) 2026-10-31 chessengine: show_info: mm4 (mm4a, mm4b, mm4tk, mm4rebel, mm5, mm5a) reads the evaluation and the first move of the main line from RAM, without key presses (the old INFO…
+- [263ceda](https://github.com/RandyR99/mame_for_picochess/commit/263ceda) 2026-10-25 mame_for_picochess: mm2.cpp family: .uci levels from the manuals (bup 9, mm2 8, mm4/mm5 11, rebel5 8, new mm4rebel 8 with '8 sss' levels), clones share the parent's file; mm4/mm…
+- [d4eed72](https://github.com/RandyR99/mame_for_picochess/commit/d4eed72) 2026-10-20 mame_for_picochess: uci: short tournament headings ('40/2h', '60/5m') as '40 moves/2h', units h/m
+- [a105b3b](https://github.com/RandyR99/mame_for_picochess/commit/a105b3b) 2026-10-10 mame_for_picochess: retro.ini: make all small names lowercase
+
+</details>
+
+<details><summary><code>mm5a</code> Mephisto MM V v5.0 + HG 550</summary>
 
 **Known limits**
 
@@ -1729,6 +1814,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess mm5a hg550`
 - interface `mm5.lua` → `mm4.lua`
 - retro.ini: elo 2005, levels 11, ponder/brain y
+
+**retro.ini comment:** Loads the HG 550 opening book module
 
 **Test notes**
 
@@ -1753,12 +1840,14 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 **Test notes**
 
 - mm6 (hegenerglaser/mm6.cpp) \| (pending) \| 98/111 from blank EEPROM (only ep_p, ur_b2 + 11 illegal FENs) \| ep_p, ur_b2 \| rebuilt from MessNew: level via internal_ram share write_u16(0x3bc) (Gemini's setlevel never set a level); cold-EEPROM fix (Err: E -&gt; CLR + 5 s LED sweep) = no nvram file needed \| 11 levels (= gk2100 table); ponder YES
-- mm6 (hegenerglaser/mm6.cpp) \| d24b7b9 \| live info via keys (OPTION x3, ENT + next x6), same LCD as gk2000; the rotating display lights LEDs for the predicted moves, so a selection counts only once the move display has settled (piece icon or page unchanged 2.5 s) \| Pi check ok, LEDs no issue
+- mm6 (hegenerglaser/mm6.cpp) \| d24b7b9 \| live info via keys (OPTION x3, ENT + next x6), same LCD as gk2000; the rotating display lights LEDs for the predicted moves, so a selection counts only once the move display has settled (piece icon or page unchanged 2.5 s) \| Pi check ok, LEDs no issue \| 2026-11-11 0658350: pages are toggles (RAM 0x3ca bits) surviving ucinewgame soft reset -&gt; select only if 0x3ca&amp;0x3f ~= 0x3f
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 5m move; 10m move; 5m game; 10m game; 15m game; 30m game; 40 moves/1.5h
 
 **Commits**
 
+- [0658350](https://github.com/RandyR99/chessengine/commit/0658350) 2026-11-11 chessengine: mm6: don't toggle the rotating display pages off again after a reset
+- [934eb83](https://github.com/RandyR99/chessengine/commit/934eb83) 2026-11-11 chessengine: Speed option: set the real speed, not a multiple of -speed
 - [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [09bd21c](https://github.com/RandyR99/chessengine/commit/09bd21c) 2026-10-25 chessengine: mm6: rebuilt from the MessNew interface (Gemini's setlevel only pressed LEV and CLR, no level was ever set): level via internal_ram share, output_value; setu…

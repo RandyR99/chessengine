@@ -284,6 +284,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `schess.lua`
 - retro.ini: elo 1325, levels 7, ponder/brain n
 
+**retro.ini comment:** Loads the Classical Style Super Strong program module
+
 **Levels:** 5s move; 15s move; 30s move; 1m move; 150s move; 6m move; Analysis
 
 **Commits**
@@ -310,6 +312,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `schess.lua`
 - retro.ini: elo 1310, levels 7, ponder/brain n
 
+**retro.ini comment:** Loads the Strong Play program module
+
 **Levels:** 5s move; 15s move; 30s move; 1m move; 150s move; 6m move; Analysis
 
 **Commits**
@@ -335,6 +339,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess schess -cart hyper`
 - interface `schess.lua`
 - retro.ini: elo 1335, levels 7, ponder/brain n
+
+**retro.ini comment:** Loads the Hyper Modern Super Strong program module
 
 **Levels:** 5s move; 15s move; 30s move; 1m move; 150s move; 6m move; Analysis
 

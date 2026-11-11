@@ -219,6 +219,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `concams5.lua` → `conc.lua`
 - retro.ini: elo 1900, levels 8, ponder/brain n
 
+**retro.ini comment:** Loads the L16 program module
+
 **Levels:** 5s move; 10s move; 20s move; 30s move; 1m move; 2m move; 3m move; 10m move
 
 **Commits**
@@ -256,6 +258,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess concams l16`
 - interface `concams.lua` → `concams5.lua` → `conc.lua`
 - retro.ini: elo 1880, levels 8, ponder/brain n
+
+**retro.ini comment:** Loads the L16 program module
 
 **Levels:** 5s move; 10s move; 20s move; 30s move; 1m move; 2m move; 3m move; 10m move
 
@@ -443,6 +447,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [934eb83](https://github.com/RandyR99/chessengine/commit/934eb83) 2026-11-11 chessengine: Speed option: set the real speed, not a multiple of -speed
+- [ddf8dd9](https://github.com/RandyR99/chessengine/commit/ddf8dd9) 2026-11-08 chessengine: docs: ivant, ivanto have no live info (HINT probe result)
 - [cac5a6e](https://github.com/RandyR99/chessengine/commit/cac5a6e) 2026-10-29 chessengine: ivant, igor: after a set up Ivan ignores a pawn move to the last rank as the first move until Verify, Clear (found by hand by Randy) - set_pos presses both;…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
@@ -470,6 +476,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [f830a26](https://github.com/RandyR99/chessengine/commit/f830a26) 2026-11-09 chessengine: init.lua: talking clones stay throttled like their parent
+- [ddf8dd9](https://github.com/RandyR99/chessengine/commit/ddf8dd9) 2026-11-08 chessengine: docs: ivant, ivanto have no live info (HINT probe result)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [958464c](https://github.com/RandyR99/chessengine/commit/958464c) 2026-10-12 chessengine: ivant: port to MAME 0.289; add ivanto interface
@@ -531,6 +539,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess intel02 chess2`
 - interface `intel02_chess2.lua`
 - retro.ini: elo 700, levels 4, ponder/brain n
+
+**retro.ini comment:** Loads the 4-level chess cartridge chess2
 
 **Test notes**
 

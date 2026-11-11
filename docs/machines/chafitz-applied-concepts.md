@@ -105,6 +105,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `ggm_boris25.lua`
 - retro.ini: elo 1370, levels 5, ponder/brain n
 
+**retro.ini comment:** Loads the Boris 2.5 / Sargon 2.5 program cartridge
+
 **Levels:** 5s move; 15s move; 40s move; 90s move; 40 moves/2h
 
 **Commits**
@@ -132,6 +134,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `ggm_morphy.lua` → `ggm_boris25.lua`
 - retro.ini: elo 1450, levels 8, ponder/brain y
 
+**retro.ini comment:** Loads the Morphy Edition program cartridge
+
 **Levels:** 5s move; 8-15s move; 10-40s move; 20-90s move; 1-4m move; 10-40m move; 30 moves/1h; 20 moves/1h
 
 **Commits**
@@ -158,6 +162,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `ggm_sandy.lua` → `ggm_morphy.lua` → `ggm_boris25.lua`
 - retro.ini: elo 1450, levels 7, ponder/brain n
 
+**retro.ini comment:** Loads the Sandy Edition program cartridge
+
 **Levels:** MATE; &lt;15s move; &lt;40s move; &lt;90s move; &lt;4m move; 30 moves/60m; 20 moves/60m
 
 **Commits**
@@ -177,6 +183,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess ggm steinitz`
 - interface `ggm_steinitz.lua`
 - retro.ini: elo 1575, levels 8, ponder/brain n
+
+**retro.ini comment:** Loads the Steinitz Edition-4 program cartridge
 
 **Levels:** 60 moves/5m; 60 moves/15m; 60 moves/60m; 48 moves/4h; 16 moves/4h; &lt;60m move; 30 moves/60m; 40 moves/2h
 
@@ -202,6 +210,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `arb_gms3.lua` → `arb_sargon25.lua`
 - retro.ini: elo 1500, levels 7, ponder/brain n
 
+**retro.ini comment:** Loads the Grand Master Series 3 program cartridge
+
 **Levels:** 5s move; 15s move; 30s move; 1m move; 5m move; 20m move; Analysis
 
 **Commits**
@@ -223,6 +233,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess arb gms4`
 - interface `arb_gms4.lua`
 - retro.ini: elo 1705, levels 9, ponder/brain n
+
+**retro.ini comment:** Loads the Grand Master Series 4.0 program cartridge
 
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 3m move; 4m move; 6m move; Analysis
 
@@ -269,6 +281,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `arb_sargon25.lua`
 - retro.ini: elo 1370, levels 7, ponder/brain n
 
+**retro.ini comment:** Loads the Sargon 2.5 program cartridge
+
 **Levels:** 5s move; 15s move; 30s move; 1m move; 3m move; 20m move; Analysis
 
 **Commits**
@@ -294,6 +308,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess arb sargon35`
 - interface `arb_sargon35.lua` → `arb_sargon25.lua`
 - retro.ini: elo 1500, levels 7, ponder/brain n
+
+**retro.ini comment:** Loads the Sargon 3.5 program cartridge
 
 **Levels:** 10s move; 30s move; 1m move; 2m move; 3m move; 6m move; Analysis
 

@@ -63,6 +63,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `leonardo.lua`
 - retro.ini: elo 1950, levels 9, ponder/brain y
 
+**retro.ini comment:** Loads the Analyst D program module and the Endgame ROM ver. 2
+
 **Test notes**
 
 - analystd2 (saitek/leonardo.cpp + Analyst module) \| live info from the module's 16-character LCD: setup selects info screen 2 (FUNCTION, INFO twice; it stays), pages "I 1 f8-c5 c2-c3" (main line 2 plies at a time) and "I Fd=4 +7.78" (depth, evaluation for White -&gt; machine side) \| 8/8, neg -767
@@ -169,6 +171,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `corona.lua` → `stratos.lua`
 - retro.ini: elo 1930, levels 11, ponder/brain n
 
+**retro.ini comment:** Loads the Endgame ROM ver. 2
+
 **Test notes**
 
 - corona, coronaa, coronab (saitek/corona.cpp) \| 72f413e / e042332, 339a31b \| suite 61 ok each \| ep_p, up_ew/up_cw/up_cb underpromotion, kn_k \| builds on stratos.lua; RAM via memory shares \| 11 levels incl. b7 analysis (show_info inherited)
@@ -195,6 +199,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `corona.lua` → `stratos.lua`
 - retro.ini: elo 1930, levels 11, ponder/brain n
 
+**retro.ini comment:** Loads the Endgame ROM ver. 2
+
 **Test notes**
 
 - corona, coronaa, coronab (saitek/corona.cpp) \| 72f413e / e042332, 339a31b \| suite 61 ok each \| ep_p, up_ew/up_cw/up_cb underpromotion, kn_k \| builds on stratos.lua; RAM via memory shares \| 11 levels incl. b7 analysis (show_info inherited)
@@ -220,6 +226,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess coronab -rom egr2`
 - interface `corona.lua` → `stratos.lua`
 - retro.ini: elo 1930, levels 11, ponder/brain n
+
+**retro.ini comment:** Loads the Endgame ROM ver. 2
 
 **Test notes**
 
@@ -636,6 +644,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `leonardo.lua`
 - retro.ini: elo 1950, levels 9, ponder/brain y
 
+**retro.ini comment:** Loads the Maestro D program module and the Endgame ROM ver. 2
+
 **Test notes**
 
 - leonardo, leonardoa, leonardob, galileo, maestroa1, maestroc1, maestrod2, maestrod4 (saitek/leonardo.cpp) \| live main line only, from the base unit's RAM at 0x45e6 (from/to pairs; Maestro modules pass their line to it); no score (LED-only display) \| info/neg 16/16, regression 24/24
@@ -667,6 +677,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess galileo -exp maestroa,bios=a1`
 - interface `leonardo.lua`
 - retro.ini: elo 1800, levels 9, ponder/brain y
+
+**retro.ini comment:** Loads the Maestro A program module
 
 **Test notes**
 
@@ -700,6 +712,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `leonardo.lua`
 - retro.ini: elo 1800, levels 9, ponder/brain y
 
+**retro.ini comment:** Loads the Maestro C program module and the Endgame ROM ver. 2
+
 **Test notes**
 
 - leonardo, leonardoa, leonardob, galileo, maestroa1, maestroc1, maestrod2, maestrod4 (saitek/leonardo.cpp) \| live main line only, from the base unit's RAM at 0x45e6 (from/to pairs; Maestro modules pass their line to it); no score (LED-only display) \| info/neg 16/16, regression 24/24
@@ -731,6 +745,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess galileo -exp maestro,bios=dpp -rom egr2`
 - interface `leonardo.lua`
 - retro.ini: elo 2025, levels 9, ponder/brain y
+
+**retro.ini comment:** Loads the Maestro D++ program module and the Endgame ROM ver. 2
 
 **Test notes**
 
@@ -787,6 +803,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess renaissa -exp sparc,bios=1`
 - interface `renaissa.lua`
 - retro.ini: elo 2200, levels 10, ponder/brain n
+
+**retro.ini comment:** Loads the Sparc program module
 
 **Test notes**
 
@@ -1029,6 +1047,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `simultano.lua`
 - retro.ini: elo 1830, levels 10, ponder/brain n
 
+**retro.ini comment:** Loads the Endgame ROM ver. 2
+
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 30m game; 40 moves/2h; Analysis
 
 **Commits**
@@ -1052,6 +1072,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess simultanoa -rom egr2`
 - interface `simultano.lua`
 - retro.ini: elo 1830, levels 10, ponder/brain n
+
+**retro.ini comment:** Loads the Endgame ROM ver. 2
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 30m game; 40 moves/2h; Analysis
 
@@ -1095,6 +1117,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `stratos.lua`
 - retro.ini: elo 1820, levels 10, ponder/brain y
 
+**retro.ini comment:** Loads the Endgame ROM ver. 2
+
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 30m game; 40 moves/2h; Analysis
 
 **Commits**
@@ -1117,6 +1141,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess stratosa -rom egr2`
 - interface `stratos.lua`
 - retro.ini: elo 1820, levels 10, ponder/brain y
+
+**retro.ini comment:** Loads the Endgame ROM ver. 2
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 30m game; 40 moves/2h; Analysis
 
@@ -1194,6 +1220,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `stratos.lua`
 - retro.ini: elo 1885, levels 10, ponder/brain y
 
+**retro.ini comment:** Loads the Endgame ROM ver. 1
+
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 30m game; 40 moves/2h; Analysis
 
 **Commits**
@@ -1216,6 +1244,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess tkingb -rom egr`
 - interface `stratos.lua`
 - retro.ini: elo 1885, levels 10, ponder/brain y
+
+**retro.ini comment:** Loads the Endgame ROM ver. 1
 
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 30m game; 40 moves/2h; Analysis
 
@@ -1243,6 +1273,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `tking.lua` → `stratos.lua`
 - retro.ini: elo 1890, levels 10, ponder/brain y
 
+**retro.ini comment:** Loads the Endgame ROM ver. 2
+
 **Levels:** 5s move; 10s move; 30s move; 1m move; 3m move; 5m game; 10m game; 30m game; 40 moves/2h; Analysis
 
 **Commits**
@@ -1262,6 +1294,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess tstar432 -rom kso`
 - interface `tstar432.lua` → `sstar28k.lua`
 - retro.ini: elo 1770, levels 10, ponder/brain n
+
+**retro.ini comment:** Loads the Kasparov Selected Openings module
 
 **Test notes**
 
@@ -1285,7 +1319,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `tstar432.lua` → `sstar28k.lua`
 - retro.ini: elo 1770, levels 10, ponder/brain n
 
-**retro.ini comment:** ROM dumped from a Superstar 36K (same program as tstar432, different opening book); runs at Turbostar speed (4 MHz); launched with the KSO module
+**retro.ini comment:** ROM dumped from a Superstar 36K (same program as tstar432, different opening book); runs at Turbostar speed (4 MHz); loads the Kasparov Selected Openings module
 
 **Test notes**
 

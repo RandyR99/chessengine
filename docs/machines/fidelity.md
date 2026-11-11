@@ -253,6 +253,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [f7e319e](https://github.com/RandyR99/chessengine/commit/f7e319e) 2026-11-09 chessengine: chesster, kishon: play the power-on greeting and the option announcements
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [4c3b350](https://github.com/RandyR99/chessengine/commit/4c3b350) 2026-10-20 chessengine: chesster, kishon: port to MAME 0.289 (output proxies); kishon 1 s wait after each square press
 - [4a4d408](https://github.com/RandyR99/mame_for_picochess/commit/4a4d408) 2026-10-20 mame_for_picochess: chesster family: 8 levels (A1-A8) per conventions, ponder y; new kishona retro.ini entry
@@ -270,6 +271,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [f7e319e](https://github.com/RandyR99/chessengine/commit/f7e319e) 2026-11-09 chessengine: chesster, kishon: play the power-on greeting and the option announcements
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [4c3b350](https://github.com/RandyR99/chessengine/commit/4c3b350) 2026-10-20 chessengine: chesster, kishon: port to MAME 0.289 (output proxies); kishon 1 s wait after each square press
@@ -288,6 +290,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [f7e319e](https://github.com/RandyR99/chessengine/commit/f7e319e) 2026-11-09 chessengine: chesster, kishon: play the power-on greeting and the option announcements
 - [4c3b350](https://github.com/RandyR99/chessengine/commit/4c3b350) 2026-10-20 chessengine: chesster, kishon: port to MAME 0.289 (output proxies); kishon 1 s wait after each square press
 - [4a4d408](https://github.com/RandyR99/mame_for_picochess/commit/4a4d408) 2026-10-20 mame_for_picochess: chesster family: 8 levels (A1-A8) per conventions, ponder y; new kishona retro.ini entry
 
@@ -304,6 +307,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [f7e319e](https://github.com/RandyR99/chessengine/commit/f7e319e) 2026-11-09 chessengine: chesster, kishon: play the power-on greeting and the option announcements
 - [4a4d408](https://github.com/RandyR99/mame_for_picochess/commit/4a4d408) 2026-10-20 mame_for_picochess: chesster family: 8 levels (A1-A8) per conventions, ponder y; new kishona retro.ini entry
 
 </details>
@@ -319,6 +323,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [4601fb7](https://github.com/RandyR99/chessengine/commit/4601fb7) 2026-11-09 chessengine: cphantom: play the power-on greeting
 - [b61bde2](https://github.com/RandyR99/chessengine/commit/b61bde2) 2026-11-05 chessengine: fphantom, cphantom: wait for the power-on arm test to end
 - [021277d](https://github.com/RandyR99/chessengine/commit/021277d) 2026-11-01 chessengine: ucinewgame: skip the soft reset via interface.no_soft_reset instead of a name list
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
@@ -364,6 +369,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [64d3c59](https://github.com/RandyR99/chessengine/commit/64d3c59) 2026-11-09 chessengine: csc: wait for the whole greeting before CL
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [143c876](https://github.com/RandyR99/chessengine/commit/143c876) 2026-10-20 chessengine: csc, super9cc: port to MAME 0.289 from the original files (output proxies, ioport API)
 - [de87c29](https://github.com/RandyR99/mame_for_picochess/commit/de87c29) 2026-10-20 mame_for_picochess: csc family, super9cc: 11 levels incl. count-down game levels, ponder y; new csce/cscet retro.ini entries
@@ -383,6 +389,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [64d3c59](https://github.com/RandyR99/chessengine/commit/64d3c59) 2026-11-09 chessengine: csc: wait for the whole greeting before CL
 - [143c876](https://github.com/RandyR99/chessengine/commit/143c876) 2026-10-20 chessengine: csc, super9cc: port to MAME 0.289 from the original files (output proxies, ioport API)
 - [de87c29](https://github.com/RandyR99/mame_for_picochess/commit/de87c29) 2026-10-20 mame_for_picochess: csc family, super9cc: 11 levels incl. count-down game levels, ponder y; new csce/cscet retro.ini entries
 - [cffddda](https://github.com/RandyR99/mame_for_picochess/commit/cffddda) 2026-10-13 mame_for_picochess: Convert CRLF line endings to LF
@@ -400,6 +407,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [64d3c59](https://github.com/RandyR99/chessengine/commit/64d3c59) 2026-11-09 chessengine: csc: wait for the whole greeting before CL
+- [f830a26](https://github.com/RandyR99/chessengine/commit/f830a26) 2026-11-09 chessengine: init.lua: talking clones stay throttled like their parent
 - [de87c29](https://github.com/RandyR99/mame_for_picochess/commit/de87c29) 2026-10-20 mame_for_picochess: csc family, super9cc: 11 levels incl. count-down game levels, ponder y; new csce/cscet retro.ini entries
 - [cffddda](https://github.com/RandyR99/mame_for_picochess/commit/cffddda) 2026-10-13 mame_for_picochess: Convert CRLF line endings to LF
 
@@ -550,6 +559,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [50ddb2d](https://github.com/RandyR99/mame_for_picochess/commit/50ddb2d) 2026-11-10 mame_for_picochess: check_softlist_roms.sh: list the missing ROM files and find them by CRC
+- [fb8e235](https://github.com/RandyR99/chessengine/commit/fb8e235) 2026-11-09 chessengine: gambitv: play the power-on greeting, no RE after it
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [a20596e](https://github.com/RandyR99/chessengine/commit/a20596e) 2026-10-22 chessengine: fscc6, miniscc, classic, gambitv: output proxies via output_value; new edit_game (final position); classic shared by gambitv as in MessChess, full RAM board…
@@ -569,6 +580,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [fb8e235](https://github.com/RandyR99/chessengine/commit/fb8e235) 2026-11-09 chessengine: gambitv: play the power-on greeting, no RE after it
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
@@ -1005,6 +1017,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [934eb83](https://github.com/RandyR99/chessengine/commit/934eb83) 2026-11-11 chessengine: Speed option: set the real speed, not a multiple of -speed
+- [d7210b3](https://github.com/RandyR99/chessengine/commit/d7210b3) 2026-11-09 chessengine: fexcelv: play the power-on greeting before the sound goes off
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [d9e05e1](https://github.com/RandyR99/chessengine/commit/d9e05e1) 2026-10-21 chessengine: fexcel: port to MAME 0.289 from the PicoChessv4 original; voice off on fexcelv; new fexcela/fexcel12; granits replay fix
@@ -1024,6 +1038,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [d7210b3](https://github.com/RandyR99/chessengine/commit/d7210b3) 2026-11-09 chessengine: fexcelv: play the power-on greeting before the sound goes off
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [d9e05e1](https://github.com/RandyR99/chessengine/commit/d9e05e1) 2026-10-21 chessengine: fexcel: port to MAME 0.289 from the PicoChessv4 original; voice off on fexcelv; new fexcela/fexcel12; granits replay fix
@@ -1049,6 +1064,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [d7210b3](https://github.com/RandyR99/chessengine/commit/d7210b3) 2026-11-09 chessengine: fexcelv: play the power-on greeting before the sound goes off
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [d9e05e1](https://github.com/RandyR99/chessengine/commit/d9e05e1) 2026-10-21 chessengine: fexcel: port to MAME 0.289 from the PicoChessv4 original; voice off on fexcelv; new fexcela/fexcel12; granits replay fix
@@ -1084,6 +1100,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [d7210b3](https://github.com/RandyR99/chessengine/commit/d7210b3) 2026-11-09 chessengine: fexcelv: play the power-on greeting before the sound goes off
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [d9e05e1](https://github.com/RandyR99/chessengine/commit/d9e05e1) 2026-10-21 chessengine: fexcel: port to MAME 0.289 from the PicoChessv4 original; voice off on fexcelv; new fexcela/fexcel12; granits replay fix
@@ -1666,6 +1683,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [e0e42bc](https://github.com/RandyR99/chessengine/commit/e0e42bc) 2026-11-09 chessengine: Elite A/S, Prestige: play the power-on greeting
 - [2da3e3c](https://github.com/RandyR99/chessengine/commit/2da3e3c) 2026-10-30 chessengine: feag, feagpriv, feas: show_info reads the Elite score and depth display correctly. With option E1 (set in setup_machine) the player's display alternates whil…
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [5dc067c](https://github.com/RandyR99/chessengine/commit/5dc067c) 2026-10-21 chessengine: feas, feag: port to MAME 0.289 from the PicoChessv4 originals; read capture-promotions with Position Verification; new feasx
@@ -1686,6 +1704,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [e0e42bc](https://github.com/RandyR99/chessengine/commit/e0e42bc) 2026-11-09 chessengine: Elite A/S, Prestige: play the power-on greeting
 - [2da3e3c](https://github.com/RandyR99/chessengine/commit/2da3e3c) 2026-10-30 chessengine: feag, feagpriv, feas: show_info reads the Elite score and depth display correctly. With option E1 (set in setup_machine) the player's display alternates whil…
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [5dc067c](https://github.com/RandyR99/chessengine/commit/5dc067c) 2026-10-21 chessengine: feas, feag: port to MAME 0.289 from the PicoChessv4 originals; read capture-promotions with Position Verification; new feasx
@@ -1704,6 +1723,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [e0e42bc](https://github.com/RandyR99/chessengine/commit/e0e42bc) 2026-11-09 chessengine: Elite A/S, Prestige: play the power-on greeting
 - [2da3e3c](https://github.com/RandyR99/chessengine/commit/2da3e3c) 2026-10-30 chessengine: feag, feagpriv, feas: show_info reads the Elite score and depth display correctly. With option E1 (set in setup_machine) the player's display alternates whil…
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [5dc067c](https://github.com/RandyR99/chessengine/commit/5dc067c) 2026-10-21 chessengine: feas, feag: port to MAME 0.289 from the PicoChessv4 originals; read capture-promotions with Position Verification; new feasx
@@ -1722,6 +1742,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [e0e42bc](https://github.com/RandyR99/chessengine/commit/e0e42bc) 2026-11-09 chessengine: Elite A/S, Prestige: play the power-on greeting
 - [2da3e3c](https://github.com/RandyR99/chessengine/commit/2da3e3c) 2026-10-30 chessengine: feag, feagpriv, feas: show_info reads the Elite score and depth display correctly. With option E1 (set in setup_machine) the player's display alternates whil…
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [5dc067c](https://github.com/RandyR99/chessengine/commit/5dc067c) 2026-10-21 chessengine: feas, feag: port to MAME 0.289 from the PicoChessv4 originals; read capture-promotions with Position Verification; new feasx
@@ -1808,6 +1829,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [e0e42bc](https://github.com/RandyR99/chessengine/commit/e0e42bc) 2026-11-09 chessengine: Elite A/S, Prestige: play the power-on greeting
 - [5dc067c](https://github.com/RandyR99/chessengine/commit/5dc067c) 2026-10-21 chessengine: feas, feag: port to MAME 0.289 from the PicoChessv4 originals; read capture-promotions with Position Verification; new feasx
 - [2834f27](https://github.com/RandyR99/mame_for_picochess/commit/2834f27) 2026-10-21 mame_for_picochess: Prestige / Elite A/S / Avant Garde: common 12 levels per manuals, ponder y; 9 new retro.ini entries; Elo from Programs.txt (premiere, feldo, Elegance)
 - [d4eed72](https://github.com/RandyR99/mame_for_picochess/commit/d4eed72) 2026-10-20 mame_for_picochess: uci: short tournament headings ('40/2h', '60/5m') as '40 moves/2h', units h/m
@@ -1825,6 +1847,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [fb8e235](https://github.com/RandyR99/chessengine/commit/fb8e235) 2026-11-09 chessengine: gambitv: play the power-on greeting, no RE after it
 - [a20596e](https://github.com/RandyR99/chessengine/commit/a20596e) 2026-10-22 chessengine: fscc6, miniscc, classic, gambitv: output proxies via output_value; new edit_game (final position); classic shared by gambitv as in MessChess, full RAM board…
 - [79a093d](https://github.com/RandyR99/mame_for_picochess/commit/79a093d) 2026-10-22 mame_for_picochess: Phantoms, Sensory 12, SC6 family: levels per manuals, Level N headings; fphantom re-enabled (mate lockup gone); new retro.ini entries fscc12a, fscc6, miniscc…
 
@@ -1933,6 +1956,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `fscc6.lua`
 - retro.ini: elo 1150, levels 6, ponder/brain n
 
+**retro.ini comment:** Loads the SC6 program cartridge
+
 **Levels:** 7s move; 30s move; 1m move; 2m move; 3m move; Analysis
 
 **Commits**
@@ -2014,6 +2039,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [d781f49](https://github.com/RandyR99/chessengine/commit/d781f49) 2026-11-09 chessengine: vcc: no second greeting from RE at setup
+- [f830a26](https://github.com/RandyR99/chessengine/commit/f830a26) 2026-11-09 chessengine: init.lua: talking clones stay throttled like their parent
 - [ff71ab9](https://github.com/RandyR99/chessengine/commit/ff71ab9) 2026-10-23 chessengine: vcc: output proxies via output_value; RE before the history set-up (Problem Mode re-entry flipped piece colors); cc10 set_pos clears empty squares (avcc keep…
 - [534d63f](https://github.com/RandyR99/mame_for_picochess/commit/534d63f) 2026-10-23 mame_for_picochess: Voice Chess Challenger: vcc/vccg 9 levels per manual (Level N headings, H infinite dropped); new engine avcc (Advanced Voice Chess Challenger)
 - [29f68b0](https://github.com/RandyR99/chessengine/commit/29f68b0) 2026-10-09 chessengine: vcc: replace deprecated output:get_value and report own name
@@ -2036,6 +2063,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [d781f49](https://github.com/RandyR99/chessengine/commit/d781f49) 2026-11-09 chessengine: vcc: no second greeting from RE at setup
 - [ff71ab9](https://github.com/RandyR99/chessengine/commit/ff71ab9) 2026-10-23 chessengine: vcc: output proxies via output_value; RE before the history set-up (Problem Mode re-entry flipped piece colors); cc10 set_pos clears empty squares (avcc keep…
 - [534d63f](https://github.com/RandyR99/mame_for_picochess/commit/534d63f) 2026-10-23 mame_for_picochess: Voice Chess Challenger: vcc/vccg 9 levels per manual (Level N headings, H infinite dropped); new engine avcc (Advanced Voice Chess Challenger)
 - [29f68b0](https://github.com/RandyR99/chessengine/commit/29f68b0) 2026-10-09 chessengine: vcc: replace deprecated output:get_value and report own name
@@ -2058,6 +2086,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [d781f49](https://github.com/RandyR99/chessengine/commit/d781f49) 2026-11-09 chessengine: vcc: no second greeting from RE at setup
+- [f830a26](https://github.com/RandyR99/chessengine/commit/f830a26) 2026-11-09 chessengine: init.lua: talking clones stay throttled like their parent
 - [d6815c6](https://github.com/RandyR99/mame_for_picochess/commit/d6815c6) 2026-10-27 mame_for_picochess: Revisit phase 2 step 2: 50 missing working sets added (scripts, _art, .uci from the parent, retro entries; all smoke-tested): borisa, conca, concglapa, sdtor…
 - [ff71ab9](https://github.com/RandyR99/chessengine/commit/ff71ab9) 2026-10-23 chessengine: vcc: output proxies via output_value; RE before the history set-up (Problem Mode re-entry flipped piece colors); cc10 set_pos clears empty squares (avcc keep…
 - [29f68b0](https://github.com/RandyR99/chessengine/commit/29f68b0) 2026-10-09 chessengine: vcc: replace deprecated output:get_value and report own name
@@ -2080,6 +2110,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [d781f49](https://github.com/RandyR99/chessengine/commit/d781f49) 2026-11-09 chessengine: vcc: no second greeting from RE at setup
 - [ff71ab9](https://github.com/RandyR99/chessengine/commit/ff71ab9) 2026-10-23 chessengine: vcc: output proxies via output_value; RE before the history set-up (Problem Mode re-entry flipped piece colors); cc10 set_pos clears empty squares (avcc keep…
 - [534d63f](https://github.com/RandyR99/mame_for_picochess/commit/534d63f) 2026-10-23 mame_for_picochess: Voice Chess Challenger: vcc/vccg 9 levels per manual (Level N headings, H infinite dropped); new engine avcc (Advanced Voice Chess Challenger)
 - [29f68b0](https://github.com/RandyR99/chessengine/commit/29f68b0) 2026-10-09 chessengine: vcc: replace deprecated output:get_value and report own name
@@ -2101,6 +2132,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [ccbc73d](https://github.com/RandyR99/chessengine/commit/ccbc73d) 2026-11-09 chessengine: vsc: wait for the whole greeting before CL
 - [26c26de](https://github.com/RandyR99/chessengine/commit/26c26de) 2026-11-04 chessengine: interfaces: player's underpromotion through the position setup on 45 more machines
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [df424c7](https://github.com/RandyR99/chessengine/commit/df424c7) 2026-10-23 chessengine: vsc: output proxies via output_value; new edit_game (silent replay, RE, final position); set-up verified by Position Verification and repeated (keys pressed…
