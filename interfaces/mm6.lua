@@ -63,7 +63,11 @@ function interface.setup_machine()
 
 	interface.cur_level = "a4"
 	interface.setlevel()
-	interface.rotating.select_pages(true)
+	-- the pages are on/off switches (RAM 0x3ca, one bit each) that survive the reset of a ucinewgame:
+	-- selecting them again turned some off, and the leftover pages lit LEDs that were read as the move
+	if ram:read_u8(0x3ca) & 0x3f ~= 0x3f then
+		interface.rotating.select_pages(true)
+	end
 end
 
 function interface.start_play(init)
