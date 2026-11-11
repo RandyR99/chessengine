@@ -804,6 +804,9 @@ local function set_option(name, value)
   if (string.lower(name) == "speed") then
     -- percent of real time; 0 = unthrottled (as -nothrottle); a throttle rate of 0 would freeze the machine
     local speed = tonumber(value) or 100
+    -- MAME runs at speed factor (-speed) x throttle rate: drop the start factor so the option
+    -- is the whole speed (a machine started with -speed 3.0 would run a 200% option at 600%)
+    manager.machine.video.speed_factor = 1000
     if speed <= 0 then
       manager.machine.video.throttled = false
     else
