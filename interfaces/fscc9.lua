@@ -35,18 +35,34 @@ function interface.setlevel()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	local led_code = { 1, 2, 4, 8, 16, 32, 64, 128, 255 }
-	local cur_leds = 0
-	local cur_level = 0
+	local cur_level = nil
 	local dif_level
-	send_input(":IN.0", 0x08, 0.5) -- LV
-	for y = 0, 7 do
-		if output_value("7." .. 7-y) ~= 0 then
-			cur_leds = cur_leds + (1 << y)
+	-- LV shows the current level on the h-file LEDs; a press too soon after a reset is lost
+	for try = 1, 3 do
+		send_input(":IN.0", 0x08, 0.5) -- LV
+		local cur_leds = 0
+		for y = 0, 7 do
+			if output_value("7." .. 7-y) ~= 0 then
+				cur_leds = cur_leds + (1 << y)
+			end
 		end
+		for l = 1, 9 do
+			if cur_leds == led_code[l] then
+				cur_level = l
+			end
+		end
+		if cur_level ~= nil then
+			break
+		end
+		send_input(":IN.0", 0x40, 0.5) -- CL
+		emu.wait(1)
 	end
-	repeat
-		cur_level = cur_level + 1
-	until cur_leds == led_code[cur_level]
+	if cur_level == nil then
+		emu.print_error("fscc9: level LEDs not readable, level not set")
+		interface.cur_level = 1 -- retried at the next level change
+		machine.video.throttled = throttled_state
+		return
+	end
 	dif_level = interface.level - cur_level
 	if (dif_level < 0) then
 		dif_level = dif_level + 9
@@ -60,6 +76,10 @@ end
 
 function interface.setup_machine()
 	sb_reset_board(":board")
+	-- after a soft reset the Playmatic S ignores LV until RE: start a new game
+	emu.wait(1) -- key presses right after a reset are lost
+	send_input(":IN.0", 0x80, 0.5) -- RE
+	emu.wait(0.5)
 	send_input(":IN.0", 0x40, 0.5) -- CL
 	interface.cur_level = 1
 	interface.setlevel()
