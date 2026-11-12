@@ -1623,6 +1623,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [b0eee03](https://github.com/RandyR99/chessengine/commit/b0eee03) 2026-11-11 chessengine: docs: rebuild for mm4_exp, mm5_exp and the module comments in retro.ini
+- [14126ba](https://github.com/RandyR99/mame_for_picochess/commit/14126ba) 2026-11-11 mame_for_picochess: dgt: mm4_exp, mm5_exp
 - [e0c57ef](https://github.com/RandyR99/mame_for_picochess/commit/e0c57ef) 2026-11-11 mame_for_picochess: mm4, mm5: run without the opening book modules; new mm4_exp, mm5_exp
 - [558e529](https://github.com/RandyR99/chessengine/commit/558e529) 2026-10-31 chessengine: show_info: polgar (milano, academy) and y532xl read the search information from RAM, without key presses. polgar keeps the same main line list as mega4 at 0x…
 - [42ec85f](https://github.com/RandyR99/chessengine/commit/42ec85f) 2026-10-31 chessengine: show_info: rebel5 (rebel5a, rebel5b) reads the evaluation and the first move of the main line from RAM like mm4. The Rebell 5.0 program keeps them in the sam…
@@ -1795,6 +1797,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [b0eee03](https://github.com/RandyR99/chessengine/commit/b0eee03) 2026-11-11 chessengine: docs: rebuild for mm4_exp, mm5_exp and the module comments in retro.ini
+- [14126ba](https://github.com/RandyR99/mame_for_picochess/commit/14126ba) 2026-11-11 mame_for_picochess: dgt: mm4_exp, mm5_exp
 - [e0c57ef](https://github.com/RandyR99/mame_for_picochess/commit/e0c57ef) 2026-11-11 mame_for_picochess: mm4, mm5: run without the opening book modules; new mm4_exp, mm5_exp
 - [f0b8554](https://github.com/RandyR99/chessengine/commit/f0b8554) 2026-11-01 chessengine: init.lua: Set Pos keeps the machine in edit mode until go; report the edit capability
 - [617edcb](https://github.com/RandyR99/chessengine/commit/617edcb) 2026-10-31 chessengine: show_info: mm4 (mm4a, mm4b, mm4tk, mm4rebel, mm5, mm5a) reads the evaluation and the first move of the main line from RAM, without key presses (the old INFO…

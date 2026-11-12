@@ -1886,6 +1886,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [bb17219](https://github.com/RandyR99/chessengine/commit/bb17219) 2026-11-11 chessengine: fscc9: press RE after a reset, never hang in setlevel
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [71b0188](https://github.com/RandyR99/mame_for_picochess/commit/71b0188) 2026-10-27 mame_for_picochess: retro.ini: years matched to MAME 0.289 (arbv2 2012, feagv11 2001, fscc9 1982, sforteb 1988, tascr30 1995)
 - [47d97db](https://github.com/RandyR99/chessengine/commit/47d97db) 2026-10-23 chessengine: fscc9, fscc9ps: output proxies via output_value; press RV after the player's move following a Black-to-move setup; set_pos throttle restore in scope
@@ -1905,6 +1906,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [bb17219](https://github.com/RandyR99/chessengine/commit/bb17219) 2026-11-11 chessengine: fscc9: press RE after a reset, never hang in setlevel
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [47d97db](https://github.com/RandyR99/chessengine/commit/47d97db) 2026-10-23 chessengine: fscc9, fscc9ps: output proxies via output_value; press RV after the player's move following a Black-to-move setup; set_pos throttle restore in scope
 - [4d33e03](https://github.com/RandyR99/mame_for_picochess/commit/4d33e03) 2026-10-23 mame_for_picochess: Sensory 9 family: 8 levels per manual (Level N headings, no increments, Analysis dropped); fscc9/fscc9ps ponder y; new retro.ini entries fscc9b, fscc9c
@@ -1922,6 +1924,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [bb17219](https://github.com/RandyR99/chessengine/commit/bb17219) 2026-11-11 chessengine: fscc9: press RE after a reset, never hang in setlevel
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [47d97db](https://github.com/RandyR99/chessengine/commit/47d97db) 2026-10-23 chessengine: fscc9, fscc9ps: output proxies via output_value; press RV after the player's move following a Black-to-move setup; set_pos throttle restore in scope
 - [4d33e03](https://github.com/RandyR99/mame_for_picochess/commit/4d33e03) 2026-10-23 mame_for_picochess: Sensory 9 family: 8 levels per manual (Level N headings, no increments, Analysis dropped); fscc9/fscc9ps ponder y; new retro.ini entries fscc9b, fscc9c
