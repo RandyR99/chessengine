@@ -43,8 +43,9 @@ end
 function interface.setup_machine()
 	sb_reset_board(":board")
 	interface.invert = false
---	send_input(":IN.1", 0x80, 1)	-- New Game
-	emu.wait(2)
+	emu.wait(3.5)	-- power-on LED sweep and start signal end ~2.8 s after a reset; keys pressed before are lost
+	send_input(":IN.1", 0x80, 1)	-- New Game
+	emu.wait(1)
 
 	interface.cur_level = "a2"
 	interface.setlevel()
