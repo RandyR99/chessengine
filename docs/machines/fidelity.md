@@ -1882,10 +1882,15 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `fscc9.lua`
 - retro.ini: elo 1610, levels 8, ponder/brain y
 
+**Test notes**
+
+- fscc9, fscc9b, fscc9c, fscc9ps (fidelity/sc9.cpp) \| 2026-11-11 bb17219: after a soft reset (ucinewgame) the Playmatic S ignores LV until RE; the old setlevel then looped forever (no yield) on unlit level LEDs -&gt; MAME froze unthrottled on New Game at any level but 1 (end-user report, picochess level 2). setup_machine now waits 1 s + RE before CL; setlevel gives up after 3 tries. Known uci_test fails in picochess_dev/tools/known_failures.txt (ep_p, ur_b2; mj_g2 n/a).
+
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/1h50m; 40 moves/2.5h; 30 moves/3h
 
 **Commits**
 
+- [edff032](https://github.com/RandyR99/chessengine/commit/edff032) 2026-11-11 chessengine: docs: rebuild for the fscc9 new-game fix
 - [bb17219](https://github.com/RandyR99/chessengine/commit/bb17219) 2026-11-11 chessengine: fscc9: press RE after a reset, never hang in setlevel
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…
 - [71b0188](https://github.com/RandyR99/mame_for_picochess/commit/71b0188) 2026-10-27 mame_for_picochess: retro.ini: years matched to MAME 0.289 (arbv2 2012, feagv11 2001, fscc9 1982, sforteb 1988, tascr30 1995)
@@ -1901,6 +1906,10 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess fscc9b`
 - interface `fscc9.lua`
 - retro.ini: elo 1590, levels 8, ponder/brain y
+
+**Test notes**
+
+- fscc9, fscc9b, fscc9c, fscc9ps (fidelity/sc9.cpp) \| 2026-11-11 bb17219: after a soft reset (ucinewgame) the Playmatic S ignores LV until RE; the old setlevel then looped forever (no yield) on unlit level LEDs -&gt; MAME froze unthrottled on New Game at any level but 1 (end-user report, picochess level 2). setup_machine now waits 1 s + RE before CL; setlevel gives up after 3 tries. Known uci_test fails in picochess_dev/tools/known_failures.txt (ep_p, ur_b2; mj_g2 n/a).
 
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/1h50m; 40 moves/2.5h; 30 moves/3h
 
@@ -1920,6 +1929,10 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `fscc9.lua`
 - retro.ini: elo 1590, levels 8, ponder/brain y
 
+**Test notes**
+
+- fscc9, fscc9b, fscc9c, fscc9ps (fidelity/sc9.cpp) \| 2026-11-11 bb17219: after a soft reset (ucinewgame) the Playmatic S ignores LV until RE; the old setlevel then looped forever (no yield) on unlit level LEDs -&gt; MAME froze unthrottled on New Game at any level but 1 (end-user report, picochess level 2). setup_machine now waits 1 s + RE before CL; setlevel gives up after 3 tries. Known uci_test fails in picochess_dev/tools/known_failures.txt (ep_p, ur_b2; mj_g2 n/a).
+
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/1h50m; 40 moves/2.5h; 30 moves/3h
 
 **Commits**
@@ -1937,6 +1950,10 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - script runs `mess fscc9ps`
 - interface `fscc9ps.lua` → `fscc9.lua`
 - retro.ini: elo 1705, levels 8, ponder/brain y
+
+**Test notes**
+
+- fscc9, fscc9b, fscc9c, fscc9ps (fidelity/sc9.cpp) \| 2026-11-11 bb17219: after a soft reset (ucinewgame) the Playmatic S ignores LV until RE; the old setlevel then looped forever (no yield) on unlit level LEDs -&gt; MAME froze unthrottled on New Game at any level but 1 (end-user report, picochess level 2). setup_machine now waits 1 s + RE before CL; setlevel gives up after 3 tries. Known uci_test fails in picochess_dev/tools/known_failures.txt (ep_p, ur_b2; mj_g2 n/a).
 
 **Levels:** 5s move; 15s move; 30s move; 1m move; 2m move; 40 moves/1h50m; 40 moves/2.5h; 30 moves/3h
 

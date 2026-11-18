@@ -362,10 +362,15 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `senterp.lua`
 - retro.ini: elo 1660, levels 10, ponder/brain n
 
+**Test notes**
+
+- senterp, senterpc (newcrest/senterprise.cpp) \| 2026-11-18: after a soft reset (ucinewgame/FEN) the machine plays its 2 s power-on signal and ignores keys until ~2.8 s after the reset. setup_machine waited only 2 s, so with a non-default level (picochess .uci) the Level key landed but the square + 2nd Level press got lost -&gt; stuck in LEVEL mode, a + 2 LEDs lit (level a2 shown), next board press changed the level (end-user report). Fix: wait 3.5 s, press New Game (commented out since CB-Emu), wait 1 s, then level/style. Boot/New Game sounds are muted by design (init.lua runs setup unthrottled + mutes). Tested PC, Pi 5, DGTPi; uci_test known fails in known_failures.txt.
+
 **Levels:** 5s move; 10s move; 30s move; 1m move; 1m game; 3m game; 5m game; 10m game; 15m game; 40 moves/1.5h
 
 **Commits**
 
+- [092234f](https://github.com/RandyR99/chessengine/commit/092234f) 2026-11-18 chessengine: senterp/senterpc: wait for the power-on signal after a reset and press New Game before setting the level
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [f4afb96](https://github.com/RandyR99/chessengine/commit/f4afb96) 2026-10-13 chessengine: senterp/senterpc: new interfaces from CB-Emu MessChess, ported to MAME 0.289
@@ -380,10 +385,16 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 - interface `senterpc.lua` → `senterp.lua`
 - retro.ini: elo 1660, levels 10, ponder/brain n
 
+**Test notes**
+
+- senterpc (newcrest/senterprise.cpp) \| MAME layout bug: from 5193d37 (outputs scoped per device) the LCD digits stay blank in stock 0.289 builds; fixed upstream by our PR #16918 (02a19ba, merged 2026-11-18). Our mess builds since 2026-11-18 have it (PC, Pi 5, DGTPi; user uploaded them for self-update + new SD images). Blank senterpc display on a user system = old mess build.
+- senterp, senterpc (newcrest/senterprise.cpp) \| 2026-11-18: after a soft reset (ucinewgame/FEN) the machine plays its 2 s power-on signal and ignores keys until ~2.8 s after the reset. setup_machine waited only 2 s, so with a non-default level (picochess .uci) the Level key landed but the square + 2nd Level press got lost -&gt; stuck in LEVEL mode, a + 2 LEDs lit (level a2 shown), next board press changed the level (end-user report). Fix: wait 3.5 s, press New Game (commented out since CB-Emu), wait 1 s, then level/style. Boot/New Game sounds are muted by design (init.lua runs setup unthrottled + mutes). Tested PC, Pi 5, DGTPi; uci_test known fails in known_failures.txt.
+
 **Levels:** 5s move; 10s move; 30s move; 1m move; 1m game; 3m game; 5m game; 10m game; 15m game; 40 moves/1.5h
 
 **Commits**
 
+- [092234f](https://github.com/RandyR99/chessengine/commit/092234f) 2026-11-18 chessengine: senterp/senterpc: wait for the power-on signal after a reset and press New Game before setting the level
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
 - [f4afb96](https://github.com/RandyR99/chessengine/commit/f4afb96) 2026-10-13 chessengine: senterp/senterpc: new interfaces from CB-Emu MessChess, ported to MAME 0.289
 - [14de866](https://github.com/RandyR99/mame_for_picochess/commit/14de866) 2026-10-13 mame_for_picochess: newcrest: new engines, .uci levels from the level picker, retro.ini fixes

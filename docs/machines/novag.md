@@ -236,7 +236,6 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 <details><summary><code>robotadv</code> Novag Chess Robot Adversary</summary>
 
 - MAME set `robotadv` (Chess Robot Adversary), driver `novag/robotadv.cpp`
-- script runs `mess robotadv`
 - interface `robotadv.lua`
 - retro.ini: elo 1460, levels 6, ponder/brain n
 
@@ -246,6 +245,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [828964d](https://github.com/RandyR99/mame_for_picochess/commit/828964d) 2026-11-16 mame_for_picochess: robotadv: mechanical sounds in the headless engine too
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [c189a33](https://github.com/RandyR99/mame_for_picochess/commit/c189a33) 2026-10-27 mame_for_picochess: Revisit phase 2 step 1: 35 .uci files to conventions (Level n headings from PicoTimeControl, easiest to hardest within per-move/game/tournament groups, tourn…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'
