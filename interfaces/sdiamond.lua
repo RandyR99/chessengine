@@ -99,7 +99,8 @@ end
 function interface.setup_machine()
 	sb_reset_board(":board")
 	promcode = 0
---	send_input(":IN.2", 0x80, 0.5) -- New Game
+	emu.wait(3.5)	-- the power-on signal ends ~2.5 s after a reset; keys pressed before are lost
+	send_input(":IN.2", 0x80, 0.5) -- New Game
 	emu.wait(1)
 
 	interface.cur_level = "a1"
