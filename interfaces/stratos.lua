@@ -1,6 +1,7 @@
 interface = {}
 interface.info_every = 1 -- show_info only reads the display
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
+interface.no_soft_reset = true -- a MAME soft reset sometimes leaves the machine dead (all LEDs dark); setup_machine power-cycles it with STOP/GO instead
 
 -- read len bytes of a memory share (battery RAM) as a string
 local function ram_block(tag, offset, len)
@@ -114,11 +115,11 @@ function interface.setup_machine()
 	local throttled_state = machine.video.throttled
 	machine.video.throttled = false
 	interface.cold_boot()
+	emu.wait(10)	-- the power-on LED sweep runs ~10 s after the cold boot; New Game pressed before is lost
+	send_input(":IN.1", 0x04, 1)	-- New Game
+	emu.wait(2)
 	sb_reset_board(":board")
 	interface.invert = false
-	emu.wait(3)
-	send_input(":IN.1", 0x04, 1)	-- New Game
-	emu.wait(1)
 	machine.video.throttled = throttled_state
 	interface.cur_level = "a1"
 	interface.setlevel()
