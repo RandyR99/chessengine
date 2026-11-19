@@ -1,4 +1,5 @@
 interface = {}
+interface.no_soft_reset = true -- a soft reset resets the 6522 VIA with its IRQ asserted (MAME bug) -> hang; setup_machine presses New Game instead
 interface.setup_underpromotion = true -- the player's underpromotion goes in through the position setup
 interface.ignore_late_go = true -- replies on its own once the player's move is on the board
 
