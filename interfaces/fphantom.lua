@@ -136,8 +136,14 @@ function interface.setup_machine()
 	send_input(":IN.0", 0x004, 0.5) -- NEW / LEVEL
 	emu.wait(0.5)
 
-	-- The level keys (ending in CLEAR) also confirm NEW; the arm starts moving after this
-	interface.setlevel()
+	if interface.initial_boot then
+		-- The level keys (ending in CLEAR) also confirm NEW; the arm starts moving after this
+		interface.setlevel()
+	else
+		-- LEVEL + CLEAR confirm NEW and keep the level; the arm starts moving after this
+		send_input(":IN.0", 0x004, 0.5) -- LEVEL
+		send_input(":IN.0", 0x080, 0.5) -- CLEAR
+	end
 
 	if interface.initial_boot then
 		local throttled_state = machine.video.throttled
@@ -163,6 +169,12 @@ function interface.setup_machine()
 			sb_reset_board(":board:board")
 		end
 		machine.video.throttled = throttled_state
+		-- NEW keeps the level (manual 2.6). Level keys pressed while the arm is still
+		-- restoring the pieces (a level square that is empty then) leave the Phantom
+		-- unresponsive, so set the level only now and only when it was changed.
+		if interface.cur_level ~= interface.level then
+			interface.setlevel()
+		end
 	end
 end
 
