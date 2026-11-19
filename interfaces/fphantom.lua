@@ -309,15 +309,16 @@ function interface.is_selected(x, y)
 	local ram = cpu and cpu.spaces["program"]
 	if not ram then return false end
 
-	-- 'n x' (mate in x moves) needs CLEAR before the move is shown. Only clear it when a
-	-- number is on the display, so the checkmate display ('-n', no number) stays up.
+	-- 'n x' (mate in x moves) needs CLEAR before the move is shown, and so does a lone 'n'
+	-- (the machine mates with this move): without CLEAR the arm never makes the mating move.
+	-- The checkmate display '-n' (dash in digit 1) stays up.
 	local function digit(n)
 		return output_value("digit" .. n) & 0x7f  -- 0x80 = dot segment
 	end
 	local numerals = { [0x3f] = true, [0x06] = true, [0x5b] = true, [0x4f] = true, [0x66] = true,
 		[0x6d] = true, [0x7d] = true, [0x07] = true, [0x7f] = true, [0x6f] = true, [0x67] = true }
 
-	if (digit(2) == 0x54 and (numerals[digit(3)] or numerals[digit(4)])) then
+	if (digit(2) == 0x54 and (numerals[digit(3)] or numerals[digit(4)] or (digit(1) ~= 0x40 and digit(3) == 0))) then
 		send_input(":IN.0", 0x080, 0.5) -- CLEAR
 	end
 	
