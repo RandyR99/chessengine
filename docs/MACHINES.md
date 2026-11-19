@@ -1,6 +1,6 @@
 # MAME chess machines in picochess
 
-Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-18 from chessengine `092234f` and mame_for_picochess `fc18596`.
+Every machine in picochess `retro.ini` after the port of the chessengine interfaces to MAME 0.289: what works, known limits, levels, and the commits that reported each change. Generated 2026-11-19 from chessengine `8351cb4` and mame_for_picochess `fc18596`.
 
 | Machines | Interface files | MAME drivers | FEN setup | History replay | Live info | Ponder |
 |---:|---:|---:|---:|---:|---:|---:|

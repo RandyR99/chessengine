@@ -1123,6 +1123,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [8351cb4](https://github.com/RandyR99/chessengine/commit/8351cb4) 2026-11-19 chessengine: stratos: no MAME soft reset on ucinewgame, press New Game after the LED sweep
 - [9473ebb](https://github.com/RandyR99/chessengine/commit/9473ebb) 2026-10-31 chessengine: tking (tkinga, tkingb): Level option applied, info display selected in start_play, ver. D info display found by stepping
 - [542b983](https://github.com/RandyR99/chessengine/commit/542b983) 2026-10-30 chessengine: show_info: Novag, stratos and ccmk5 send only values read in the current search. sexperta/sfortea, nsnova/supremo and cfortea already read the score with the…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
@@ -1148,6 +1149,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [8351cb4](https://github.com/RandyR99/chessengine/commit/8351cb4) 2026-11-19 chessengine: stratos: no MAME soft reset on ucinewgame, press New Game after the LED sweep
 - [542b983](https://github.com/RandyR99/chessengine/commit/542b983) 2026-10-30 chessengine: show_info: Novag, stratos and ccmk5 send only values read in the current search. sexperta/sfortea, nsnova/supremo and cfortea already read the score with the…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
@@ -1226,6 +1228,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [8351cb4](https://github.com/RandyR99/chessengine/commit/8351cb4) 2026-11-19 chessengine: stratos: no MAME soft reset on ucinewgame, press New Game after the LED sweep
 - [9473ebb](https://github.com/RandyR99/chessengine/commit/9473ebb) 2026-10-31 chessengine: tking (tkinga, tkingb): Level option applied, info display selected in start_play, ver. D info display found by stepping
 - [542b983](https://github.com/RandyR99/chessengine/commit/542b983) 2026-10-30 chessengine: show_info: Novag, stratos and ccmk5 send only values read in the current search. sexperta/sfortea, nsnova/supremo and cfortea already read the score with the…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
@@ -1251,6 +1254,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [8351cb4](https://github.com/RandyR99/chessengine/commit/8351cb4) 2026-11-19 chessengine: stratos: no MAME soft reset on ucinewgame, press New Game after the LED sweep
 - [9473ebb](https://github.com/RandyR99/chessengine/commit/9473ebb) 2026-10-31 chessengine: tking (tkinga, tkingb): Level option applied, info display selected in start_play, ver. D info display found by stepping
 - [542b983](https://github.com/RandyR99/chessengine/commit/542b983) 2026-10-30 chessengine: show_info: Novag, stratos and ccmk5 send only values read in the current search. sexperta/sfortea, nsnova/supremo and cfortea already read the score with the…
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…

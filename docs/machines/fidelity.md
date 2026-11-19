@@ -345,6 +345,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [893b2e0](https://github.com/RandyR99/chessengine/commit/893b2e0) 2026-11-19 chessengine: fphantom: press CLEAR on the lone 'n' so the arm makes the mating move
+- [27e33f6](https://github.com/RandyR99/chessengine/commit/27e33f6) 2026-11-19 chessengine: fphantom: confirm NEW with LEVEL + CLEAR after a reset, set the level after the arm is done
 - [b61bde2](https://github.com/RandyR99/chessengine/commit/b61bde2) 2026-11-05 chessengine: fphantom, cphantom: wait for the power-on arm test to end
 - [021277d](https://github.com/RandyR99/chessengine/commit/021277d) 2026-11-01 chessengine: ucinewgame: skip the soft reset via interface.no_soft_reset instead of a name list
 - [b704aee](https://github.com/RandyR99/chessengine/commit/b704aee) 2026-10-29 chessengine: ignore_late_go for the Fidelity and H&amp;G interfaces (Phase 3 late-go check): 43 base interfaces (all 78 Fid/H&amp;G sets) plus premiere (own Vancouver interface).…

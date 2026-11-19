@@ -813,6 +813,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [d2ed8e9](https://github.com/RandyR99/chessengine/commit/d2ed8e9) 2026-11-19 chessengine: sdiamond: wait for the power-on signal after a reset and press New Game
 - [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [e98fc39](https://github.com/RandyR99/mame_for_picochess/commit/e98fc39) 2026-10-29 mame_for_picochess: retro.ini: ponder/brain = y for 32 sets measured to think on the player's time (Phase 3 ponder check, RAM activity during the player's turn from a non-book p…
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
@@ -837,6 +838,8 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [d2ed8e9](https://github.com/RandyR99/chessengine/commit/d2ed8e9) 2026-11-19 chessengine: sdiamond: wait for the power-on signal after a reset and press New Game
+- [037d3fe](https://github.com/RandyR99/chessengine/commit/037d3fe) 2026-11-19 chessengine: diamond2: wait for the power-on signal after a reset and press New Game
 - [d24b7b9](https://github.com/RandyR99/chessengine/commit/d24b7b9) 2026-11-07 chessengine: show_info from the rotating search displays (Novag, Saitek, feagv)
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'

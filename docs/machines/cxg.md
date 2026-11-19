@@ -370,6 +370,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [241a813](https://github.com/RandyR99/chessengine/commit/241a813) 2026-11-18 chessengine: docs: rebuild for the senterp/senterpc new-game fix
 - [092234f](https://github.com/RandyR99/chessengine/commit/092234f) 2026-11-18 chessengine: senterp/senterpc: wait for the power-on signal after a reset and press New Game before setting the level
 - [af6cb5a](https://github.com/RandyR99/chessengine/commit/af6cb5a) 2026-10-28 chessengine: ignore_late_go for 100 interfaces (Phase 3 late-go check): these machines answer the player's move on their own, so a 'go' that arrives after the reply must…
 - [e2aa330](https://github.com/RandyR99/mame_for_picochess/commit/e2aa330) 2026-10-20 mame_for_picochess: uci: tournament headings as '40 moves/2h' instead of '40 moves in 2h'

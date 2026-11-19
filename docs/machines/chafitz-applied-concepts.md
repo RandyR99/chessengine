@@ -289,6 +289,7 @@ MAME chess machines in picochess, part of the [machine overview](../MACHINES.md)
 
 **Commits**
 
+- [164beef](https://github.com/RandyR99/chessengine/commit/164beef) 2026-11-19 chessengine: arb_sargon25: no MAME soft reset on ucinewgame (6522 VIA IRQ hang)
 - [fc18596](https://github.com/RandyR99/mame_for_picochess/commit/fc18596) 2026-11-16 mame_for_picochess: Ignore Python caches; README: folders in list zips only where names clash
 - [0d5650f](https://github.com/RandyR99/chessengine/commit/0d5650f) 2026-11-05 chessengine: docs: rebuild for the arb module artwork and labels
 - [993d593](https://github.com/RandyR99/mame_for_picochess/commit/993d593) 2026-11-05 mame_for_picochess: arb modules: own artwork in the _art scripts, arb_gms3 level labels
