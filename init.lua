@@ -796,6 +796,30 @@ local function send_options()
   end
 end
 
+-- views MAME generates for a screen, without artwork: "Screen 0 Standard (4:3)", "Screen 0 Pixel Aspect (4:3)"
+local function is_plain_screen(view_name)
+  return view_name:match("^Screen %d+ Standard ") ~= nil or view_name:match("^Screen %d+ Pixel Aspect ") ~= nil
+end
+
+-- the next artwork view in the visible window; MAME saves the view in the machine's cfg file when it exits
+local function next_view()
+  for _, target in pairs(manager.machine.render.targets) do
+    if not target.hidden then
+      local names = target.view_names
+      local count = #names
+      local index = target.view_index
+      for _ = 1, count - 1 do
+        index = index % count + 1
+        if not is_plain_screen(names[index]) then
+          target.view_index = index
+          return
+        end
+      end
+      return
+    end
+  end
+end
+
 local function set_option(name, value)
   if (name == nil or value == nil) then
     return
@@ -812,6 +836,10 @@ local function set_option(name, value)
     else
       manager.machine.video.throttled = true
       manager.machine.video.throttle_rate = speed / 100.0
+    end
+  elseif (string.lower(name) == "view") then
+    if string.lower(value) == "next" then
+      next_view()
     end
   elseif (interface.set_option) then
     interface.set_option(string.lower(name), value)
