@@ -36,7 +36,9 @@ The same overview as an interactive page, with search and filters: **[MAME Chess
 
 ## Writing an interface
 
-An interface is a Lua file that returns a table of functions. The main hooks are `setup_machine`, `start_play`, `is_selected` and `select_piece` (reading and entering moves), `set_pos` (FEN setup), `edit_game` (history replay), the promotion functions, `setlevel`/`get_options`/`set_option`, and optionally `show_info`, `game_over`, `resigned` and the `ignore_late_go` flag. See [docs/MACHINES.md](docs/MACHINES.md#plugin-core-initlua) for what each one does, and the interfaces of similar machines for examples. Interfaces run in a sandbox with `machine`, `emu`, `send_input`, the `sb_*` sensor-board helpers, `pairs`, `ipairs`, `string` and `math`, but no `table`, `os` or `io`.
+An interface is a Lua file that returns a table of functions. The main hooks are `setup_machine`, `start_play`, `is_selected` and `select_piece` (reading and entering moves), `set_pos` (FEN setup), `edit_game` (history replay), the promotion functions, `setlevel`/`get_options`/`set_option`, and optionally `show_info`, `game_over`, `resigned` and the `ignore_late_go` flag. See [docs/MACHINES.md](docs/MACHINES.md#plugin-core-initlua) for what each one does, and the interfaces of similar machines for examples. Interfaces run in a sandbox with `machine`, `emu`, `send_input`, the `sb_*` sensor-board helpers, `accelerate_move_input`, `pairs`, `ipairs`, `string` and `math`, but no `table`, `os` or `io`.
+
+With artwork and sound on, the plugin enters the player's move at real time, so the machine's beeps or speech can be heard. Headless runs, `-sound none` and history replays keep the fast entry. An interface that speeds up its own key sequences calls `accelerate_move_input()` instead of setting `machine.video.throttled = false`, so a real-time move stays at real time.
 
 ## Credits
 

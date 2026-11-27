@@ -135,7 +135,7 @@ end
 function interface.select_piece(x, y, event)
 	if interface.edit then
 		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
+		accelerate_move_input()
 		if event == "get" or event == "get_castling" then
 			lastx = x
 			lasty = y

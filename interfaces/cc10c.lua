@@ -31,7 +31,7 @@ function interface.setlevel()
 	interface.cur_level = interface.level
 	local lcd_num = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x3f }
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	-- CL steps through the levels, digit3 shows the level number
 	for i = 1, 20 do
 		send_input(":IN.1", 0x04, 0.5) -- CL
@@ -140,7 +140,7 @@ end
 -- only moves after a player move, so the player's move (or a trigger move) is entered last
 local function sync(mc, move)
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	interface.invert = (mc == 1) -- the machine always plays the pieces moving down the board
 	send_input(":RESET", 0x01, 0.5) -- RE
 	emu.wait(1.0)

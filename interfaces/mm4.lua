@@ -196,7 +196,7 @@ end
 
 function interface.promote(x, y, piece)
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	sb_promote(":board:board", x, y, piece)
 	if     (piece == "q") then send_input(":KEY.1", 0x01, 1)
 	elseif (piece == "r") then send_input(":KEY.1", 0x80, 1)

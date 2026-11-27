@@ -178,7 +178,7 @@ function interface.select_piece(x, y, event)
 		interface.last_get = {x=x, y=y}
 	elseif (event == "put" and interface.turn) then
 		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
+		accelerate_move_input()
 		local move_type = get_move_type(interface.last_get.x, interface.last_get.y, x, y)
 		if (move_type == "castling") then
 			local pos
@@ -244,7 +244,7 @@ end
 function interface.promote(x, y, piece)
 	if (piece == "q" or piece == "r" or piece == "b" or piece == "n") then
 		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
+		accelerate_move_input()
 		send_input(":IN.1", 0x01, 0.5) -- IP
 		local p = get_piece_id(x,y)
 		if (interface.invert) then

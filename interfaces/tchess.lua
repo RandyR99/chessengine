@@ -184,7 +184,7 @@ end
 
 function interface.select_piece(x, y, event)
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	if (event == "get" and interface.turn) then
 		interface.last_get = {x = x, y = y}
 	elseif (event == "put" and interface.turn) then
@@ -251,7 +251,7 @@ end
 function interface.promote(x, y, piece)
 	if (piece == "q" or piece == "r" or piece == "b" or piece == "n") then
 		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
+		accelerate_move_input()
 		send_input(":IN.0", 0x08, 0.5) -- EP
 		if get_piece_id(x, y) > 0 then
 			if     (piece == "q") then send_input(":IN.1", 0x04, 0.5)

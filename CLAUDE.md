@@ -19,8 +19,9 @@ Related repos:
 
 - Commit and push only after the maintainer's OK. Work one MAME driver (`.cpp`) at a time, with one commit per driver. Docs rebuilds go in their own commit.
 - LF line endings, UTF-8, English identifiers.
-- Interfaces run in a sandbox: `machine`, `emu`, `send_input`, the `sb_*` sensor-board helpers, `pairs`, `ipairs`, `string`, `math`. There is no `table`, `os`, `io` or `manager` (use `machine`, e.g. `machine.time:as_double()`).
+- Interfaces run in a sandbox: `machine`, `emu`, `send_input`, the `sb_*` sensor-board helpers, `accelerate_move_input`, `pairs`, `ipairs`, `string`, `math`. There is no `table`, `os`, `io` or `manager` (use `machine`, e.g. `machine.time:as_double()`).
 - MAME Lua API: read outputs with `machine.devices[":"]:output(name):get()` (wrap it in a local helper such as `led_on()` or `digit()`), and read RAM through the CPU program space (`machine.devices[":maincpu"].spaces["program"]:read_u8(addr)`). Don't use `output:get_value` or `emu.item`.
+- To speed up key sequences, call `accelerate_move_input()` rather than `machine.video.throttled = false` (it keeps a player's move at real time when artwork and sound are on). Restore the saved throttle state afterwards as before.
 - Syntax check: `luac5.4 -p init.lua interfaces/*.lua`.
 - Check each change against the machine's original manual: levels, setup, castling and promotion rules.
 

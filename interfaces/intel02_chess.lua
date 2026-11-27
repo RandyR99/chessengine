@@ -107,7 +107,7 @@ end
 
 function interface.select_piece(x, y, event)
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	if (event == "get" and interface.turn) then
 		interface.last_get = {x=x, y=y}
 	elseif (event == "put" and interface.turn) then

@@ -144,7 +144,7 @@ end
 function interface.select_piece(x, y, event)
 	if interface.edit then
 		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
+		accelerate_move_input()
 		if event == "get" or event == "get_castling" then
 			lastx = x
 			lasty = y
@@ -222,7 +222,7 @@ end
 
 function interface.promote(x, y, piece)
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	sb_promote(":board", x, y, piece)
 	if interface.edit then
 		sb_select_piece(":board", 1, x, y, "get")

@@ -130,7 +130,7 @@ end
 function interface.select_piece(x, y, event)
 	if (event ~= "capture" and event ~= "get_castling" and event ~= "put_castling" and event ~= "en_passant") then
 		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
+		accelerate_move_input()
 		if (interface.turn) then
 			interface.send_pos(x)
 			interface.send_pos(y)

@@ -135,7 +135,7 @@ function interface.select_piece(x, y, event)
 		interface.last_get = {x=x, y=y}
 	elseif (event == "put") then
 		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
+		accelerate_move_input()
 		local move_type = get_move_type(interface.last_get.x, interface.last_get.y, x, y)
 		sb_select_piece(":board", 1, interface.last_get.x, interface.last_get.y, "get")
 		sb_select_piece(":board", 1, x, y, "put")

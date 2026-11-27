@@ -247,7 +247,7 @@ function interface.select_piece(x, y, event)
 		interface.last_get = {x=x, y=y}
 	elseif (event == "put" and interface.turn) then
 		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
+		accelerate_move_input()
 		local g = interface.last_get
 		enter_move({ fx = g.x, fy = g.y, tx = x, ty = y, type = get_move_type(g.x, g.y, x, y) }, false)
 		interface.last_get = nil

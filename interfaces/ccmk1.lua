@@ -171,7 +171,7 @@ end
 
 function interface.select_piece(x, y, event)
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	if interface.set_color == -1 then
 		invert_pos()
 		interface.set_color = 0
@@ -244,7 +244,7 @@ end
 function interface.promote(x, y, piece)
 	if (piece == "q" or piece == "r" or piece == "b" or piece == "n") then
 		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
+		accelerate_move_input()
 		send_input(":IN.3", 0x01, 0.5) -- ep
 		local p = get_piece_id(x,y)
 		if (interface.invert) then

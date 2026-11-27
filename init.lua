@@ -43,6 +43,7 @@ local prev_move = nil
 local moved_since_position = false -- the machine sent a bestmove after the last "position" command
 local game_over_sent = false -- "bestmove 0000" was sent for the machine's resignation or draw claim
 local edit_open = false -- a replayed history left the machine in edit mode until the next 'go' (Set Pos)
+local realtime_move_input = false -- the player's move is being entered at real time (artwork with sound)
 local resigned = false       -- the machine resigned together with its move (interface.resigned()); answered on its next turn
 local pos_count = {}         -- occurrences of each position (board + side to move) in this game, for threefold repetition
 local turn_since = nil       -- emulated time when the machine's current turn began
@@ -660,6 +661,38 @@ local function make_move(move, reason, promotion)
   end
 end
 
+-- interfaces call this instead of unthrottling the machine themselves,
+-- so a player's move entered at real time stays at real time
+local function accelerate_move_input()
+  if not realtime_move_input then
+    manager.machine.video.throttled = false
+  end
+end
+
+-- With artwork and sound, enter the player's move at real time, so the machine's
+-- key and square beeps (or speech) can be heard. Unthrottled, MAME drops that sound.
+-- Headless runs, -sound none and history replays keep the fast entry.
+local function enter_player_move(move)
+  local options = manager.options.entries
+  if edit_open or options["video"]:value() == "none" or options["sound"]:value() == "none" then
+    return make_move(move, "", true)
+  end
+
+  local video = manager.machine.video
+  local was_throttled, previous_rate = video.throttled, video.throttle_rate
+  -- The throttle rate multiplies MAME's startup speed factor (per mille).
+  video.throttle_rate = 1000 / video.speed_factor
+  video.throttled = true
+  realtime_move_input = true
+  local ok, err = pcall(make_move, move, "", true)
+  realtime_move_input = false
+  video.throttle_rate = previous_rate
+  video.throttled = was_throttled
+  if not ok then
+    error(err, 0)
+  end
+end
+
 local function search_selected_piece()
   local active_fpos = 0
   local active_tpos = 0
@@ -1156,7 +1189,7 @@ function execute_uci_command(cmd)
       if move_delay > 0 then
         emu.wait(move_delay*math.random())
       end
-      make_move(last_move, "", true)
+      enter_player_move(last_move)
       lastpos = lastpos .. " " .. last_move
       piece_from = nil
       piece_to = nil
@@ -1308,6 +1341,7 @@ local function load_interface(name)
   local env = { machine = manager.machine, send_input = send_input, get_piece_id = get_piece_id, output = manager.machine.output, ioport = manager.machine.ioport, get_move_type = get_move_type, load_interface = load_interface, emu = emu,
       sb_select_piece = sb_select_piece, sb_move_piece = sb_move_piece, sb_press_square = sb_press_square, sb_promote = sb_promote, promotion_error = promotion_error,
       sb_remove_piece = sb_remove_piece, sb_clear_board = sb_clear_board, sb_reset_board = sb_reset_board, sb_rotate_board = sb_rotate_board, sb_set_ui = sb_set_ui,
+      accelerate_move_input = accelerate_move_input,
       pairs = pairs, ipairs = ipairs, tostring = tostring, tonumber = tonumber, string = string, math = math, print = _G.print }
 
   local func = loadfile(plugin_path .. "/interfaces/" .. name .. ".lua", "t", env)

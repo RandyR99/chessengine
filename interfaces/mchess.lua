@@ -176,7 +176,7 @@ end
 
 function interface.select_piece(x, y, event)
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	if (interface.turn) then
 		if (event == "get" or event == "put") then
 			if (event == "get") then
@@ -246,7 +246,7 @@ function interface.promote(x, y, piece)
 		return
 	end
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	if y == 1 then
 		code = code + 0x08 -- black
 	end

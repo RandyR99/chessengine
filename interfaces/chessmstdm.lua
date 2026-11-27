@@ -202,7 +202,7 @@ end
 
 function interface.promote(x, y, piece)
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	sb_promote(":board", x, y, piece)
 	local right = -1
 	if     (piece == "q") then right = 0

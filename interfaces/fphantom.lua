@@ -494,7 +494,7 @@ function interface.promote(x, y, piece)
 	-- Arm the isolation thread shield
 	interface.promotion_active = true
 	local original_throttle = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 
 	-- After a capture the arm centers the captured piece in its border space, and
 	-- presses made while it moves are ignored

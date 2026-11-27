@@ -160,7 +160,7 @@ end
 
 function interface.select_piece(x, y, event)
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	if event == "put" then
 		interface.stm = other(interface.stm)
 	end

@@ -175,7 +175,7 @@ end
 
 function interface.promote(x, y, piece)
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	sb_promote(":board:board", x, y, piece)
 	-- wait for the 'Pr' prompt: ver. A shows it ~4 s after the pawn move, earlier key presses are lost
 	for i = 1, 40 do

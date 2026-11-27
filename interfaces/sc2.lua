@@ -34,7 +34,7 @@ function interface.setlevel()
 	end
 	interface.cur_level = interface.level
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	local lcd_num = { 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x3f }
 	send_input(":IN.0", 0x04, 0.5) -- L (Clear)
 	local tries = 0
@@ -159,7 +159,7 @@ local function setup_board(machine_first)
 	end
 
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	send_input(":IN.3", 0x04, 1) -- R (Reset)
 	emu.wait(1)
 	interface.cur_level = -1
@@ -266,7 +266,7 @@ function interface.select_piece(x, y, event)
 			y = 9 - y
 		end
 		local throttled_state = machine.video.throttled
-		machine.video.throttled = false
+		accelerate_move_input()
 		if (interface.turn) then
 			interface.send_pos(x)
 			interface.send_pos(y)

@@ -208,7 +208,7 @@ function interface.select_piece(x, y, event)
 	if (interface.turn or interface.edit) then
 		if (event == "get" or event == "put") then
 			local throttled_state = machine.video.throttled
-			machine.video.throttled = false
+			accelerate_move_input()
 			if (event == "get") then
 				lastx = 1
 				lasty = inity

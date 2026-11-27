@@ -159,7 +159,7 @@ end
 
 function interface.select_piece(x, y, event)
 	local throttled_state = machine.video.throttled
-	machine.video.throttled = false
+	accelerate_move_input()
 	if (ioport.ports[":IN.5"]:read() == 0x01) then
 		if (event == "get_castling" or event == "en_passant" or event == "capture") then
 			emu.wait(1)
